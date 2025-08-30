@@ -1250,7 +1250,8 @@ def add_line_item(invoice_id):
         serial_item.customer_code = request.args.get('cusCode', '')
         serial_item.validation_status = validation_status
         serial_item.validation_error = validation_error
-        
+        serial_item.bpl_id=validation_result.get('BPLid', '')
+        serial_item.bpl_name=validation_result.get('BPLName','')
         db.session.add(serial_item)
         
         # CUSTOMER CODE FREEZE LOGIC - once any line items exist, customer cannot be changed
@@ -1533,8 +1534,8 @@ def qc_approve_invoice(invoice_id):
         sap_invoice_data = generate_sap_invoice_json(invoice)
         
         # Add BPL_IDAssignedToInvoice as required for QC approval
-        sap_invoice_data['BPL_IDAssignedToInvoice'] = 5  # ORD-CHENNAI branch
-        sap_invoice_data['BPLName'] = 'ORD-CHENNAI'
+        # sap_invoice_data['BPL_IDAssignedToInvoice'] = 5  # ORD-CHENNAI branch
+        # sap_invoice_data['BPLName'] = 'ORD-CHENNAI'
         
         print(f"QC Approved Invoice JSON: {sap_invoice_data}")
         # Post to SAP B1
@@ -1661,8 +1662,8 @@ def generate_sap_invoice_json(invoice):
         sap_invoice = {
             'DocDate': datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'DocDueDate': (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-            'BPL_IDAssignedToInvoice': getattr(invoice, 'bpl_id', 5),  # Default to 5 if not set
-            'BPLName': getattr(invoice, 'bpl_name', 'ORD-CHENNAI'),
+            'BPL_IDAssignedToInvoice': serial_item.bpl_id,#getattr(invoice, 'bpl_id', 5),  # Default to 5 if not set
+            'BPLName': serial_item.bpl_name,#getattr(invoice, 'bpl_name', 'ORD-CHENNAI'),
             'CardCode': invoice.customer_code,
             'DocumentLines': document_lines
         }

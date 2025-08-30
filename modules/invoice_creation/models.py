@@ -68,6 +68,8 @@ class InvoiceSerialNumber(db.Model):
     warehouse_code = db.Column(db.String(10))  # From SAP validation
     customer_code = db.Column(db.String(20))  # Auto-populated from SAP validation
     customer_name = db.Column(db.String(100))  # Auto-populated from SAP validation
+    bpl_id = db.Column(db.Integer, default=5)  # BPL_IDAssignedToInvoice for SAP B1
+    bpl_name = db.Column(db.String(100))  # Branch/Location name
     base_line_number = db.Column(db.Integer, default=0)
     quantity = db.Column(db.Numeric(15, 3), default=1.0)
     validation_status = db.Column(db.String(20), default='pending')  # pending, validated, failed

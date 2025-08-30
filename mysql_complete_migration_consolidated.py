@@ -236,6 +236,8 @@ class ConsolidatedMySQLMigration:
                     customer_name VARCHAR(100),
                     base_line_number INT DEFAULT 0,
                     quantity DECIMAL(15,3) DEFAULT 1.0,
+                    bpl_id VARCHAR(100),
+                    bpl_name VARCHAR(150),
                     validation_status VARCHAR(20) DEFAULT 'pending',
                     validation_error TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
