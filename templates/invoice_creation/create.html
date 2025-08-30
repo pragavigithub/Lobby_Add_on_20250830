@@ -239,7 +239,12 @@ function initializeInvoiceCreation() {
     // Note: Draft invoice will be created only when first line item is added
 
     // Load business partners on page load
-    loadBusinessPartners();\n    \n    // Check if this is an edit request\n    {% if edit_invoice %}\n        loadEditInvoiceData();\n    {% endif %}
+    loadBusinessPartners();
+    
+    // Check if this is an edit request
+    {% if edit_invoice %}
+        loadEditInvoiceData();
+    {% endif %}
 
     // Event handlers
     $('#serialNumberInput').on('keydown', function(e) {
@@ -533,11 +538,21 @@ function loadBusinessPartners() {
                     console.log('Loaded', response.business_partners.length, 'business partners');
                 } else {
                     console.warn('SAP B1 unavailable - using offline mode');
+                    // Add fallback customers for offline mode
+                    customerSelect.append('<option value="C20000">C20000 - Demo Customer</option>');
+                    customerSelect.append('<option value="C20001">C20001 - Test Customer</option>');
+                    customerSelect.append('<option value="C20002">C20002 - Sample Customer</option>');
                 }
             },
             error: function(xhr, status, error) {
                 console.warn('Business partners API error:', error);
-                console.log('Running in offline mode - no fallback needed, handled by server');
+                console.log('Running in offline mode - adding fallback customers');
+                
+                // Add fallback customers for offline mode
+                let customerSelect = $('#customerCode');
+                customerSelect.append('<option value="C20000">C20000 - Demo Customer</option>');
+                customerSelect.append('<option value="C20001">C20001 - Test Customer</option>');
+                customerSelect.append('<option value="C20002">C20002 - Sample Customer</option>');
             }
         });
     }
@@ -557,8 +572,10 @@ function loadBusinessPartners() {
         $.ajax({
             url: '/invoice_creation/api/validate-serial-number',
             method: 'GET',
-            data: { serial_number: serialNumber,
-             cusCode:customerCodes},
+            data: { 
+                serial_number: serialNumber,
+                cusCode: customerCodes
+            },
             timeout: 15000,
             xhrFields: {
                 withCredentials: true
@@ -614,15 +631,21 @@ function loadBusinessPartners() {
                 
                 // Try to use fallback data for demo
                 window.currentSerialData = {
-
+                    itemCode: 'IP294',
+                    itemName: 'Fallback Demo Item',
+                    whsCode: '01',
+                    whsName: 'Main Warehouse',
+                    CardCode: 'C20000',
+                    CardName: 'Demo Customer',
+                    serialNumber: serialNumber
                 };
                 
                 // Auto-fill customer with fallback data
                 let customerSelect = $('#customerCode');
-                if (customerSelect.find('option[value=""]').length === 0) {
-                    customerSelect.append('<option value=""></option>');
+                if (customerSelect.find('option[value="C20000"]').length === 0) {
+                    customerSelect.append('<option value="C20000">C20000 - Demo Customer</option>');
                 }
-                customerSelect.val('');
+                customerSelect.val('C20000');
                 
                 showTemporaryMessage('🔄 Using offline mode. Press Enter to add item.', 'info');
             }
@@ -669,7 +692,7 @@ function loadBusinessPartners() {
 
         const addData = {
             serial_number: serialNumber,
-            custCode:cusCode
+            custCode: cusCode
         };
 
         console.log('📤 Adding serial item with data:', addData);
