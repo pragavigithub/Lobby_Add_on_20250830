@@ -1150,7 +1150,7 @@ def add_line_item(invoice_id):
             return jsonify({'success': False, 'error': 'Access denied'}), 403
         
         if invoice.status not in ['draft', 'pending_qc']:
-            return jsonify({'success': False, 'error': 'Cannot add items to this invoice status'}), 400
+            return jsonify({'success': False, 'error': 'Cannot add items to finalized invoice. Document is locked after QC approval.'}), 400
         
         # Get form data (support both JSON and form data)
         if request.is_json:
@@ -1316,7 +1316,7 @@ def remove_line_item(invoice_id, item_id):
             return jsonify({'success': False, 'error': 'Access denied'}), 403
         
         if invoice.status not in ['draft', 'pending_qc']:
-            return jsonify({'success': False, 'error': 'Cannot remove items from this invoice status'}), 400
+            return jsonify({'success': False, 'error': 'Cannot remove items from finalized invoice. Document is locked after QC approval.'}), 400
         
         # Find and delete the serial item
         serial_item = InvoiceSerialNumber.query.get_or_404(item_id)
@@ -1590,18 +1590,18 @@ def qc_reject_invoice(invoice_id):
         data = request.get_json()
         rejection_reason = data.get('rejection_reason', 'No reason provided')
         
-        # Update invoice status
-        invoice.status = 'rejected'
+        # Update invoice status back to draft for re-editing
+        invoice.status = 'draft'
         invoice.notes = f"Rejected by QC: {rejection_reason}"
         invoice.updated_at = datetime.utcnow()
         
         db.session.commit()
         
-        logging.info(f"✅ Invoice {invoice.id} rejected by QC. Reason: {rejection_reason}")
+        logging.info(f"✅ Invoice {invoice.id} rejected by QC and returned to draft for editing. Reason: {rejection_reason}")
         
         return jsonify({
             'success': True,
-            'message': 'Invoice rejected successfully'
+            'message': 'Invoice rejected and returned to draft mode for editing'
         })
         
     except Exception as e:
@@ -1661,7 +1661,7 @@ def generate_sap_invoice_json(invoice):
         # Generate SAP B1 Invoice JSON
         sap_invoice = {
             'DocDate': datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-            "U_EA_CREATEDBy": current_user.username,
+            "U_EA_CREATEDBy": invoice.user.username,
             "U_EA_Approved": current_user.username,
             'DocDueDate': (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'BPL_IDAssignedToInvoice': serial_item.bpl_id,#getattr(invoice, 'bpl_id', 5),  # Default to 5 if not set

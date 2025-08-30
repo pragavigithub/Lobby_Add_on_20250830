@@ -1035,7 +1035,9 @@ class SAPIntegration:
 
         transfer_data = {
             "DocDate": datetime.now().strftime('%Y-%m-%d'),
-            "Comments": f"Serial Item Transfer {transfer_document.transfer_number} - {transfer_document.qc_approver.username if transfer_document.qc_approver else 'System'}",
+            "U_EA_CREATEDBy": transfer_document.user.username,
+            "U_EA_Approved": transfer_document.qc_approver.username if transfer_document.qc_approver else transfer_document.user.username,
+            "Comments": f"Serial Item Transfer {transfer_document.transfer_number} - Created by {transfer_document.user.username}, Approved by {transfer_document.qc_approver.username if transfer_document.qc_approver else 'System'}",
             "FromWarehouse": transfer_document.from_warehouse,
             "ToWarehouse": transfer_document.to_warehouse,
             "StockTransferLines": stock_transfer_lines
@@ -2755,8 +2757,8 @@ class SAPIntegration:
                 "CardCode": "",
                 "CardName": "",
                 "Address": "",
-                "U_EA_CREATEDBy":serial_transfer_document.user.username,
-                "U_EA_Approved" : serial_transfer_document.user.username,
+                "U_EA_CREATEDBy": serial_transfer_document.user.username,
+                "U_EA_Approved": serial_transfer_document.qc_approver.username if serial_transfer_document.qc_approver else serial_transfer_document.user.username,
                 "Comments": f"Serial Number Transfer {serial_transfer_document.transfer_number} - {serial_transfer_document.user.username if serial_transfer_document.user else 'System'}",
                 "JournalMemo": f"Serial Number Transfer - {serial_transfer_document.transfer_number}",
                 "PriceList": -1,
