@@ -173,6 +173,8 @@ class ConsolidatedMySQLMigration:
                     branch_name VARCHAR(100),
                     user_id INT NOT NULL,
                     status VARCHAR(20) DEFAULT 'draft',
+                    bpl_id INT DEFAULT 5,
+                    bpl_name VARCHAR(100) DEFAULT 'ORD-CHENNAI',
                     doc_date DATE,
                     due_date DATE,
                     total_amount DECIMAL(15,2),

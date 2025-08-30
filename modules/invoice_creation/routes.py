@@ -166,29 +166,27 @@ def create():
                     db.session.add(serial_lookup)
                     
                     # Create invoice line
-                    invoice_line = InvoiceLine(
-                        invoice_id=invoice.id,
-                        line_number=line_number,
-                        item_code=item_data.get('item_code', 'UNKNOWN'),
-                        item_description=item_data.get('item_name', 'Unknown Item'),
-                        quantity=1.0,
-                        warehouse_code=item_data.get('warehouse', ''),
-                        tax_code='IGST0'
-                    )
+                    invoice_line = InvoiceLine()
+                    invoice_line.invoice_id = invoice.id
+                    invoice_line.line_number = line_number
+                    invoice_line.item_code = item_data.get('item_code', 'UNKNOWN')
+                    invoice_line.item_description = item_data.get('item_name', 'Unknown Item')
+                    invoice_line.quantity = 1.0
+                    invoice_line.warehouse_code = item_data.get('warehouse', '')
+                    invoice_line.tax_code = 'IGST0'
                     db.session.add(invoice_line)
                     db.session.flush()  # Get the line ID
                     
                     # Create serial number record
-                    serial_item = InvoiceSerialNumber(
-                        invoice_line_id=invoice_line.id,
-                        serial_number=item_data.get('serial_number'),
-                        item_code=item_data.get('item_code', 'UNKNOWN'),
-                        item_description=item_data.get('item_name', 'Unknown Item'),
-                        warehouse_code=item_data.get('warehouse', ''),
-                        customer_code=customer_code,
-                        quantity=1.0,
-                        validation_status='validated'
-                    )
+                    serial_item = InvoiceSerialNumber()
+                    serial_item.invoice_line_id = invoice_line.id
+                    serial_item.serial_number = item_data.get('serial_number')
+                    serial_item.item_code = item_data.get('item_code', 'UNKNOWN')
+                    serial_item.item_description = item_data.get('item_name', 'Unknown Item')
+                    serial_item.warehouse_code = item_data.get('warehouse', '')
+                    serial_item.customer_code = customer_code
+                    serial_item.quantity = 1.0
+                    serial_item.validation_status = 'validated'
                     db.session.add(serial_item)
                     line_number += 1
                 
@@ -822,16 +820,15 @@ def create_invoice_ajax():
         # Create invoice document in local database
         invoice_number = generate_invoice_number()
         
-        invoice_doc = InvoiceDocument(
-            invoice_number=invoice_number,
-            customer_code=customer_code,
-            customer_name=data.get('customer_name', ''),
-            user_id=current_user.id,
-            status='pending_qc',
-            doc_date=datetime.strptime(invoice_date, '%Y-%m-%d').date(),
-            branch_id=current_user.branch_id,
-            branch_name=current_user.branch_name
-        )
+        invoice_doc = InvoiceDocument()
+        invoice_doc.invoice_number = invoice_number
+        invoice_doc.customer_code = customer_code
+        invoice_doc.customer_name = data.get('customer_name', '')
+        invoice_doc.user_id = current_user.id
+        invoice_doc.status = 'pending_qc'
+        invoice_doc.doc_date = datetime.strptime(invoice_date, '%Y-%m-%d').date()
+        invoice_doc.branch_id = current_user.branch_id
+        invoice_doc.branch_name = current_user.branch_name
         
         db.session.add(invoice_doc)
         db.session.flush()  # Get the ID
@@ -840,27 +837,25 @@ def create_invoice_ajax():
         line_number = 1
         for item in serial_items:
             # Create invoice line
-            invoice_line = InvoiceLine(
-                invoice_id=invoice_doc.id,
-                line_number=line_number,
-                item_code=item.get('item_code'),
-                item_description=item.get('item_name'),
-                quantity=item.get('quantity', 1),
-                warehouse_code=item.get('warehouse'),
-                unit_price=0.00,  # Will be updated when posted to SAP
-                line_total=0.00
-            )
+            invoice_line = InvoiceLine()
+            invoice_line.invoice_id = invoice_doc.id
+            invoice_line.line_number = line_number
+            invoice_line.item_code = item.get('item_code')
+            invoice_line.item_description = item.get('item_name')
+            invoice_line.quantity = item.get('quantity', 1)
+            invoice_line.warehouse_code = item.get('warehouse')
+            invoice_line.unit_price = 0.00  # Will be updated when posted to SAP
+            invoice_line.line_total = 0.00
             
             db.session.add(invoice_line)
             db.session.flush()  # Get the line ID
             
             # Add serial number
-            serial_number = InvoiceSerialNumber(
-                invoice_line_id=invoice_line.id,
-                serial_number=item.get('serial_number'),
-                item_code=item.get('item_code'),
-                warehouse_code=item.get('warehouse')
-            )
+            serial_number = InvoiceSerialNumber()
+            serial_number.invoice_line_id = invoice_line.id
+            serial_number.serial_number = item.get('serial_number')
+            serial_number.item_code = item.get('item_code')
+            serial_number.warehouse_code = item.get('warehouse')
             
             db.session.add(serial_number)
             line_number += 1
@@ -1019,7 +1014,7 @@ def add_serial_item():
                     url = f"{sap.base_url}/b1s/v1/SQLQueries('Invoice_creation')/List"
                     payload = {"ParamList": f"serial_number='{serial_number}'"}
                     
-                    response = requests.post(url, json=payload, headers=sap.headers, verify=False, timeout=15)
+                    response = sap.session.post(url, json=payload, timeout=15)
                     
                     if response.status_code == 200:
                         results = response.json().get('value', [])
@@ -1231,40 +1226,50 @@ def add_line_item(invoice_id):
         next_line_number = (max_line or 0) + 1
         
         # Create invoice line
-        invoice_line = InvoiceLine(
-            invoice_id=invoice.id,
-            line_number=next_line_number,
-            item_code=validation_result.get('ItemCode', 'UNKNOWN'),
-            item_description=validation_result.get('itemName', validation_result.get('ItemName', 'Unknown Item')),
-            quantity=1.0,
-            warehouse_code=validation_result.get('WhsCode', ''),
-            warehouse_name=validation_result.get('WhsName', ''),
-        )
+        invoice_line = InvoiceLine()
+        invoice_line.invoice_id = invoice.id
+        invoice_line.line_number = next_line_number
+        invoice_line.item_code = validation_result.get('ItemCode', 'UNKNOWN')
+        invoice_line.item_description = validation_result.get('itemName', validation_result.get('ItemName', 'Unknown Item'))
+        invoice_line.quantity = 1.0
+        invoice_line.warehouse_code = validation_result.get('WhsCode', '')
+        invoice_line.warehouse_name = validation_result.get('WhsName', '')
         
         db.session.add(invoice_line)
         db.session.flush()  # Get the line ID
         
         # Create serial number record
-        serial_item = InvoiceSerialNumber(
-            invoice_line_id=invoice_line.id,
-            serial_number=serial_number,
-            item_code=validation_result.get('ItemCode', 'UNKNOWN'),
-            item_description=validation_result.get('itemName', validation_result.get('ItemName', 'Unknown Item')),
-            warehouse_code=validation_result.get('WhsCode', ''),
-            #customer_code=validation_result.get('CardCode', ''),
-            customer_name=validation_result.get('CardName', ''),
-            quantity=1.0,
-            customer_code = cusCode,
-            validation_status=validation_status,
-            validation_error=validation_error
-        )
+        serial_item = InvoiceSerialNumber()
+        serial_item.invoice_line_id = invoice_line.id
+        serial_item.serial_number = serial_number
+        serial_item.item_code = validation_result.get('ItemCode', 'UNKNOWN')
+        serial_item.item_description = validation_result.get('itemName', validation_result.get('ItemName', 'Unknown Item'))
+        serial_item.warehouse_code = validation_result.get('WhsCode', '')
+        serial_item.customer_name = validation_result.get('CardName', '')
+        serial_item.quantity = 1.0
+        serial_item.customer_code = request.args.get('cusCode', '')
+        serial_item.validation_status = validation_status
+        serial_item.validation_error = validation_error
         
         db.session.add(serial_item)
         
-        # Update invoice customer if auto-detected
-        if validation_result.get('CardCode') and not invoice.customer_code:
+        # CUSTOMER CODE FREEZE LOGIC - once any line items exist, customer cannot be changed
+        existing_lines_count = InvoiceLine.query.filter_by(invoice_id=invoice.id).count()
+        
+        if validation_result.get('CardCode') and not invoice.customer_code and existing_lines_count == 0:
+            # Only set customer on first line item - customer code becomes FROZEN after this
             invoice.customer_code = validation_result.get('CardCode')
             invoice.customer_name = validation_result.get('CardName', '')
+            logging.info(f"🔒 Customer locked to {invoice.customer_code} after first line item")
+        elif invoice.customer_code and existing_lines_count > 0:
+            # Validate that serial belongs to the locked customer - REJECT if different
+            detected_customer = validation_result.get('CardCode', '')
+            if detected_customer and detected_customer != invoice.customer_code:
+                return jsonify({
+                    'success': False,
+                    'error': f'Customer code is FROZEN to {invoice.customer_code}. Cannot add items for different customer {detected_customer}',
+                    'customer_locked': True
+                }), 400
         
         db.session.commit()
         
@@ -1285,7 +1290,8 @@ def add_line_item(invoice_id):
                 'customer_name': serial_item.customer_name,
                 'quantity': serial_item.quantity,
                 'validation_status': validation_status,
-                'validation_error': validation_error
+                'validation_error': validation_error,
+                'customer_locked': bool(invoice.customer_code)  # Indicate if customer is locked
             }
         })
         
@@ -1347,13 +1353,12 @@ def create_draft_invoice():
             return jsonify({'success': False, 'error': 'Access denied - Invoice Creation permissions required'}), 403
         
         # Create new draft invoice
-        invoice = InvoiceDocument(
-            user_id=current_user.id,
-            status='draft',
-            doc_date=datetime.now().date(),
-            branch_id=current_user.branch_id,
-            branch_name=current_user.branch_name
-        )
+        invoice = InvoiceDocument()
+        invoice.user_id = current_user.id
+        invoice.status = 'draft'
+        invoice.doc_date = datetime.now().date()
+        invoice.branch_id = current_user.branch_id
+        invoice.branch_name = current_user.branch_name
         
         db.session.add(invoice)
         db.session.commit()
@@ -1475,9 +1480,14 @@ def qc_approve_invoice(invoice_id):
         if not invoice.lines:
             return jsonify({'success': False, 'error': 'Invoice must have line items'}), 400
         
-        # Generate SAP B1 Invoice JSON based on line items
+        # Generate SAP B1 Invoice JSON with BPL_IDAssignedToInvoice field
         sap_invoice_data = generate_sap_invoice_json(invoice)
-        print(sap_invoice_data)
+        
+        # Add BPL_IDAssignedToInvoice as required for QC approval
+        sap_invoice_data['BPL_IDAssignedToInvoice'] = 5  # ORD-CHENNAI branch
+        sap_invoice_data['BPLName'] = 'ORD-CHENNAI'
+        
+        print(f"QC Approved Invoice JSON: {sap_invoice_data}")
         # Post to SAP B1
         sap_result = post_invoice_to_sap_b1(sap_invoice_data)
         
@@ -1602,8 +1612,8 @@ def generate_sap_invoice_json(invoice):
         sap_invoice = {
             'DocDate': datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'DocDueDate': (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-            'BPL_IDAssignedToInvoice':invoice.bpl_id ,  # Default branch
-            'BPLName': invoice.bpl_name,
+            'BPL_IDAssignedToInvoice': getattr(invoice, 'bpl_id', 5),  # Default to 5 if not set
+            'BPLName': getattr(invoice, 'bpl_name', 'ORD-CHENNAI'),
             'CardCode': invoice.customer_code,
             'DocumentLines': document_lines
         }

@@ -18,6 +18,8 @@ class InvoiceDocument(db.Model):
     branch_name = db.Column(db.String(100))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     status = db.Column(db.String(20), default='draft')  # draft, pending_qc, created, posted, cancelled, rejected
+    bpl_id = db.Column(db.Integer, default=5)  # BPL_IDAssignedToInvoice for SAP B1
+    bpl_name = db.Column(db.String(100), default='ORD-CHENNAI')  # Branch/Location name
     doc_date = db.Column(db.DateTime, default=datetime.utcnow)
     due_date = db.Column(db.DateTime)
     total_amount = db.Column(db.Numeric(15, 2))
