@@ -23,7 +23,7 @@ def generate_serial_item_transfer_number():
 @login_required
 def index():
     """Serial Item Transfer main page with pagination and user filtering"""
-    if not current_user.has_permission('serial_transfer'):
+    if not current_user.has_permission('serial_item_transfer'):
         flash('Access denied - Serial Item Transfer permissions required', 'error')
         return redirect(url_for('dashboard'))
 
@@ -76,7 +76,7 @@ def index():
 @login_required
 def create():
     """Create new Serial Item Transfer"""
-    if not current_user.has_permission('serial_transfer'):
+    if not current_user.has_permission('serial_item_transfer'):
         flash('Access denied - Serial Item Transfer permissions required', 'error')
         return redirect(url_for('dashboard'))
 

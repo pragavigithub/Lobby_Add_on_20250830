@@ -39,7 +39,7 @@
 
     {% if current_user.has_permission('serial_item_transfer') %}
     <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card dashboard-card" data-url="{{ url_for('serial_item_transfer.serial_index') }}">
+        <div class="card dashboard-card" data-url="{{ url_for('serial_item_transfer.index') }}">
             <div class="card-body text-center">
                 <i data-feather="move" class="mb-3" style="width: 48px; height: 48px;"></i>
                 <p>Serial Item Transfer</p>

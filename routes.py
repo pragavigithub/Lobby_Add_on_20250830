@@ -3075,8 +3075,8 @@ def create_user():
     
     # Set custom permissions if provided
     permissions = {}
-    for screen in ['dashboard', 'grpo', 'inventory_transfer', 'serial_transfer', 'batch_transfer', 'pick_list', 'inventory_counting', 
-                   'bin_scanning', 'label_printing', 'user_management', 'qc_dashboard']:
+    for screen in ['dashboard', 'grpo', 'inventory_transfer', 'serial_item_transfer', 'serial_transfer', 'batch_transfer', 'pick_list', 'inventory_counting', 
+                   'bin_scanning', 'label_printing', 'user_management', 'qc_dashboard', 'invoice_creation']:
         permissions[screen] = screen in request.form
     
     user.set_permissions(permissions)
