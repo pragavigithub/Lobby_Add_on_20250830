@@ -89,8 +89,7 @@ def cascading_get_bin_locations():
         return jsonify({
             'success': True,
             'bins': [
-                {'BinCode': f'{warehouse_code}-A01', 'BinName': 'Aisle A - Position 01'},
-                {'BinCode': f'{warehouse_code}-B01', 'BinName': 'Aisle B - Position 01'}
+
             ]
         })
 

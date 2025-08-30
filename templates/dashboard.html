@@ -6,7 +6,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <h1>Welcome, {{ current_user.first_name }}!</h1>
-        <p class="text-muted">{{ current_user.role|title }} - {{ current_user.branch_name or 'No Branch Selected' }}</p>
+        <p class="text-muted">{{ current_user.role|title }} </p>
     </div>
 </div>
 
@@ -38,29 +38,39 @@
 <!--    {% endif %}-->
 
     {% if current_user.has_permission('serial_item_transfer') %}
-    <div class="col-md-3 col-sm-6 mb-3">
+    <div class="col-md-2 col-sm-6 mb-3">
         <div class="card dashboard-card" data-url="{{ url_for('serial_item_transfer.index') }}">
             <div class="card-body text-center">
                 <i data-feather="move" class="mb-3" style="width: 48px; height: 48px;"></i>
-                <p>Serial Item Transfer</p>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-    
-    {% if current_user.has_permission('serial_transfer') %}
-    <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card dashboard-card" data-url="{{ url_for('inventory_transfer.serial_index') }}">
-            <div class="card-body text-center">
-                <i data-feather="arrow-right-circle" class="mb-3" style="width: 48px; height: 48px;"></i>
                 <p>Serial Transfer</p>
             </div>
         </div>
     </div>
     {% endif %}
     
+    {% if current_user.has_permission('serial_transfer') %}
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="card dashboard-card" data-url="{{ url_for('inventory_transfer.serial_index') }}">
+            <div class="card-body text-center">
+                <i data-feather="arrow-right-circle" class="mb-3" style="width: 48px; height: 48px;"></i>
+                <p>Bulk Transfer</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if current_user.has_permission('invoice_creation') %}
+    <div class="col-md-2 col-sm-6 mb-3">
+        <div class="card dashboard-card" data-url="{{ url_for('invoice_creation.index') }}">
+            <div class="card-body text-center">
+                <i data-feather="file-text" class="mb-3" style="width: 48px; height: 48px;"></i>
+                <p>Invoice Creation</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     {% if current_user.has_permission('qc_dashboard') %}
-    <div class="col-md-3 col-sm-6 mb-3">
+    <div class="col-md-2 col-sm-6 mb-3">
         <div class="card dashboard-card" data-url="{{ url_for('qc_dashboard') }}">
             <div class="card-body text-center">
                 <i data-feather="check-circle" class="mb-3" style="width: 48px; height: 48px;"></i>
@@ -71,7 +81,7 @@
     {% endif %}
     
     {% if current_user.has_permission('user_management') %}
-    <div class="col-md-3 col-sm-6 mb-3">
+    <div class="col-md-2 col-sm-6 mb-3">
         <div class="card dashboard-card" data-url="{{ url_for('user_management') }}">
             <div class="card-body text-center">
                 <i data-feather="users" class="mb-3" style="width: 48px; height: 48px;"></i>
@@ -81,16 +91,6 @@
     </div>
     {% endif %}
 
-    {% if current_user.has_permission('invoice_creation') %}
-    <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card dashboard-card" data-url="{{ url_for('invoice_creation.index') }}">
-            <div class="card-body text-center">
-                <i data-feather="file-text" class="mb-3" style="width: 48px; height: 48px;"></i>
-                <p>Invoice Creation</p>
-            </div>
-        </div>
-    </div>
-    {% endif %}
     
 <!--    {% if current_user.has_permission('pick_list') %}-->
 <!--    <div class="col-md-3 col-sm-6 mb-3">-->

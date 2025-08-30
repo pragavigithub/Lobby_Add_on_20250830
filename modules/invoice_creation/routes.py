@@ -1661,6 +1661,8 @@ def generate_sap_invoice_json(invoice):
         # Generate SAP B1 Invoice JSON
         sap_invoice = {
             'DocDate': datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            "U_EA_CREATEDBy": current_user.username,
+            "U_EA_Approved": current_user.username,
             'DocDueDate': (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'BPL_IDAssignedToInvoice': serial_item.bpl_id,#getattr(invoice, 'bpl_id', 5),  # Default to 5 if not set
             'BPLName': serial_item.bpl_name,#getattr(invoice, 'bpl_name', 'ORD-CHENNAI'),
