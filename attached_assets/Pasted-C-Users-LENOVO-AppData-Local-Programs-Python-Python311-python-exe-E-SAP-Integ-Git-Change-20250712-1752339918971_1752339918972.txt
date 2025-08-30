@@ -1,0 +1,150 @@
+C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\python.exe "E:\SAP_Integ\Git Change\20250712\4\Emerging_BarCode_Integration\main.py" 
+INFO:root:Using SQLite database for local development: E:\SAP_Integ\Git Change\20250712\4\Emerging_BarCode_Integration\instance\wms.db
+INFO:root:Database tables created
+ * Serving Flask app 'app'
+ * Debug mode: on
+INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.5:5000
+INFO:werkzeug:Press CTRL+C to quit
+INFO:werkzeug: * Restarting with stat
+INFO:root:Using PostgreSQL database
+INFO:root:Database tables created
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 888-243-362
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:30:52] "GET / HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:30:52] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:30:53] "GET /static/css/style.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:30:53] "GET /static/js/barcode-scanner.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:30:53] "GET /static/js/app.js HTTP/1.1" 200 -
+INFO:root:Starting full SAP B1 master data synchronization...
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): 192.168.1.5:50000
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "POST /b1s/v1/Login HTTP/1.1" 200 175
+INFO:root:Successfully logged in to SAP B1
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "GET /b1s/v1/Warehouses HTTP/1.1" 200 2366
+ERROR:root:Error syncing warehouses: (sqlite3.OperationalError) no such function: NOW
+[SQL: 
+                            INSERT INTO branches (id, name, address, is_active, created_at, updated_at)
+                            VALUES (?, ?, ?, ?, NOW(), NOW())
+                        ]
+[parameters: ('01', 'MAINTENENCE Warehouse', 'Plot 600 A Indospace Industrial Park - Oragadam', True)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "GET /b1s/v1/BinLocations HTTP/1.1" 200 908
+ERROR:root:Error syncing bins: (sqlite3.OperationalError) near "(": syntax error
+[SQL: 
+                    CREATE TABLE IF NOT EXISTS bin_locations (
+                        id SERIAL PRIMARY KEY,
+                        bin_code VARCHAR(50) NOT NULL,
+                        warehouse_code VARCHAR(10) NOT NULL,
+                        bin_name VARCHAR(100),
+                        is_active BOOLEAN DEFAULT TRUE,
+                        created_at TIMESTAMP DEFAULT NOW(),
+                        updated_at TIMESTAMP DEFAULT NOW(),
+                        UNIQUE(bin_code, warehouse_code)
+                    )
+                ]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "GET /b1s/v1/BusinessPartners?$filter=CardType%20eq%20'cSupplier'%20or%20CardType%20eq%20'cCustomer' HTTP/1.1" 200 14231
+ERROR:root:Error syncing business partners: (sqlite3.OperationalError) near "(": syntax error
+[SQL: 
+                    CREATE TABLE IF NOT EXISTS business_partners (
+                        id SERIAL PRIMARY KEY,
+                        card_code VARCHAR(50) UNIQUE NOT NULL,
+                        card_name VARCHAR(200) NOT NULL,
+                        card_type VARCHAR(20) NOT NULL,
+                        phone VARCHAR(50),
+                        email VARCHAR(100),
+                        address TEXT,
+                        is_active BOOLEAN DEFAULT TRUE,
+                        created_at TIMESTAMP DEFAULT NOW(),
+                        updated_at TIMESTAMP DEFAULT NOW()
+                    )
+                ]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+INFO:root:Master data sync completed: 0/3 successful
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:05] "POST /sync-sap-data HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:05] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:05] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:05] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:05] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:22] "GET /grpo HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:22] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:22] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:22] "GET /static/js/app.js HTTP/1.1" 304 -
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): 192.168.1.5:50000
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): 192.168.1.5:50000
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "POST /b1s/v1/Login HTTP/1.1" 200 174
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "POST /b1s/v1/Login HTTP/1.1" 200 175
+INFO:root:Successfully logged in to SAP B1
+INFO:root:Successfully logged in to SAP B1
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "GET /b1s/v1/PurchaseOrders?$filter=DocNum%20eq%20222310540 HTTP/1.1" 200 7090
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:39] "POST /api/validate_po HTTP/1.1" 200 -
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "GET /b1s/v1/PurchaseOrders?$filter=DocNum%20eq%20222310540 HTTP/1.1" 200 7090
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:40] "POST /grpo/create HTTP/1.1" 302 -
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): 192.168.1.5:50000
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "POST /b1s/v1/Login HTTP/1.1" 200 174
+INFO:root:Successfully logged in to SAP B1
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "GET /b1s/v1/PurchaseOrders?$filter=DocNum%20eq%20222310540 HTTP/1.1" 200 7090
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:43] "GET /grpo/1 HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:43] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:43] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:43] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:53] "GET /qc_dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:53] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:54] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:54] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:56] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:56] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:56] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:56] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:57] "GET /grpo HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:57] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:57] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:31:57] "GET /static/js/app.js HTTP/1.1" 304 -
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): 192.168.1.5:50000
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "POST /b1s/v1/Login HTTP/1.1" 200 174
+INFO:root:Successfully logged in to SAP B1
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "GET /b1s/v1/PurchaseOrders?$filter=DocNum%20eq%20222310540 HTTP/1.1" 200 7090
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:02] "GET /grpo/1 HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:02] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:02] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:02] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:04] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:04] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:04] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:04] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:06] "GET /grpo HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:06] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:06] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:06] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): 192.168.1.5:50000
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "POST /b1s/v1/Login HTTP/1.1" 200 174
+INFO:root:Successfully logged in to SAP B1
+DEBUG:urllib3.connectionpool:https://192.168.1.5:50000 "GET /b1s/v1/PurchaseOrders?$filter=DocNum%20eq%20222310540 HTTP/1.1" 200 7090
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:09] "GET /grpo/1 HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:09] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:09] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:09] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:17] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:17] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:17] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:17] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:21] "GET /inventory_transfer HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:21] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:21] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:32:21] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:34] "POST /api/validate_transfer_request HTTP/1.1" 404 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:34] "POST /inventory_transfer/create HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:34] "GET /inventory_transfer/1 HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:34] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:34] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:34] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:43] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:43] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:43] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:43] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:45] "GET /inventory_transfer HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:45] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:45] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [12/Jul/2025 22:33:45] "GET /static/js/app.js HTTP/1.1" 304 -

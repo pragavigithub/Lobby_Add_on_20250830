@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory Transfer - Warehouse Selection{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('inventory_transfer') }}">Inventory Transfer</a></li>
+                    <li class="breadcrumb-item active">Warehouse Selection</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Warehouse Selection -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i data-feather="home"></i> 
+                        Select Warehouse for Transfer
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for warehouse in warehouses %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card warehouse-card" onclick="selectWarehouse('{{ warehouse.id }}', '{{ warehouse.name }}')">
+                                <div class="card-body text-center">
+                                    <i data-feather="home" class="warehouse-icon"></i>
+                                    <h6 class="card-title mt-2">{{ warehouse.name }}</h6>
+                                    <p class="card-text text-muted">{{ warehouse.id }}</p>
+                                    {% if warehouse.address %}
+                                    <small class="text-muted">{{ warehouse.address }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function selectWarehouse(warehouseId, warehouseName) {
+    if (confirm(`Proceed with transfer to warehouse: ${warehouseName}?`)) {
+        // Redirect to create transfer with selected warehouse
+        window.location.href = `/inventory_transfer/create?warehouse=${warehouseId}`;
+    }
+}
+
+// Initialize feather icons
+feather.replace();
+</script>
+
+<style>
+.warehouse-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #dee2e6;
+}
+
+.warehouse-card:hover {
+    border-color: #007bff;
+    box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+    transform: translateY(-2px);
+}
+
+.warehouse-icon {
+    width: 48px;
+    height: 48px;
+    color: #007bff;
+}
+
+.card-title {
+    color: #495057;
+    font-weight: 600;
+}
+</style>
+{% endblock %}

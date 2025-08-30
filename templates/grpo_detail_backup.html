@@ -1,0 +1,1161 @@
+{% extends "base.html" %}
+
+{% block title %}GRPO Detail - {{ grpo_doc.po_number }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('grpo') }}">GRPO</a></li>
+                    <li class="breadcrumb-item active">{{ grpo_doc.po_number }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- GRPO Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i data-feather="package"></i> 
+                            Goods Receipt PO - {{ grpo_doc.po_number }}
+                        </h5>
+                        <div>
+                            {% if grpo_doc.status == 'draft' %}
+                                <span class="badge bg-secondary">Draft</span>
+                            {% elif grpo_doc.status == 'approved' %}
+                                <span class="badge bg-success">Approved</span>
+                            {% elif grpo_doc.status == 'posted' %}
+                                <span class="badge bg-primary">Posted</span>
+                            {% elif grpo_doc.status == 'rejected' %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>PO Number:</strong> {{ grpo_doc.po_number }}</p>
+                            <p><strong>Supplier:</strong> {{ grpo_doc.supplier_name or 'Unknown' }} ({{ grpo_doc.supplier_code or 'N/A' }})</p>
+                            <p><strong>SAP Document:</strong> {{ grpo_doc.sap_document_number or 'Not assigned' }}</p>
+                            <p><strong>Status:</strong> {{ grpo_doc.status.title() }}</p>
+                            <p><strong>Mode:</strong> {{ 'Draft Mode' if grpo_doc.draft_or_post == 'draft' else 'Direct Post' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Created By:</strong> {{ grpo_doc.user.first_name }} {{ grpo_doc.user.last_name }}</p>
+                            <p><strong>Created At:</strong> {{ grpo_doc.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p><strong>Updated At:</strong> {{ grpo_doc.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% if grpo_doc.qc_user %}
+                            <p><strong>QC Reviewer:</strong> {{ grpo_doc.qc_user.first_name }} {{ grpo_doc.qc_user.last_name }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Order Items -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i data-feather="list"></i> 
+                        Purchase Order Items
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if po_items and po_items|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>Quantity</th>
+                                    <th>Open Qty</th>
+                                    <th>UoM</th>
+                                    <th>Price</th>
+                                    <th>Line Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in po_items %}
+                                <tr>
+                                    <td><strong>{{ item.ItemCode or item.item_code or 'N/A' }}</strong></td>
+                                    <td>{{ item.ItemName or item.item_name or item.Description or 'N/A' }}</td>
+                                    <td>{{ item.Quantity or item.quantity or 0 }}</td>
+                                    <td>{{ item.RemainingOpenQuantity or item.OpenQuantity or item.open_quantity or 0 }}</td>
+                                    <td>{{ item.UoMCode or item.UnitOfMeasure or item.unit_of_measure or item.UoM or 'EA' }}</td>
+                                    <td>${{ "%.2f"|format(item.Price or item.price or 0) }}</td>
+                                    <td>
+                                        {% set line_status = item.LineStatus or item.line_status or 'Unknown' %}
+                                        {% if line_status == 'bost_Open' %}
+                                            <span class="badge bg-success">Open</span>
+                                        {% elif line_status == 'bost_Close' %}
+                                            <span class="badge bg-danger">Closed</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ line_status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% set line_status = item.LineStatus or item.line_status or 'bost_Open' %}
+                                        {% set received_items = grpo_doc.items|selectattr('po_line_number', 'equalto', item.LineNum)|selectattr('item_code', 'equalto', item.ItemCode or item.item_code)|list %}
+                                        {% set total_received = received_items|sum(attribute='received_quantity') %}
+                                        {% set po_quantity = item.Quantity or item.quantity or 0 %}
+                                        {% set open_quantity = item.RemainingOpenQuantity or item.OpenQuantity or item.open_quantity or 0 %}
+                                        {% set is_fully_received = (total_received >= open_quantity) and (open_quantity > 0) %}
+                                        {% set is_line_closed = line_status == 'bost_Close' %}
+                                        
+                                        {% if not is_line_closed and not is_fully_received and open_quantity > 0 %}
+                                        <button class="btn btn-sm btn-primary add-item-btn" 
+                                                data-item-code="{{ item.ItemCode or item.item_code }}"
+                                                data-item-name="{{ item.ItemName or item.item_name or item.Description }}"
+                                                data-uom="{{ item.UoMCode or item.UnitOfMeasure or item.unit_of_measure or item.UoM or 'EA' }}"
+                                                data-warehouse="{{ item.WarehouseCode or item.WhsCode or 'WH001' }}"
+                                                data-po-item="{{ item|tojson|e }}">
+                                            <i data-feather="plus"></i> Add
+                                            {% if item.SerialNum == 'tYES' %}
+                                                <span class="badge bg-warning ms-1">Serial</span>
+                                            {% endif %}
+                                            {% if item.ManageBatchNumbers == 'tYES' %}
+                                                <span class="badge bg-info ms-1">Batch</span>
+                                            {% endif %}
+                                        </button>
+                                        {% if received_items|length > 0 %}
+                                        <br><small class="text-muted">{{ total_received }}/{{ open_quantity }} received ({{ open_quantity }} remaining)</small>
+                                        {% endif %}
+                                        {% elif is_line_closed %}
+                                        <span class="badge bg-danger">Line Closed</span>
+                                        {% else %}
+                                        <span class="badge bg-success">Fully Received</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i data-feather="info"></i>
+                        No purchase order items found. This may be due to SAP connection issues or the PO number may not exist.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRPO Items -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i data-feather="check-square"></i> 
+                            Received Items
+                        </h6>
+                        <button class="btn btn-sm btn-success" onclick="showAddItemModal()">
+                            <i data-feather="plus"></i> Add Item
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if grpo_doc.items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>PO Qty</th>
+                                    <th>Open Qty</th>
+                                    <th>Received Qty</th>
+                                    <th>UoM</th>
+                                    <th>Warehouse</th>
+                                    <th>Batch</th>
+                                    <th>Expiry</th>
+                                    <th>Barcode</th>
+                                    <th>QC Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in grpo_doc.items %}
+                                <tr>
+                                    <td><strong>{{ item.item_code }}</strong></td>
+                                    <td>{{ item.item_name }}</td>
+                                    <td>{{ item.po_quantity or '-' }}</td>
+                                    <td>{{ item.open_quantity or '-' }}</td>
+                                    <td>
+                                        {% if grpo_doc.status in ['draft', 'rejected'] %}
+                                        <input type="number" class="form-control form-control-sm" 
+                                               value="{{ item.received_quantity }}" 
+                                               min="0" step="0.01"
+                                               onchange="updateItemField({{ item.id }}, 'received_quantity', this.value)"
+                                               style="width: 80px;">
+                                        {% else %}
+                                        <strong>{{ item.received_quantity }}</strong>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.unit_of_measure or 'EA' }}</td>
+                                    <td>
+                                        {% set warehouse_code = item.bin_location.split('-')[0] if item.bin_location and '-' in item.bin_location else item.bin_location[:4] if item.bin_location else 'N/A' %}
+                                        <strong>{{ warehouse_code }}</strong>
+                                        <br><small class="text-muted">Warehouse: {{ item.bin_location }}</small>
+                                    </td>
+                                    <td>
+                                        {% if grpo_doc.status in ['draft', 'rejected'] %}
+                                        <input type="text" class="form-control form-control-sm" 
+                                               value="{{ item.batch_number or '' }}" 
+                                               placeholder="Batch number"
+                                               onchange="updateItemField({{ item.id }}, 'batch_number', this.value)"
+                                               style="width: 120px;">
+                                        {% else %}
+                                        {{ item.batch_number or '-' }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if grpo_doc.status in ['draft', 'rejected'] %}
+                                        <input type="date" class="form-control form-control-sm" 
+                                               value="{{ item.expiration_date.strftime('%Y-%m-%d') if item.expiration_date else '' }}" 
+                                               onchange="updateItemField({{ item.id }}, 'expiration_date', this.value)"
+                                               style="width: 140px;">
+                                        {% else %}
+                                        {{ item.expiration_date.strftime('%Y-%m-%d') if item.expiration_date else '-' }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if item.generated_barcode %}
+                                            <span class="badge bg-success">{{ item.generated_barcode }}</span>
+                                            {% if not item.barcode_printed %}
+                                            <button class="btn btn-xs btn-outline-primary" onclick="printBarcode('{{ item.generated_barcode }}', {{ item.id }})">
+                                                <i data-feather="printer"></i> Print
+                                            </button>
+                                            {% endif %}
+                                        {% elif grpo_doc.status in ['draft', 'rejected'] %}
+                                            <button class="btn btn-xs btn-success" onclick="generateBarcode({{ item.id }}, '{{ item.item_code }}')">
+                                                <i data-feather="plus"></i> Generate
+                                            </button>
+                                        {% else %}
+                                            {{ item.supplier_barcode or 'No barcode' }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if item.qc_status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif item.qc_status == 'approved' %}
+                                            <span class="badge bg-success">Approved</span>
+                                        {% elif item.qc_status == 'rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if grpo_doc.status in ['draft', 'rejected'] %}
+                                        <div class="btn-group">
+                                            <a href="{{ url_for('edit_grpo_item', grpo_id=grpo_doc.id, item_id=item.id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i data-feather="edit-2"></i> Edit
+                                            </a>
+                                            <button class="btn btn-sm btn-success" onclick="generateQRLabel('{{ item.item_code }}', '{{ item.item_name }}', '{{ item.batch_number or '' }}', {{ grpo_doc.id }})">
+                                                <i data-feather="maximize"></i> QR Label
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="removeItem({{ item.id }})">
+                                                <i data-feather="trash-2"></i>
+                                            </button>
+                                        </div>
+                                        {% else %}
+                                        <button class="btn btn-sm btn-success" onclick="generateQRLabel('{{ item.item_code }}', '{{ item.item_name }}', '{{ item.batch_number or '' }}', {{ grpo_doc.id }})">
+                                            <i data-feather="maximize"></i> Print QR Label
+                                        </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i data-feather="info"></i>
+                        No items have been received yet. Add items from the purchase order above.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('grpo') }}" class="btn btn-secondary">
+                            <i data-feather="arrow-left"></i> Back to GRPO List
+                        </a>
+                        <div>
+                            {% if grpo_doc.status == 'draft' %}
+                            <button id="submitQCBtn" class="btn btn-success" onclick="submitGRPO({{ grpo_doc.id }})" {% if not grpo_doc.items %}disabled{% endif %}>
+                                <i data-feather="check"></i> Submit for QC Approval
+                            </button>
+                            {% if not grpo_doc.items %}
+                            <small class="text-muted d-block">Add items to enable submission</small>
+                            {% endif %}
+                            {% elif grpo_doc.status == 'submitted' and current_user.role in ['qc', 'manager', 'admin'] %}
+                            <div class="btn-group">
+                                <button class="btn btn-success" onclick="approveGRPO({{ grpo_doc.id }})">
+                                    <i data-feather="check"></i> Approve & Post to SAP
+                                </button>
+                                <button class="btn btn-danger" onclick="rejectGRPO({{ grpo_doc.id }})">
+                                    <i data-feather="x"></i> Reject
+                                </button>
+                            </div>
+                            {% elif grpo_doc.status == 'approved' and current_user.role in ['admin', 'manager'] %}
+                            <div class="btn-group">
+                                <form method="POST" action="{{ url_for('post_grpo_to_sap_manual', grpo_id=grpo_doc.id) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-primary" onclick="return confirm('Post this GRPO to SAP B1 as Purchase Delivery Note?')">
+                                        <i data-feather="upload"></i> Post to SAP B1
+                                    </button>
+                                </form>
+                                <button type="button" class="btn btn-info" onclick="showJsonPreview({{ grpo_doc.id }})">
+                                    <i data-feather="eye"></i> Preview JSON
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Item to GRPO</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addItemForm" method="POST" action="{{ url_for('add_grpo_item', grpo_id=grpo_doc.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="item_code" class="form-label">Item Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="item_code" name="item_code" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="item_name" class="form-label">Item Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="item_name" name="item_name" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="unit_of_measure" class="form-label">Unit of Measure (UoM) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="unit_of_measure" name="unit_of_measure" value="EA" readonly>
+                                <div class="form-text">Unit of measure from Purchase Order</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item Management Type Indicator -->
+                    <div class="mb-3" id="item_management_indicator" style="display: none;">
+                        <div class="alert alert-info">
+                            <i data-feather="info"></i> 
+                            <span id="management_type_text">This item requires management tracking</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Warehouse and Bin Location -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="warehouse_code" class="form-label">Warehouse Code <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="warehouse_code" name="warehouse_code" 
+                                           placeholder="From Purchase Order" readonly required>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="toggleWarehouseEdit()">
+                                        <i data-feather="edit-2"></i> Edit
+                                    </button>
+                                </div>
+                                <div class="form-text">Warehouse from PO (click Edit to change)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="bin_location" class="form-label">Bin Location</label>
+                                <input type="text" class="form-control" id="bin_location" name="bin_location" 
+                                       placeholder="Auto-selected or enter manually">
+                                <div class="form-text">Will auto-populate based on warehouse</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Serial/Batch Management Section -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="batch_number" class="form-label">Batch Number</label>
+                                <div class="input-group">
+                                    <select class="form-select" id="batch_select" onchange="handleBatchSelection()" disabled>
+                                        <option value="">Select Batch...</option>
+                                    </select>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="toggleManualBatch()" title="Enter manually">
+                                        <i data-feather="edit-3"></i>
+                                    </button>
+                                </div>
+                                <input type="text" class="form-control mt-2" id="batch_number" name="batch_number"
+                                       placeholder="Or enter batch number manually" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="expiration_date" class="form-label">Expiration Date</label>
+                                <input type="date" class="form-control" id="expiration_date" name="expiration_date">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Serial Number Section (hidden by default) -->
+                    <div class="mb-3" id="serial_number_section" style="display: none;">
+                        <label for="serial_number" class="form-label">
+                            Serial Number
+                            <span id="serial_required_indicator" class="text-danger" style="display: none;">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="serial_number" name="serial_number">
+                    </div>
+                    <div class="mb-3">
+                        <label for="barcode" class="form-label">Barcode</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Generated barcode will appear here">
+                            <button type="button" class="btn btn-outline-primary" onclick="generateBarcodeForModal()">
+                                <i data-feather="plus"></i> Generate Barcode
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- JSON Preview Modal -->
+<div class="modal fade" id="jsonPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">SAP B1 JSON Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <h6>Purchase Delivery Note JSON Structure:</h6>
+                    <div class="form-text">This is the exact JSON that will be posted to SAP B1</div>
+                </div>
+                <pre id="jsonContent" class="bg-light p-3" style="border-radius: 5px; font-size: 12px; white-space: pre-wrap; word-wrap: break-word;"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="copyJsonToClipboard()">
+                    <i data-feather="copy"></i> Copy JSON
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+// Global variables to store PO item data
+let selectedPoItemData = null;
+
+function addItemToGRPO(itemCode, itemName, uom, warehouseCode, poItemData = null) {
+    console.log('🔍 addItemToGRPO called with:', {itemCode, itemName, uom, warehouseCode, poItemData});
+    
+    // Store the PO item data for use in the modal
+    selectedPoItemData = {
+        itemCode: itemCode,
+        itemName: itemName || 'N/A',
+        uom: uom || 'EA',
+        warehouseCode: warehouseCode || 'WH001',
+        managementType: poItemData?.ManagementType || 'None',
+        serialManaged: poItemData?.SerialNum === 'tYES' || false,
+        batchManaged: poItemData?.ManageBatchNumbers === 'tYES' || false
+    };
+    
+    console.log('📝 selectedPoItemData:', selectedPoItemData);
+    
+    // Populate the modal with PO data
+    document.getElementById('item_code').value = itemCode;
+    document.getElementById('item_name').value = selectedPoItemData.itemName;
+    document.getElementById('unit_of_measure').value = selectedPoItemData.uom;
+    document.getElementById('warehouse_code').value = selectedPoItemData.warehouseCode;
+    document.getElementById('bin_location').value = ''; // Will be populated based on warehouse
+    
+    // Show/hide management type indicator
+    const managementIndicator = document.getElementById('item_management_indicator');
+    const managementText = document.getElementById('management_type_text');
+    const serialSection = document.getElementById('serial_number_section');
+    const batchRequiredIndicator = document.getElementById('batch_required_indicator');
+    const serialRequiredIndicator = document.getElementById('serial_required_indicator');
+    
+    if (selectedPoItemData.serialManaged || selectedPoItemData.batchManaged) {
+        managementIndicator.style.display = 'block';
+        if (selectedPoItemData.serialManaged) {
+            managementText.innerHTML = '<i data-feather="hash"></i> This item requires Serial Number tracking';
+            serialSection.style.display = 'block';
+            serialRequiredIndicator.style.display = 'inline';
+        } else {
+            serialSection.style.display = 'none';
+            serialRequiredIndicator.style.display = 'none';
+        }
+        
+        if (selectedPoItemData.batchManaged) {
+            if (selectedPoItemData.serialManaged) {
+                managementText.innerHTML = '<i data-feather="hash"></i> This item requires Serial Number and Batch tracking';
+            } else {
+                managementText.innerHTML = '<i data-feather="package"></i> This item requires Batch Number tracking';
+            }
+            batchRequiredIndicator.style.display = 'inline';
+        } else {
+            batchRequiredIndicator.style.display = 'none';
+        }
+    } else {
+        managementIndicator.style.display = 'none';
+        serialSection.style.display = 'none';
+        batchRequiredIndicator.style.display = 'none';
+        serialRequiredIndicator.style.display = 'none';
+    }
+    
+    // Clear previous values
+    document.getElementById('quantity').value = '';
+    document.getElementById('batch_number').value = '';
+    document.getElementById('serial_number').value = '';
+    document.getElementById('expiration_date').value = '';
+    document.getElementById('barcode').value = '';
+    
+    // Reset warehouse edit mode
+    document.getElementById('warehouse_code').readOnly = true;
+    
+    // Refresh feather icons
+    setTimeout(() => {
+        if (window.feather) {
+            feather.replace();
+        }
+    }, 100);
+    
+    // Show the modal
+    console.log('🎭 Opening modal...');
+    const modalElement = document.getElementById('addItemModal');
+    if (modalElement) {
+        console.log('✅ Modal element found');
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+        console.log('✅ Modal.show() called');
+    } else {
+        console.error('❌ Modal element not found!');
+    }
+}
+
+// Toggle manual batch entry
+function toggleManualBatch() {
+    const batchSelect = document.getElementById('batch_select');
+    const batchNumber = document.getElementById('batch_number');
+
+    if (batchNumber.style.display === 'none') {
+        batchNumber.style.display = 'block';
+        batchSelect.parentElement.style.display = 'none';
+        batchNumber.focus();
+    } else {
+        batchNumber.style.display = 'none';
+        batchSelect.parentElement.style.display = 'flex';
+        batchSelect.focus();
+    }
+}
+
+function generateQRLabel(itemCode, itemName, batchNumber, grpoId) {
+    // Generate QR code label for GRPO item
+    const data = {
+        item_code: itemCode,
+        item_name: itemName,
+        batch_number: batchNumber,
+        grpo_id: grpoId
+    };
+    
+    fetch('/api/generate-qr-label', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Create QR code and show print dialog
+            showQRLabelModal(data.qr_data, data.label_info);
+        } else {
+            alert(`Error generating QR label: ${data.error}`);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error generating QR label');
+    });
+}
+
+function showQRLabelModal(qrData, labelInfo) {
+    // Create modal dynamically if it doesn't exist
+    let modal = document.getElementById('qrLabelModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'qrLabelModal';
+        modal.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">QR Code Label</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div id="qrCodeContainer" class="mb-3"></div>
+                        <div id="labelDetails" class="mb-3"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="printQRLabel()">
+                            <i data-feather="printer"></i> Print Label
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    // Generate QR code using QRCode.js or similar library
+    const qrContainer = document.getElementById('qrCodeContainer');
+    qrContainer.innerHTML = `
+        <div class="qr-code-display p-3 border rounded">
+            <canvas id="qrCanvas" width="200" height="200"></canvas>
+        </div>
+    `;
+    
+    // Generate QR code (using a simple method for now)
+    generateQRCode(qrData, 'qrCanvas');
+    
+    // Display label details
+    const labelDetails = document.getElementById('labelDetails');
+    labelDetails.innerHTML = `
+        <div class="label-info">
+            <p><strong>Item Code:</strong> ${labelInfo.item_code}</p>
+            <p><strong>Item Name:</strong> ${labelInfo.item_name}</p>
+            <p><strong>Batch Number:</strong> ${labelInfo.batch_number || 'N/A'}</p>
+            <p><strong>GRPO ID:</strong> ${labelInfo.grpo_id}</p>
+        </div>
+    `;
+    
+    // Show modal
+    const modalInstance = new bootstrap.Modal(modal);
+    modalInstance.show();
+    
+    // Refresh feather icons
+    setTimeout(() => {
+        if (window.feather) {
+            feather.replace();
+        }
+    }, 100);
+}
+
+// Handle batch selection
+function handleBatchSelection() {
+    const batchSelect = document.getElementById('batch_select');
+    const batchNumber = document.getElementById('batch_number');
+    const expirationDate = document.getElementById('expiration_date');
+
+    if (batchSelect.value) {
+        batchNumber.value = batchSelect.value;
+        batchNumber.style.display = 'none';
+        batchSelect.parentElement.style.display = 'flex';
+
+        // Auto-fill expiration date if available
+        const selectedBatch = batchesData.find(b => b.Batch === batchSelect.value);
+        if (selectedBatch && selectedBatch.ExpirationDate) {
+            expirationDate.value = selectedBatch.ExpirationDate;
+        }
+    }
+}
+
+function generateQRCode(text, canvasId) {
+    // Simple QR code generation using canvas
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Clear canvas
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 200, 200);
+    
+    // Simple placeholder QR pattern (you'd want to use a proper QR library)
+    ctx.fillStyle = 'black';
+    
+    // Create a simple pattern for demo
+    const size = 8;
+    for (let i = 0; i < 25; i++) {
+        for (let j = 0; j < 25; j++) {
+            if ((i + j) % 3 === 0 || (i % 5 === 0 && j % 5 === 0)) {
+                ctx.fillRect(i * size, j * size, size, size);
+            }
+        }
+    }
+    
+    // Add text below QR code
+    ctx.fillStyle = 'black';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Scan for item details', 100, 190);
+}
+
+function printQRLabel() {
+    // Create printable content
+    const qrCanvas = document.getElementById('qrCanvas');
+    const labelInfo = document.querySelector('#labelDetails .label-info').innerHTML;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>QR Code Label</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+                .label { border: 2px solid black; padding: 15px; display: inline-block; }
+                .qr-code { margin-bottom: 10px; }
+                .label-details { font-size: 12px; }
+                @media print { body { margin: 0; } .label { border: 1px solid black; } }
+            </style>
+        </head>
+        <body>
+            <div class="label">
+                <div class="qr-code">
+                    <img src="${qrCanvas.toDataURL()}" width="150" height="150">
+                </div>
+                <div class="label-details">
+                    ${labelInfo}
+                </div>
+            </div>
+            <script>
+                window.onload = function() {
+                    window.print();
+                    window.close();
+                }
+            </script>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+}
+
+function toggleWarehouseEdit() {
+    const warehouseCodeInput = document.getElementById('warehouse_code');
+    const editButton = event.target.closest('button');
+    
+    if (warehouseCodeInput.readOnly) {
+        warehouseCodeInput.readOnly = false;
+        warehouseCodeInput.focus();
+        editButton.innerHTML = '<i data-feather="save"></i> Save';
+        editButton.classList.remove('btn-outline-secondary');
+        editButton.classList.add('btn-outline-success');
+    } else {
+        warehouseCodeInput.readOnly = true;
+        editButton.innerHTML = '<i data-feather="edit-2"></i> Edit';
+        editButton.classList.remove('btn-outline-success');
+        editButton.classList.add('btn-outline-secondary');
+        
+        // Auto-populate bin location based on warehouse
+        const binLocationInput = document.getElementById('bin_location');
+        if (warehouseCodeInput.value) {
+            binLocationInput.value = warehouseCodeInput.value + '-BIN-01'; // Default bin
+        }
+    }
+    
+    // Refresh feather icons
+    setTimeout(() => {
+        if (window.feather) {
+            feather.replace();
+        }
+    }, 100);
+}
+
+function showAddItemModal() {
+    // Clear all fields when opening manually
+    selectedPoItemData = null;
+    document.getElementById('item_code').value = '';
+    document.getElementById('item_name').value = '';
+    document.getElementById('unit_of_measure').value = 'EA';
+    document.getElementById('warehouse_code').value = '';
+    document.getElementById('quantity').value = '';
+    document.getElementById('batch_number').value = '';
+    document.getElementById('expiration_date').value = '';
+    document.getElementById('barcode').value = '';
+    
+    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+    modal.show();
+}
+
+// Show JSON Preview for SAP B1 posting
+function showJsonPreview(grpoId) {
+    console.log('🔍 Fetching JSON preview for GRPO ID:', grpoId);
+    
+    fetch(`/api/grpo/${grpoId}/preview_json`)
+        .then(response => {
+            console.log('📡 Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('📄 JSON Preview Response:', data);
+            
+            const jsonContent = document.getElementById('jsonContent');
+            if (data.success) {
+                const formattedJson = JSON.stringify(data.json_data, null, 2);
+                jsonContent.textContent = formattedJson;
+                
+                console.log('✅ JSON Structure for SAP B1:');
+                console.log('📊 PO Number:', data.po_number);
+                console.log('📋 Total Lines:', data.total_lines);
+                console.log('🏗️ Complete JSON Structure:');
+                console.log(formattedJson);
+                
+                // Also log individual components for debugging
+                if (data.json_data) {
+                    console.log('🏢 Card Code:', data.json_data.CardCode);
+                    console.log('📅 Doc Date:', data.json_data.DocDate);
+                    console.log('🏪 Business Place ID:', data.json_data.BPL_IDAssignedToInvoice);
+                    console.log('📦 Document Lines Count:', data.json_data.DocumentLines?.length || 0);
+                    
+                    if (data.json_data.DocumentLines) {
+                        data.json_data.DocumentLines.forEach((line, index) => {
+                            console.log(`📝 Line ${index + 1}:`, {
+                                ItemCode: line.ItemCode,
+                                Quantity: line.Quantity,
+                                WarehouseCode: line.WarehouseCode,
+                                BaseType: line.BaseType,
+                                BaseEntry: line.BaseEntry,
+                                BaseLine: line.BaseLine
+                            });
+                        });
+                    }
+                }
+            } else {
+                const errorMsg = `❌ Error generating JSON preview: ${data.error}`;
+                jsonContent.textContent = errorMsg;
+                console.error('❌ JSON Preview Error:', data.error);
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('jsonPreviewModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('🚨 Error fetching JSON preview:', error);
+            const jsonContent = document.getElementById('jsonContent');
+            const errorMsg = `🚨 Network/Server Error: ${error.message}`;
+            jsonContent.textContent = errorMsg;
+            
+            const modal = new bootstrap.Modal(document.getElementById('jsonPreviewModal'));
+            modal.show();
+        });
+}
+
+function copyJsonToClipboard() {
+    const jsonContent = document.getElementById('jsonContent').textContent;
+    navigator.clipboard.writeText(jsonContent).then(() => {
+        alert('JSON copied to clipboard!');
+    }).catch(err => {
+        console.error('Could not copy text: ', err);
+        alert('Failed to copy JSON to clipboard');
+    });
+}
+
+function addItemToGRPO(itemCode) {
+    // Pre-fill the modal with item code
+    document.getElementById('item_code').value = itemCode;
+    showAddItemModal();
+}
+
+function submitGRPO(grpoId) {
+    if (confirm('Are you sure you want to submit this GRPO for QC approval?')) {
+        fetch(`/grpo/${grpoId}/submit`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error submitting GRPO');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error submitting GRPO');
+        });
+    }
+}
+
+function approveGRPO(grpoId) {
+    const notes = prompt('QC Notes (optional):');
+    if (notes !== null) {
+        const draftOrPost = confirm('Click OK to POST to SAP B1 immediately, or Cancel to save as DRAFT for later posting');
+        
+        const formData = new FormData();
+        formData.append('qc_notes', notes);
+        formData.append('draft_or_post', draftOrPost ? 'post' : 'draft');
+        
+        fetch(`/grpo/${grpoId}/approve`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error approving GRPO');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error approving GRPO');
+        });
+    }
+}
+
+function rejectGRPO(grpoId) {
+    const notes = prompt('Rejection reason (required):');
+    if (notes && notes.trim()) {
+        const formData = new FormData();
+        formData.append('qc_notes', notes);
+        
+        fetch(`/grpo/${grpoId}/reject`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error rejecting GRPO');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error rejecting GRPO');
+        });
+    } else {
+        alert('Rejection reason is required');
+    }
+}
+
+function printBarcode(barcode, itemId) {
+    // Call the print barcode API
+    fetch('/api/print_barcode', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            barcode: barcode,
+            item_id: itemId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            // Reload page to update UI
+            location.reload();
+        } else {
+            alert('Error printing barcode: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error printing barcode');
+    });
+}
+
+function generateBarcode(itemId, itemCode) {
+    // Call the generate barcode API
+    fetch('/api/generate_barcode', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            item_id: itemId,
+            item_code: itemCode
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Barcode generated: ${data.barcode}`);
+            // Reload page to update UI
+            location.reload();
+        } else {
+            alert('Error generating barcode: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error generating barcode');
+    });
+}
+
+function removeItem(itemId) {
+    if (confirm('Are you sure you want to remove this item?')) {
+        // Implementation for removing item
+        console.log('Remove item:', itemId);
+    }
+}
+
+// Removed duplicate function - using the one at the end of file
+
+// Removed duplicate function - using the one at the end of file
+
+// Generate barcode for the modal form
+function generateBarcodeForModal() {
+    const itemCodeInput = document.getElementById('item_code');
+    const barcodeInput = document.getElementById('barcode');
+    
+    if (!itemCodeInput.value.trim()) {
+        alert('Please enter an item code first');
+        itemCodeInput.focus();
+        return;
+    }
+    
+    // Generate WMS barcode format
+    const itemCode = itemCodeInput.value.trim();
+    const randomHex = Math.random().toString(16).substring(2, 10).toUpperCase();
+    const generatedBarcode = `WMS-${itemCode}-${randomHex}`;
+    
+    barcodeInput.value = generatedBarcode;
+    console.log('🏷️ Generated barcode:', generatedBarcode);
+}
+
+// Generate barcode for existing GRPO items
+function generateBarcode(itemId, itemCode) {
+    console.log('🏷️ Generating barcode for item:', itemCode, 'ID:', itemId);
+    
+    // Generate WMS barcode format
+    const randomHex = Math.random().toString(16).substring(2, 10).toUpperCase();
+    const generatedBarcode = `WMS-${itemCode}-${randomHex}`;
+    
+    // Update the item with the generated barcode
+    updateItemField(itemId, 'generated_barcode', generatedBarcode);
+}
+
+// Update item field via AJAX
+function updateItemField(itemId, fieldName, value) {
+    console.log('📝 Updating item field:', itemId, fieldName, value);
+    
+    fetch(`/grpo/item/${itemId}/update_field`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            field_name: fieldName,
+            value: value
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('✅ Field updated successfully');
+            // Refresh the page to show updates
+            location.reload();
+        } else {
+            console.error('❌ Error updating field:', data.error);
+            alert('Error updating field: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('❌ Network error:', error);
+        alert('Network error updating field');
+    });
+}
+
+// Add event listeners when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Page loaded, setting up event listeners...');
+    
+    // Add event listeners for Add Item buttons
+    document.querySelectorAll('.add-item-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            console.log('🔘 Add button clicked');
+            
+            const itemCode = this.getAttribute('data-item-code');
+            const itemName = this.getAttribute('data-item-name');
+            const uom = this.getAttribute('data-uom');
+            const warehouse = this.getAttribute('data-warehouse');
+            const poItemJson = this.getAttribute('data-po-item');
+            
+            console.log('📋 Button data:', {
+                itemCode, itemName, uom, warehouse, poItemJson
+            });
+            
+            // Validate required data
+            if (!itemCode) {
+                console.error('❌ Missing item code');
+                alert('Error: Item code is missing');
+                return;
+            }
+            
+            console.log('📦 Item data:', {itemCode, itemName, uom, warehouse});
+            
+            let poItemData = null;
+            try {
+                poItemData = JSON.parse(poItemJson);
+            } catch (e) {
+                console.warn('Could not parse PO item data:', e);
+            }
+            
+            // Call the function
+            addItemToGRPO(itemCode, itemName, uom, warehouse, poItemData);
+        });
+    });
+    
+    console.log('✅ Event listeners set up complete');
+});
+</script>
+{% endblock %}

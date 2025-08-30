@@ -1,0 +1,614 @@
+{% extends "base.html" %}
+
+{% block title %}Label Printing - WMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>Label Printing</h1>
+        <p class="text-muted">Generate and print barcode labels for items</p>
+    </div>
+</div>
+
+<!-- Label Generation -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Generate Labels</h5>
+            </div>
+            <div class="card-body">
+                <form id="labelForm">
+                    <div class="mb-3">
+                        <label for="itemCode" class="form-label">Item Code</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="itemCode" name="itemCode" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="scanItemCode()">
+                                <i data-feather="camera"></i> Scan
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="labelFormat" class="form-label">Label Format</label>
+                        <select class="form-select" id="labelFormat" name="labelFormat" required>
+                            <option value="standard">Standard (30x20mm)</option>
+                            <option value="large">Large (50x30mm)</option>
+                            <option value="small">Small (20x15mm)</option>
+                            <option value="custom">Custom Format</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="100" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="batchNumber" class="form-label">Batch Number (Optional)</label>
+                        <input type="text" class="form-control" id="batchNumber" name="batchNumber">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="expirationDate" class="form-label">Expiration Date (Optional)</label>
+                        <input type="date" class="form-control" id="expirationDate" name="expirationDate">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="serialNumber" class="form-label">Serial Number (Optional)</label>
+                        <input type="text" class="form-control" id="serialNumber" name="serialNumber">
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i data-feather="printer"></i> Generate & Print
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="previewLabel()">
+                            <i data-feather="eye"></i> Preview
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="scanner-container mt-3" id="labelScannerContainer" style="display: none;">
+                    <video id="labelScanVideo" class="scanner-video" autoplay></video>
+                    <div class="scanner-overlay"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Label Preview</h5>
+            </div>
+            <div class="card-body">
+                <div id="labelPreview" class="text-center">
+                    <div class="py-4">
+                        <i data-feather="image" style="width: 48px; height: 48px;" class="text-muted mb-3"></i>
+                        <h6>No Preview Available</h6>
+                        <p class="text-muted">Fill in the form to preview the label</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Batch Printing -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Batch Printing</h5>
+                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#batchModal">
+                        <i data-feather="layers"></i> Batch Print
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h3>0</h3>
+                                <p class="mb-0">Items in Queue</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h3>0</h3>
+                                <p class="mb-0">Labels Printed Today</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h3>Ready</h3>
+                                <p class="mb-0">Printer Status</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Labels -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Labels</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Barcode</th>
+                                <th>Format</th>
+                                <th>Quantity</th>
+                                <th>Printed</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentLabelsTable">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Batch Modal -->
+<div class="modal fade" id="batchModal" tabindex="-1" aria-labelledby="batchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="batchModalLabel">Batch Printing</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Add Items</h6>
+                        <div class="mb-3">
+                            <label for="batchItemCode" class="form-label">Item Code</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="batchItemCode">
+                                <button class="btn btn-outline-secondary" type="button" onclick="scanBatchItem()">
+                                    <i data-feather="camera"></i> Scan
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="batchQuantity" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="batchQuantity" value="1" min="1" max="100">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="batchFormat" class="form-label">Format</label>
+                            <select class="form-select" id="batchFormat">
+                                <option value="standard">Standard</option>
+                                <option value="large">Large</option>
+                                <option value="small">Small</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="addToBatch()">
+                            <i data-feather="plus"></i> Add to Batch
+                        </button>
+                        
+                        <div class="scanner-container mt-3" id="batchScannerContainer" style="display: none;">
+                            <video id="batchScanVideo" class="scanner-video" autoplay></video>
+                            <div class="scanner-overlay"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6>Batch Items</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Qty</th>
+                                        <th>Format</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="batchItemsTable">
+                                    <!-- Items will be added here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" onclick="clearBatch()">Clear Batch</button>
+                <button type="button" class="btn btn-success" onclick="printBatch()">Print All</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Label Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel">Label Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalPreviewContent" class="text-center">
+                    <!-- Preview content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="printFromPreview()">Print</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let batchItems = [];
+
+function scanItemCode() {
+    const container = document.getElementById('labelScannerContainer');
+    const video = document.getElementById('labelScanVideo');
+    
+    container.style.display = 'block';
+    
+    startBarcodeScanner('labelScanVideo', function(code) {
+        document.getElementById('itemCode').value = code;
+        container.style.display = 'none';
+        stopBarcodeScanner();
+        
+        // Validate item and auto-fill details
+        validateAndFillItem(code);
+    });
+}
+
+function scanBatchItem() {
+    const container = document.getElementById('batchScannerContainer');
+    const video = document.getElementById('batchScanVideo');
+    
+    container.style.display = 'block';
+    
+    startBarcodeScanner('batchScanVideo', function(code) {
+        document.getElementById('batchItemCode').value = code;
+        container.style.display = 'none';
+        stopBarcodeScanner();
+    });
+}
+
+async function validateAndFillItem(itemCode) {
+    try {
+        const response = await fetch('/api/validate_item', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ item_code: itemCode })
+        });
+        
+        const data = await response.json();
+        
+        if (data.valid && data.item_data) {
+            // Auto-generate preview
+            previewLabel();
+        } else {
+            alert('Item not found in system');
+        }
+    } catch (error) {
+        console.error('Error validating item:', error);
+    }
+}
+
+function previewLabel() {
+    const itemCode = document.getElementById('itemCode').value;
+    const labelFormat = document.getElementById('labelFormat').value;
+    const batchNumber = document.getElementById('batchNumber').value;
+    const expirationDate = document.getElementById('expirationDate').value;
+    const serialNumber = document.getElementById('serialNumber').value;
+    
+    if (!itemCode) {
+        alert('Please enter an item code');
+        return;
+    }
+    
+    // Generate barcode
+    const barcode = window.barcodeScanner.generateBarcode(itemCode, batchNumber, new Date(expirationDate), serialNumber);
+    
+    // Create preview
+    const preview = generateLabelPreview(itemCode, barcode, labelFormat, batchNumber, expirationDate, serialNumber);
+    
+    document.getElementById('labelPreview').innerHTML = preview;
+    document.getElementById('modalPreviewContent').innerHTML = preview;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+    modal.show();
+}
+
+function generateLabelPreview(itemCode, barcode, format, batchNumber, expirationDate, serialNumber) {
+    const formatSizes = {
+        standard: { width: '120px', height: '80px' },
+        large: { width: '200px', height: '120px' },
+        small: { width: '80px', height: '60px' }
+    };
+    
+    const size = formatSizes[format] || formatSizes.standard;
+    
+    return `
+        <div class="label-preview" style="
+            width: ${size.width}; 
+            height: ${size.height}; 
+            border: 2px solid #ddd; 
+            margin: 0 auto; 
+            padding: 8px; 
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: monospace;
+            font-size: 10px;
+        ">
+            <div style="text-align: center; font-weight: bold; font-size: 12px;">
+                ${itemCode}
+            </div>
+            <div style="text-align: center; margin: 5px 0;">
+                <div style="background: #000; color: white; padding: 2px; font-size: 8px;">
+                    ${barcode}
+                </div>
+            </div>
+            <div style="font-size: 8px; text-align: center;">
+                ${batchNumber ? `Batch: ${batchNumber}` : ''}
+                ${expirationDate ? `<br>Exp: ${expirationDate}` : ''}
+                ${serialNumber ? `<br>S/N: ${serialNumber}` : ''}
+            </div>
+        </div>
+    `;
+}
+
+document.getElementById('labelForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+    
+    try {
+        const response = await fetch('/api/print_label', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Label printed successfully!');
+            loadRecentLabels();
+            
+            // Clear form
+            this.reset();
+            document.getElementById('labelPreview').innerHTML = `
+                <div class="py-4">
+                    <i data-feather="image" style="width: 48px; height: 48px;" class="text-muted mb-3"></i>
+                    <h6>No Preview Available</h6>
+                    <p class="text-muted">Fill in the form to preview the label</p>
+                </div>
+            `;
+            feather.replace();
+        } else {
+            alert('Error printing label: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error printing label:', error);
+        alert('Error printing label');
+    }
+});
+
+function addToBatch() {
+    const itemCode = document.getElementById('batchItemCode').value;
+    const quantity = parseInt(document.getElementById('batchQuantity').value);
+    const format = document.getElementById('batchFormat').value;
+    
+    if (!itemCode || !quantity) {
+        alert('Please enter item code and quantity');
+        return;
+    }
+    
+    // Check if item already exists in batch
+    const existingIndex = batchItems.findIndex(item => item.itemCode === itemCode && item.format === format);
+    
+    if (existingIndex >= 0) {
+        batchItems[existingIndex].quantity += quantity;
+    } else {
+        batchItems.push({
+            itemCode: itemCode,
+            quantity: quantity,
+            format: format
+        });
+    }
+    
+    updateBatchTable();
+    
+    // Clear inputs
+    document.getElementById('batchItemCode').value = '';
+    document.getElementById('batchQuantity').value = 1;
+}
+
+function updateBatchTable() {
+    const tbody = document.getElementById('batchItemsTable');
+    tbody.innerHTML = '';
+    
+    batchItems.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.itemCode}</td>
+            <td>${item.quantity}</td>
+            <td>${item.format}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeFromBatch(${index})">
+                    <i data-feather="trash-2"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    feather.replace();
+}
+
+function removeFromBatch(index) {
+    batchItems.splice(index, 1);
+    updateBatchTable();
+}
+
+function clearBatch() {
+    batchItems = [];
+    updateBatchTable();
+}
+
+async function printBatch() {
+    if (batchItems.length === 0) {
+        alert('No items in batch');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/print_batch_labels', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ items: batchItems })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`Batch printed successfully! ${result.total_labels} labels printed.`);
+            clearBatch();
+            loadRecentLabels();
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('batchModal'));
+            modal.hide();
+        } else {
+            alert('Error printing batch: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error printing batch:', error);
+        alert('Error printing batch');
+    }
+}
+
+function printFromPreview() {
+    // Trigger form submission
+    document.getElementById('labelForm').dispatchEvent(new Event('submit'));
+    
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('previewModal'));
+    modal.hide();
+}
+
+async function loadRecentLabels() {
+    try {
+        const response = await fetch('/api/recent_labels');
+        const data = await response.json();
+        
+        const tbody = document.getElementById('recentLabelsTable');
+        tbody.innerHTML = '';
+        
+        if (data.labels && data.labels.length > 0) {
+            data.labels.forEach(label => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${label.item_code}</td>
+                    <td><code>${label.barcode}</code></td>
+                    <td><span class="badge bg-secondary">${label.label_format}</span></td>
+                    <td>${label.print_count}</td>
+                    <td>${label.last_printed}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="reprintLabel(${label.id})">
+                            <i data-feather="printer"></i> Reprint
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">No recent labels</td></tr>';
+        }
+        
+        feather.replace();
+    } catch (error) {
+        console.error('Error loading recent labels:', error);
+    }
+}
+
+async function reprintLabel(labelId) {
+    try {
+        const response = await fetch('/api/reprint_label', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ label_id: labelId })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Label reprinted successfully!');
+            loadRecentLabels();
+        } else {
+            alert('Error reprinting label');
+        }
+    } catch (error) {
+        console.error('Error reprinting label:', error);
+        alert('Error reprinting label');
+    }
+}
+
+// Auto-preview when form changes
+document.getElementById('labelForm').addEventListener('input', function() {
+    const itemCode = document.getElementById('itemCode').value;
+    if (itemCode) {
+        previewLabel();
+    }
+});
+
+// Load recent labels on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadRecentLabels();
+});
+
+// Clean up scanners when modals are closed
+document.getElementById('batchModal').addEventListener('hidden.bs.modal', function () {
+    stopBarcodeScanner();
+    document.getElementById('batchScannerContainer').style.display = 'none';
+});
+</script>
+{% endblock %}

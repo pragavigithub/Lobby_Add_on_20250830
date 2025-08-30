@@ -1,0 +1,108 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS E:\SAP_Integ\Git Change\20250713\4\Emerging_BarCode_Integration> python setup_local_env.py       
+=== WMS Local Environment Setup ===
+
+.env file already exists. Overwrite? (y/n): y
+🔧 Setting up environment variables for local development
+
+💡 Connection Options:
+1. Local SQL Server (recommended for development)
+2. Remote SQL Server (requires network access)
+3. Skip MSSQL (use SQLite for development)
+
+Choose option (1-3): 1
+Server name options:
+1. 192.168.1.5\SQLEXPRESS
+2. .\SQLEXPRESS
+3. DESKTOP-PLFK2B5\SQLEXPRESS
+4. Custom
+Choose server (1-4) or press Enter for default [192.168.1.5\SQLEXPRESS]: 1
+Enter MSSQL_DATABASE [WMS_DB]: WMS_DB
+Enter MSSQL_USERNAME [sa]: sa
+Enter MSSQL_PASSWORD [Ea@12345]: Ea@12345
+
+✅ Environment variables saved to .env file
+Server: 192.168.1.5\SQLEXPRESS
+Database: WMS_DB
+Username: sa
+
+📋 To use the .env file, install python-dotenv:
+pip install python-dotenv
+
+Then add this to your main.py:
+from dotenv import load_dotenv
+load_dotenv()
+
+Or set system environment variables manually.
+
+🎉 Setup complete!
+
+Next steps:
+1. Make sure SQL Server is running
+2. Create WMS_DB database
+3. Run: python fix_mssql_connection.py (to test connection)
+4. Run: python main.py (to start the app)
+PS E:\SAP_Integ\Git Change\20250713\4\Emerging_BarCode_Integration> python fix_mssql_connection.py
+INFO: 🔍 MSSQL Connection Diagnostics
+INFO: ==================================================
+INFO: Server: None
+INFO: Database: None
+INFO: Username: None
+INFO: Password: Not set
+ERROR: ❌ Missing environment variables
+INFO: Set: MSSQL_SERVER, MSSQL_DATABASE, MSSQL_USERNAME, MSSQL_PASSWORD
+PS E:\SAP_Integ\Git Change\20250713\4\Emerging_BarCode_Integration>  python main.py                 
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 with TCP/IP: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Providerr
+: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft][ODBC Dr
+iver 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 without Named Pipes: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes  
+Provider: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft]
+[ODBC Driver 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with SQL Server driver: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist  
+or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53); [08001] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:root:❌ All MSSQL connection attempts failed for 192.168.1.5\SQLEXPRESS/WMS_DB
+ * Serving Flask app 'app'
+ * Debug mode: on
+INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.5:5000
+INFO:werkzeug:Press CTRL+C to quit
+INFO:werkzeug: * Restarting with stat
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 with TCP/IP: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Providerr
+: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft][ODBC Dr
+iver 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 without Named Pipes: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes  
+Provider: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft]
+[ODBC Driver 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with SQL Server driver: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist  
+or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53); [08001] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:root:❌ All MSSQL connection attempts failed for 192.168.1.5\SQLEXPRESS/WMS_DB
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 888-243-362
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:02] "GET / HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:02] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:03] "GET /static/js/barcode-scanner.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:03] "GET /static/css/style.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:03] "GET /static/js/app.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:17] "GET /grpo HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:17] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:17] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:17] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:42] "POST /api/validate_po HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:42] "POST /grpo/create HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:42] "GET /grpo HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:42] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:42] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 07:41:42] "GET /static/js/app.js HTTP/1.1" 304 -
+

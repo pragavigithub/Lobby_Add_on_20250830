@@ -1,0 +1,453 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory Counting - WMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Inventory Counting</h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCountModal">
+                <i data-feather="plus"></i> Create Count Task
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Count Tasks -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Count Tasks</h5>
+            </div>
+            <div class="card-body">
+                {% if counts %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Count ID</th>
+                                <th>Count Number</th>
+                                <th>Warehouse</th>
+                                <th>Bin Location</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for count in counts %}
+                            <tr>
+                                <td>{{ count.id }}</td>
+                                <td>{{ count.count_number }}</td>
+                                <td>{{ count.warehouse_code }}</td>
+                                <td>{{ count.bin_location }}</td>
+                                <td>
+                                    {% if count.status == 'assigned' %}
+                                        <span class="badge bg-warning">Assigned</span>
+                                    {% elif count.status == 'in_progress' %}
+                                        <span class="badge bg-info">In Progress</span>
+                                    {% elif count.status == 'completed' %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ count.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <a href="{{ url_for('inventory_counting_detail', count_id=count.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i data-feather="eye"></i> View
+                                    </a>
+                                    {% if count.status == 'assigned' %}
+                                    <button class="btn btn-sm btn-outline-success" onclick="startCounting({{ count.id }})">
+                                        <i data-feather="play"></i> Start
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i data-feather="check-square" style="width: 48px; height: 48px;" class="text-muted mb-3"></i>
+                    <h5>No Count Tasks</h5>
+                    <p class="text-muted">Create your first count task to get started.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Count Task Modal -->
+<div class="modal fade" id="createCountModal" tabindex="-1" aria-labelledby="createCountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createCountModalLabel">Create Count Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('create_count_task') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="count_number" class="form-label">Count Number</label>
+                        <input type="text" class="form-control" id="count_number" name="count_number" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="warehouse_code" class="form-label">Warehouse</label>
+                        <select class="form-select" id="warehouse_code" name="warehouse_code" required>
+                            <option value="">Select Warehouse</option>
+                            <option value="01">Main Warehouse</option>
+                            <option value="02">Distribution Center</option>
+                            <option value="03">Retail Store</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="bin_location" class="form-label">Bin Location</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="bin_location" name="bin_location" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="scanBinLocation()">
+                                <i data-feather="camera"></i> Scan
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="scanner-container" id="countScannerContainer" style="display: none;">
+                        <video id="countScanVideo" class="scanner-video" autoplay></video>
+                        <div class="scanner-overlay"></div>
+                    </div>
+                    
+                    <div id="binValidationResult" style="display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Count Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Count Modal -->
+<div class="modal fade" id="quickCountModal" tabindex="-1" aria-labelledby="quickCountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="quickCountModalLabel">Quick Count</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="quickCountBin" class="form-label">Bin Location</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="quickCountBin" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="scanQuickCountBin()">
+                                    <i data-feather="camera"></i> Scan
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="quickCountItem" class="form-label">Item Code</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="quickCountItem" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="scanQuickCountItem()">
+                                    <i data-feather="camera"></i> Scan
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="quickCountQty" class="form-label">Counted Quantity</label>
+                            <input type="number" class="form-control" id="quickCountQty" step="0.01" required>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="addQuickCountItem()">
+                            <i data-feather="plus"></i> Add Item
+                        </button>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="scanner-container" id="quickCountScannerContainer" style="display: none;">
+                            <video id="quickCountScanVideo" class="scanner-video" autoplay></video>
+                            <div class="scanner-overlay"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6>Counted Items</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>System Qty</th>
+                                    <th>Counted Qty</th>
+                                    <th>Variance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="quickCountItems">
+                                <!-- Items will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitQuickCount()">Submit Count</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Count Button -->
+<div class="position-fixed bottom-0 end-0 m-3">
+    <button class="btn btn-success btn-lg rounded-circle" data-bs-toggle="modal" data-bs-target="#quickCountModal" title="Quick Count">
+        <i data-feather="zap"></i>
+    </button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let quickCountData = [];
+
+function scanBinLocation() {
+    const container = document.getElementById('countScannerContainer');
+    const video = document.getElementById('countScanVideo');
+    
+    container.style.display = 'block';
+    
+    startBarcodeScanner('countScanVideo', function(code) {
+        document.getElementById('bin_location').value = code;
+        container.style.display = 'none';
+        stopBarcodeScanner();
+        
+        // Validate bin location
+        validateBinLocation(code);
+    });
+}
+
+function scanQuickCountBin() {
+    const container = document.getElementById('quickCountScannerContainer');
+    const video = document.getElementById('quickCountScanVideo');
+    
+    container.style.display = 'block';
+    
+    startBarcodeScanner('quickCountScanVideo', function(code) {
+        document.getElementById('quickCountBin').value = code;
+        container.style.display = 'none';
+        stopBarcodeScanner();
+    });
+}
+
+function scanQuickCountItem() {
+    const container = document.getElementById('quickCountScannerContainer');
+    const video = document.getElementById('quickCountScanVideo');
+    
+    container.style.display = 'block';
+    
+    startBarcodeScanner('quickCountScanVideo', function(code) {
+        document.getElementById('quickCountItem').value = code;
+        container.style.display = 'none';
+        stopBarcodeScanner();
+        
+        // Get system quantity
+        getSystemQuantity(code);
+    });
+}
+
+async function validateBinLocation(binCode) {
+    try {
+        const response = await fetch('/api/validate_bin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ bin_code: binCode })
+        });
+        
+        const data = await response.json();
+        const resultDiv = document.getElementById('binValidationResult');
+        
+        if (data.valid) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <strong>Valid Bin:</strong> ${binCode}
+                    <br><small>Items: ${data.items_count || 0}</small>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>Invalid Bin:</strong> ${data.error}
+                </div>
+            `;
+        }
+        
+        resultDiv.style.display = 'block';
+    } catch (error) {
+        console.error('Error validating bin:', error);
+    }
+}
+
+async function getSystemQuantity(itemCode) {
+    try {
+        const binCode = document.getElementById('quickCountBin').value;
+        if (!binCode) {
+            alert('Please scan bin location first');
+            return;
+        }
+        
+        const response = await fetch('/api/get_system_quantity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ item_code: itemCode, bin_code: binCode })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // You could display system quantity here
+            console.log('System quantity:', data.quantity);
+        }
+    } catch (error) {
+        console.error('Error getting system quantity:', error);
+    }
+}
+
+function addQuickCountItem() {
+    const binCode = document.getElementById('quickCountBin').value;
+    const itemCode = document.getElementById('quickCountItem').value;
+    const countedQty = parseFloat(document.getElementById('quickCountQty').value);
+    
+    if (!binCode || !itemCode || isNaN(countedQty)) {
+        alert('Please fill all fields');
+        return;
+    }
+    
+    // Check if item already exists
+    const existingIndex = quickCountData.findIndex(item => item.itemCode === itemCode);
+    
+    if (existingIndex >= 0) {
+        quickCountData[existingIndex].countedQty = countedQty;
+    } else {
+        quickCountData.push({
+            itemCode: itemCode,
+            systemQty: 0, // This would come from SAP
+            countedQty: countedQty,
+            variance: countedQty - 0 // This would be calculated with real system qty
+        });
+    }
+    
+    updateQuickCountTable();
+    
+    // Clear input fields
+    document.getElementById('quickCountItem').value = '';
+    document.getElementById('quickCountQty').value = '';
+}
+
+function updateQuickCountTable() {
+    const tbody = document.getElementById('quickCountItems');
+    tbody.innerHTML = '';
+    
+    quickCountData.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.itemCode}</td>
+            <td>${item.systemQty}</td>
+            <td>${item.countedQty}</td>
+            <td class="${item.variance !== 0 ? 'text-warning' : 'text-success'}">${item.variance}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeQuickCountItem(${index})">
+                    <i data-feather="trash-2"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    feather.replace();
+}
+
+function removeQuickCountItem(index) {
+    quickCountData.splice(index, 1);
+    updateQuickCountTable();
+}
+
+async function submitQuickCount() {
+    const binCode = document.getElementById('quickCountBin').value;
+    
+    if (!binCode || quickCountData.length === 0) {
+        alert('Please add at least one item to count');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/submit_quick_count', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                bin_code: binCode,
+                items: quickCountData
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Count submitted successfully');
+            
+            // Reset form
+            quickCountData = [];
+            updateQuickCountTable();
+            document.getElementById('quickCountBin').value = '';
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('quickCountModal'));
+            modal.hide();
+            
+            // Refresh page
+            location.reload();
+        } else {
+            alert('Error submitting count: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error submitting count:', error);
+        alert('Error submitting count');
+    }
+}
+
+function startCounting(countId) {
+    if (confirm('Start counting for this task?')) {
+        window.location.href = `/inventory_counting/${countId}`;
+    }
+}
+
+// Auto-generate count number
+document.getElementById('count_number').value = 'CNT-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-6);
+
+// Clean up scanners when modals are closed
+document.getElementById('createCountModal').addEventListener('hidden.bs.modal', function () {
+    stopBarcodeScanner();
+    document.getElementById('countScannerContainer').style.display = 'none';
+});
+
+document.getElementById('quickCountModal').addEventListener('hidden.bs.modal', function () {
+    stopBarcodeScanner();
+    document.getElementById('quickCountScannerContainer').style.display = 'none';
+});
+</script>
+{% endblock %}

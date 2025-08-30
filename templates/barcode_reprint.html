@@ -1,0 +1,629 @@
+{% extends "base.html" %}
+
+{% block title %}Barcode Reprint - WMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>Barcode Reprint</h1>
+        <p class="text-muted">Reprint existing barcode labels</p>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Search Labels</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="searchItemCode" class="form-label">Item Code</label>
+                            <input type="text" class="form-control" id="searchItemCode" placeholder="Enter item code">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="searchBarcode" class="form-label">Barcode</label>
+                            <input type="text" class="form-control" id="searchBarcode" placeholder="Enter barcode">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="searchFormat" class="form-label">Format</label>
+                            <select class="form-select" id="searchFormat">
+                                <option value="">All Formats</option>
+                                <option value="standard">Standard</option>
+                                <option value="large">Large</option>
+                                <option value="small">Small</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="searchDate" class="form-label">Date Range</label>
+                            <select class="form-select" id="searchDate">
+                                <option value="">All Dates</option>
+                                <option value="today">Today</option>
+                                <option value="yesterday">Yesterday</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="searchLabels()">
+                            <i data-feather="search"></i> Search
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="clearSearch()">
+                            <i data-feather="x"></i> Clear
+                        </button>
+                        <button class="btn btn-outline-success" onclick="scanToSearch()">
+                            <i data-feather="camera"></i> Scan to Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Labels List -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Available Labels</h5>
+                    <div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="selectAll()">
+                            <i data-feather="check-square"></i> Select All
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="deselectAll()">
+                            <i data-feather="square"></i> Deselect All
+                        </button>
+                        <button class="btn btn-success btn-sm" onclick="reprintSelected()">
+                            <i data-feather="printer"></i> Reprint Selected
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="labelsContainer">
+                    {% if labels %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                                    </th>
+                                    <th>Item Code</th>
+                                    <th>Barcode</th>
+                                    <th>Format</th>
+                                    <th>Print Count</th>
+                                    <th>Last Printed</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="labelsTableBody">
+                                {% for label in labels %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="label-checkbox" value="{{ label.id }}">
+                                    </td>
+                                    <td><strong>{{ label.item_code }}</strong></td>
+                                    <td><code>{{ label.barcode }}</code></td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ label.label_format }}</span>
+                                    </td>
+                                    <td>{{ label.print_count }}</td>
+                                    <td>{{ label.last_printed.strftime('%Y-%m-%d %H:%M') if label.last_printed else 'Never' }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="reprintSingle({{ label.id }})">
+                                            <i data-feather="printer"></i> Reprint
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-info" onclick="previewLabel({{ label.id }})">
+                                            <i data-feather="eye"></i> Preview
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-success" onclick="duplicateLabel({{ label.id }})">
+                                            <i data-feather="copy"></i> Duplicate
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i data-feather="printer" style="width: 48px; height: 48px;" class="text-muted mb-3"></i>
+                        <h6>No Labels Available</h6>
+                        <p class="text-muted">No barcode labels have been printed yet.</p>
+                        <a href="{{ url_for('label_printing') }}" class="btn btn-primary">
+                            <i data-feather="plus"></i> Create Labels
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scanner Modal -->
+<div class="modal fade" id="scannerModal" tabindex="-1" aria-labelledby="scannerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scannerModalLabel">Scan Barcode</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="scanner-container">
+                    <video id="scannerVideo" class="scanner-video" autoplay></video>
+                    <div class="scanner-overlay"></div>
+                </div>
+                <div class="mt-3">
+                    <input type="text" class="form-control" id="manualBarcode" placeholder="Or enter barcode manually">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="searchByBarcode()">Search</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel">Label Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContent" class="text-center">
+                    <!-- Preview content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="reprintFromPreview()">Reprint</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Duplicate Modal -->
+<div class="modal fade" id="duplicateModal" tabindex="-1" aria-labelledby="duplicateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="duplicateModalLabel">Duplicate Label</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="duplicateQuantity" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="duplicateQuantity" value="1" min="1" max="100">
+                </div>
+                <div class="mb-3">
+                    <label for="duplicateFormat" class="form-label">Format</label>
+                    <select class="form-select" id="duplicateFormat">
+                        <option value="standard">Standard</option>
+                        <option value="large">Large</option>
+                        <option value="small">Small</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="newBarcode">
+                        <label class="form-check-label" for="newBarcode">
+                            Generate new barcode
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmDuplicate()">Duplicate & Print</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reprint Progress Modal -->
+<div class="modal fade" id="progressModal" tabindex="-1" aria-labelledby="progressModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="progressModalLabel">Printing Progress</h5>
+            </div>
+            <div class="modal-body">
+                <div class="progress mb-3">
+                    <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+                <div id="progressStatus">Preparing to print...</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentPreviewId = null;
+let currentDuplicateId = null;
+
+function scanToSearch() {
+    const modal = new bootstrap.Modal(document.getElementById('scannerModal'));
+    modal.show();
+    
+    modal._element.addEventListener('shown.bs.modal', function () {
+        startBarcodeScanner('scannerVideo', function(code) {
+            document.getElementById('manualBarcode').value = code;
+            searchByBarcode();
+        });
+    });
+}
+
+function searchByBarcode() {
+    const barcode = document.getElementById('manualBarcode').value;
+    if (barcode) {
+        document.getElementById('searchBarcode').value = barcode;
+        searchLabels();
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('scannerModal'));
+        modal.hide();
+    }
+}
+
+async function searchLabels() {
+    const itemCode = document.getElementById('searchItemCode').value;
+    const barcode = document.getElementById('searchBarcode').value;
+    const format = document.getElementById('searchFormat').value;
+    const dateRange = document.getElementById('searchDate').value;
+    
+    const params = new URLSearchParams();
+    if (itemCode) params.append('item_code', itemCode);
+    if (barcode) params.append('barcode', barcode);
+    if (format) params.append('format', format);
+    if (dateRange) params.append('date_range', dateRange);
+    
+    try {
+        const response = await fetch(`/api/search_labels?${params}`);
+        const data = await response.json();
+        
+        updateLabelsTable(data.labels);
+    } catch (error) {
+        console.error('Error searching labels:', error);
+        alert('Error searching labels');
+    }
+}
+
+function updateLabelsTable(labels) {
+    const container = document.getElementById('labelsContainer');
+    
+    if (labels.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-4">
+                <i data-feather="search" style="width: 48px; height: 48px;" class="text-muted mb-3"></i>
+                <h6>No Labels Found</h6>
+                <p class="text-muted">No labels match your search criteria.</p>
+            </div>
+        `;
+        feather.replace();
+        return;
+    }
+    
+    const table = `
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                        </th>
+                        <th>Item Code</th>
+                        <th>Barcode</th>
+                        <th>Format</th>
+                        <th>Print Count</th>
+                        <th>Last Printed</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="labelsTableBody">
+                    ${labels.map(label => `
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="label-checkbox" value="${label.id}">
+                            </td>
+                            <td><strong>${label.item_code}</strong></td>
+                            <td><code>${label.barcode}</code></td>
+                            <td>
+                                <span class="badge bg-secondary">${label.label_format}</span>
+                            </td>
+                            <td>${label.print_count}</td>
+                            <td>${label.last_printed || 'Never'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="reprintSingle(${label.id})">
+                                    <i data-feather="printer"></i> Reprint
+                                </button>
+                                <button class="btn btn-sm btn-outline-info" onclick="previewLabel(${label.id})">
+                                    <i data-feather="eye"></i> Preview
+                                </button>
+                                <button class="btn btn-sm btn-outline-success" onclick="duplicateLabel(${label.id})">
+                                    <i data-feather="copy"></i> Duplicate
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.innerHTML = table;
+    feather.replace();
+}
+
+function clearSearch() {
+    document.getElementById('searchItemCode').value = '';
+    document.getElementById('searchBarcode').value = '';
+    document.getElementById('searchFormat').value = '';
+    document.getElementById('searchDate').value = '';
+    
+    // Reload all labels
+    location.reload();
+}
+
+function toggleSelectAll() {
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    const checkboxes = document.querySelectorAll('.label-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+}
+
+function selectAll() {
+    const checkboxes = document.querySelectorAll('.label-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    document.getElementById('selectAllCheckbox').checked = true;
+}
+
+function deselectAll() {
+    const checkboxes = document.querySelectorAll('.label-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    document.getElementById('selectAllCheckbox').checked = false;
+}
+
+async function reprintSingle(labelId) {
+    try {
+        const response = await fetch('/api/reprint_label', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ label_id: labelId })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Label reprinted successfully!');
+            location.reload();
+        } else {
+            alert('Error reprinting label: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error reprinting label:', error);
+        alert('Error reprinting label');
+    }
+}
+
+async function reprintSelected() {
+    const checkboxes = document.querySelectorAll('.label-checkbox:checked');
+    const labelIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    
+    if (labelIds.length === 0) {
+        alert('Please select at least one label to reprint');
+        return;
+    }
+    
+    // Show progress modal
+    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+    progressModal.show();
+    
+    try {
+        const response = await fetch('/api/reprint_multiple_labels', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ label_ids: labelIds })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            updateProgress(100, `Successfully reprinted ${labelIds.length} labels`);
+            
+            setTimeout(() => {
+                progressModal.hide();
+                location.reload();
+            }, 2000);
+        } else {
+            updateProgress(0, 'Error reprinting labels: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error reprinting labels:', error);
+        updateProgress(0, 'Error reprinting labels');
+    }
+}
+
+function updateProgress(percent, status) {
+    const progressBar = document.querySelector('.progress-bar');
+    const progressStatus = document.getElementById('progressStatus');
+    
+    progressBar.style.width = percent + '%';
+    progressStatus.textContent = status;
+}
+
+async function previewLabel(labelId) {
+    currentPreviewId = labelId;
+    
+    try {
+        const response = await fetch(`/api/get_label_details/${labelId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const label = data.label;
+            const preview = generateLabelPreview(label);
+            
+            document.getElementById('previewContent').innerHTML = preview;
+            
+            const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+            modal.show();
+        } else {
+            alert('Error loading label details');
+        }
+    } catch (error) {
+        console.error('Error loading label details:', error);
+        alert('Error loading label details');
+    }
+}
+
+function generateLabelPreview(label) {
+    const formatSizes = {
+        standard: { width: '120px', height: '80px' },
+        large: { width: '200px', height: '120px' },
+        small: { width: '80px', height: '60px' }
+    };
+    
+    const size = formatSizes[label.label_format] || formatSizes.standard;
+    
+    return `
+        <div class="label-preview" style="
+            width: ${size.width}; 
+            height: ${size.height}; 
+            border: 2px solid #ddd; 
+            margin: 0 auto; 
+            padding: 8px; 
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: monospace;
+            font-size: 10px;
+        ">
+            <div style="text-align: center; font-weight: bold; font-size: 12px;">
+                ${label.item_code}
+            </div>
+            <div style="text-align: center; margin: 5px 0;">
+                <div style="background: #000; color: white; padding: 2px; font-size: 8px;">
+                    ${label.barcode}
+                </div>
+            </div>
+            <div style="font-size: 8px; text-align: center;">
+                Format: ${label.label_format}<br>
+                Printed: ${label.print_count} times
+            </div>
+        </div>
+    `;
+}
+
+function reprintFromPreview() {
+    if (currentPreviewId) {
+        reprintSingle(currentPreviewId);
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('previewModal'));
+        modal.hide();
+    }
+}
+
+function duplicateLabel(labelId) {
+    currentDuplicateId = labelId;
+    
+    const modal = new bootstrap.Modal(document.getElementById('duplicateModal'));
+    modal.show();
+}
+
+async function confirmDuplicate() {
+    const quantity = parseInt(document.getElementById('duplicateQuantity').value);
+    const format = document.getElementById('duplicateFormat').value;
+    const newBarcode = document.getElementById('newBarcode').checked;
+    
+    if (!quantity || quantity < 1) {
+        alert('Please enter a valid quantity');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/duplicate_label', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                label_id: currentDuplicateId,
+                quantity: quantity,
+                format: format,
+                new_barcode: newBarcode
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`Label duplicated and printed successfully! ${quantity} copies printed.`);
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('duplicateModal'));
+            modal.hide();
+            
+            location.reload();
+        } else {
+            alert('Error duplicating label: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error duplicating label:', error);
+        alert('Error duplicating label');
+    }
+}
+
+// Handle Enter key in search fields
+document.getElementById('searchItemCode').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') searchLabels();
+});
+
+document.getElementById('searchBarcode').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') searchLabels();
+});
+
+document.getElementById('manualBarcode').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') searchByBarcode();
+});
+
+// Clean up scanner when modal is closed
+document.getElementById('scannerModal').addEventListener('hidden.bs.modal', function () {
+    stopBarcodeScanner();
+});
+</script>
+{% endblock %}

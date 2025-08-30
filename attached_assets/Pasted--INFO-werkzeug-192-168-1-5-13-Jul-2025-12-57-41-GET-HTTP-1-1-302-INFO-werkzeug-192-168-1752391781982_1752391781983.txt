@@ -1,0 +1,30 @@
+
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:57:41] "GET / HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:57:41] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:57:41] "GET /static/css/style.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:57:49] "POST /login HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:57:49] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:57:49] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:57:49] "GET /static/js/barcode-scanner.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:57:49] "GET /static/js/app.js HTTP/1.1" 200 -
+ERROR:root:Error syncing business partners: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'CONFLICT (card_code) \n                            DO UPDATE SET \n               ' at line 3")
+[SQL:
+                            INSERT INTO business_partners (card_code, card_name, card_type, phone, email, address, is_active, created_at, updated_at)
+                            VALUES (%(card_code)s, %(card_name)s, %(card_type)s, %(phone)s, %(email)s, %(address)s, %(is_active)s, NOW(), NOW())
+                            ON CONFLICT (card_code)
+                            DO UPDATE SET
+                                card_name = EXCLUDED.card_name,
+                                card_type = EXCLUDED.card_type,
+                                phone = EXCLUDED.phone,
+                                email = EXCLUDED.email,
+                                address = EXCLUDED.address,
+                                is_active = EXCLUDED.is_active,
+                                updated_at = NOW()
+                        ]
+[parameters: {'card_code': '3D SEALS', 'card_name': '3D SEALS PRIVATE LIMITED', 'card_type': 'cCustomer', 'phone': '+91.22.2167 4668', 'email': 'ajay.shukla@3dseals.in', 'address': '906, 9th Floor', 'is_active': False}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:58:01] "POST /sync-sap-data HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:58:01] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:58:01] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:58:01] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:58:01] "GET /static/js/app.js HTTP/1.1" 304 -

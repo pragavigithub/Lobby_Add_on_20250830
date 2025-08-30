@@ -1,0 +1,178 @@
+{
+    "odata.metadata": "https://192.168.0.127:50000/b1s/v1/$metadata#Items",
+    "value": [
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "\"1\"\" M X 1/2\"\" (F) REDUCER BUSH BRAS\"",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "\"1\"\" M X 1/2\"\" (F) REDUCER BUSH BRASS\"",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "\"1\"\" Pipe\"",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "\"1\"\" Valve & Flage Box\"",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "\"2½\"\" Pipe\"",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "\"2½\"\" Valve & Flage Box\"",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "\"3/4\"\" X 3/4' HEX NIPPLE\"",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "\"Supply and Installation of 1 \"\" inch U clamp\"",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "1.26E+122",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "1.26E+82",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "160/D546824100105X6",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "27567-3 discs",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "2M Patch cable",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "5.44224E+13",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "5.44524E+13",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "532G92",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "Ceiling Fan",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "CHAIRS",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "CONSUMMABLES",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "M531018G",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "scissor medium",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "too",
+            "ItemName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "\"2\"\"CELLO TAPE DISPENSER\"",
+            "ItemName": "\"2\"\"CELLO TAPE DISPENSER\""
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "HSR0000026",
+            "ItemName": "\"Charges for Arresting of Oil Leakage in HTBushing Gasket in 630 KVA Transformer for theFollowing: Close the radiators, Drain out oilfromTransformer Main tank. Dismantling the Topinspection cover. Rep"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "HSR0000025",
+            "ItemName": "\"Charges for replacing of necessary BushingGasket.\""
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "COMP/009",
+            "ItemName": "\"DELL 22\"\"\"\" TFT\"\"\""
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "CONS0064",
+            "ItemName": "\"POP TAPE PRINTED 2\"\"\""
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "Proface Software",
+            "ItemName": "\"Proface GP4000 Series, 5.7 InchTFT Color HMI . Operating at 24V DC Power , with 2 Serial Comport, 1 Ethernet , 1 USB ( Type A), 1 Ethernet ( Type miniB) and SD Card Slot ( Model Ref : PFXGP4301TAD)"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "PROGARMMING CHARGES",
+            "ItemName": "\"Proface GP4000 Series, 5.7 InchTFT Color HMI . Operating at 24V DC Power , with 2 Serial Comport, 1 Ethernet , 1 USB ( Type A), 1 Ethernet ( Type miniB) and SD Card Slot ( Model Ref : PFXGP4301TAD)"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "HRE7.5KW001",
+            "ItemName": "\"Removing of Existing Bearing(6209,6309) and Fixing of New Bearing (6209,6309) ,Fixing of Cooling Fan,Shaft Rework and Lathe Work,Varnish of Motor,Cleaning and Painting work.\""
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "Brown Tape",
+            "ItemName": "\"Size - 3"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "Brown Tape.",
+            "ItemName": "\"Size - 3 inch ( 60 mtrs )"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "COMP/004",
+            "ItemName": "\"tft monitor 18.5\"\"\"\"- hp\"\"\""
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "ZT42062-T0G0000Z",
+            "ItemName": "\"TT Printer ZT420; 6\"\". 203 dpi. India Cord. Serial. USB. 10/100 Ethernet. Bluetooth 2.1/MFi. USB Host\""
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "ItemCode": "board pin.",
+            "ItemName": "( RED 120 - GREEN - 100 - YELLOW 80 )"
+        },

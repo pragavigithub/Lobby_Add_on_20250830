@@ -1,0 +1,1069 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice Creation - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="h4 mb-0">Invoice Creation</h2>
+                    <p class="text-muted mb-0">Create invoice using serial number validation</p>
+                </div>
+                <a href="{{ url_for('invoice_creation.index') }}" class="btn btn-secondary">
+                    <i data-feather="arrow-left"></i> Back to Invoices
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Form Row -->
+    <div class="row mb-4">
+        <!-- Invoice Details Section -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <h5 class="mb-0"><i data-feather="file-text"></i> Invoice Details</h5>
+                </div>
+                <div class="card-body">
+                    <form id="invoiceForm" method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="customerCode">Customer Code <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="customerCode" name="customer_code" required>
+                                        <option value="">Select Customer...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="invoiceDate">Invoice Date</label>
+                                    <input type="date" class="form-control" id="invoiceDate" name="invoice_date" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Serial Items Section -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i data-feather="plus-square"></i> Add Serial Items</h5>
+                        <small class="badge badge-light">Line by Line Entry</small>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="serialNumberInput">Line <span id="currentLineDisplay">1</span> &nbsp;&nbsp;&nbsp; Serial Number</label>
+                        <div class="d-flex align-items-center">
+                            <div class="serial-line-number bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 30px; height: 30px; min-width: 30px;">
+                                <span id="currentLineNumber">1</span>
+                            </div>
+                            <input type="text" class="form-control mr-2" id="serialNumberInput" 
+                                   placeholder="Enter serial number and press Tab/Enter">
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-3">
+                        <button type="button" class="btn btn-outline-secondary" id="clearAllBtn">
+                            <i data-feather="trash-2"></i> Clear All
+                        </button>
+                        <button type="button" class="btn btn-info" id="aboutAddingBtn">
+                            <i data-feather="info"></i> About Real-time Adding
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Line Items Table -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i data-feather="list"></i> Invoice Line Items</h5>
+                        <span class="badge badge-light" id="itemCount">0 items</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm" id="serialItemsTable" style="font-size: 0.9rem;">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="width: 60px;">Line</th>
+                                    <th style="width: 140px;">Serial Number</th>
+                                    <th style="width: 120px;">Item Code</th>
+                                    <th style="width: 200px;">Item Description</th>
+                                    <th style="width: 90px;">Warehouse</th>
+                                    <th style="width: 90px;">Status</th>
+                                    <th style="width: 50px;">Qty</th>
+                                    <th style="width: 120px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="serialItemsBody">
+                                <!-- Line items will be populated here -->
+                            </tbody>
+                        </table>
+                        
+                        <!-- No items message -->
+                        <div id="noItemsMessage" class="text-center py-4">
+                            <i data-feather="box" style="width: 48px; height: 48px;" class="text-muted mb-3"></i>
+                            <p class="text-muted">No line items added yet.</p>
+                            <p class="text-muted">Use the serial number input above to add items.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Summary Cards -->
+                    <div class="row mt-3" id="summaryCards" style="display: none;">
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h5 id="validatedCount">0</h5>
+                                    <small>Validated Items</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h5 id="totalItems">0</h5>
+                                    <small>Total Items</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h5 id="totalQuantity">0</h5>
+                                    <small>Total Quantity</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="row">
+        <div class="col-12 text-center">
+            <button type="button" class="btn btn-primary btn-lg" id="submitForQCBtn" disabled>
+                <i data-feather="check-circle"></i> Submit for QC Approval
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div class="mt-3">
+                    <h6 id="loadingMessage">Processing...</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- About Modal -->
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">About Real-time Adding</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6><i data-feather="info"></i> How the system works:</h6>
+                <ul class="list-unstyled">
+                    <li><i data-feather="arrow-right"></i> Enter a serial number in the input field</li>
+                    <li><i data-feather="arrow-right"></i> Press <kbd>Tab</kbd> to validate and auto-fetch details from SAP</li>
+                    <li><i data-feather="arrow-right"></i> Press <kbd>Enter</kbd> to add the validated item to the invoice</li>
+                    <li><i data-feather="arrow-right"></i> Items are automatically validated against SAP B1 inventory</li>
+                    <li><i data-feather="arrow-right"></i> Review the summary before submitting for QC approval</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Ensure jQuery is available and initialize properly
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait for jQuery to be fully loaded
+    if (typeof $ === 'undefined') {
+        console.error('jQuery is not loaded!');
+        return;
+    }
+    
+    console.log('Invoice Creation page loaded with jQuery version:', $.fn.jquery);
+    
+    // Initialize page after jQuery is confirmed loaded
+    initializeInvoiceCreation();
+});
+
+// Global variables
+let currentInvoiceId = null;
+let currentLine = 1;
+let serialNumbers = [];
+
+function initializeInvoiceCreation() {
+    console.log('Initializing Invoice Creation functionality');
+
+    // Set current date
+    const today = new Date();
+    $('#invoiceDate').val(today.toISOString().split('T')[0]);
+
+    // Note: Draft invoice will be created only when first line item is added
+
+    // Load business partners on page load
+    loadBusinessPartners();
+
+    // Event handlers
+    $('#serialNumberInput').on('keydown', function(e) {
+        if (e.which === 9) { // Tab key
+            e.preventDefault();
+            autoFetchSerialDetails();
+        } else if (e.which === 13) { // Enter key
+            e.preventDefault();
+            addSerialNumber();
+        }
+    });
+
+    $('#clearAllBtn').on('click', clearAllItems);
+    $('#aboutAddingBtn').on('click', function() {
+        $('#aboutModal').modal('show');
+    });
+    $('#submitForQCBtn').on('click', submitInvoice);
+}
+
+// Global functions that need to be accessible
+function createDraftInvoice() {
+        console.log('🔄 Creating draft invoice...');
+        
+        $.ajax({
+            url: '/invoice_creation/create_draft',
+            method: 'POST',
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response) {
+                if (response.success && response.invoice_id) {
+                    currentInvoiceId = response.invoice_id;
+                    console.log('✅ Draft invoice created with ID:', currentInvoiceId);
+                    
+                    // Load existing items if any
+                    loadExistingItems();
+                } else {
+                    console.error('❌ Failed to create draft invoice:', response.error);
+                    showTemporaryMessage('Failed to create draft invoice: ' + (response.error || 'Unknown error'), 'danger');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('❌ Error creating draft invoice:', error);
+                showTemporaryMessage('Error creating draft invoice. Please refresh the page.', 'danger');
+            }
+        });
+}
+
+function createDraftInvoiceAndAddItem(serialNumber) {
+        console.log('🔄 Creating draft invoice and adding first item:', serialNumber);
+        showTemporaryMessage('Creating invoice for first item...', 'info');
+        
+        $.ajax({
+            url: '/invoice_creation/create_draft',
+            method: 'POST',
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response) {
+                if (response.success && response.invoice_id) {
+                    currentInvoiceId = response.invoice_id;
+                    console.log('✅ Draft invoice created with ID:', currentInvoiceId);
+                    
+                    // Now add the serial number to the newly created invoice
+                    const addData = {
+                        serial_number: serialNumber
+                    };
+
+                    console.log('📤 Adding first serial item:', addData);
+
+                    $.ajax({
+                        url: `/invoice_creation/${currentInvoiceId}/add_line_item`,
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(addData),
+                        xhrFields: {
+                            withCredentials: true
+                        },
+                        success: function(response) {
+                            console.log('✅ First serial item added successfully:', response);
+                            
+                            if (response.success && response.item_added && response.item_data) {
+                                // Add row to table
+                                addRowToTable(response.item_data);
+                                
+                                // Update customer dropdown if auto-detected
+                                if (response.item_data.customer_code) {
+                                    let customerSelect = $('#customerCode');
+                                    let existingOption = customerSelect.find(`option[value="${response.item_data.customer_code}"]`);
+                                    
+                                    if (existingOption.length > 0) {
+                                        customerSelect.val(response.item_data.customer_code);
+                                    } else {
+                                        // Add customer option if not exists
+                                        let customerName = response.item_data.customer_name || 'Unknown Customer';
+                                        customerSelect.append(`<option value="${response.item_data.customer_code}">${response.item_data.customer_code} - ${customerName}</option>`);
+                                        customerSelect.val(response.item_data.customer_code);
+                                    }
+                                }
+                                
+                                // Update summary and counters
+                                updateSummaryCards();
+                                
+                                // Clear input and move to next line
+                                $('#serialNumberInput').val('');
+                                currentLine++;
+                                $('#currentLineNumber').text(currentLine);
+                                $('#currentLineDisplay').text(currentLine);
+                                window.currentSerialData = null;
+                                
+                                // Enable submit button
+                                $('#submitForQCBtn').prop('disabled', false);
+                                
+                                // Focus back to input
+                                $('#serialNumberInput').focus();
+
+                                showTemporaryMessage(`✅ Invoice created and "${serialNumber}" added!`, 'success');
+                            } else {
+                                showTemporaryMessage('Failed to add first item: ' + (response.error || 'Unknown error'), 'danger');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('❌ Failed to add first serial item:', error, xhr.responseJSON);
+                            let errorMsg = 'Failed to add first item to invoice';
+                            if (xhr.responseJSON && xhr.responseJSON.error) {
+                                errorMsg = xhr.responseJSON.error;
+                            }
+                            showTemporaryMessage(errorMsg, 'danger');
+                        }
+                    });
+                    
+                } else {
+                    console.error('❌ Failed to create draft invoice:', response.error);
+                    showTemporaryMessage('Failed to create invoice: ' + (response.error || 'Unknown error'), 'danger');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('❌ Error creating draft invoice:', error);
+                showTemporaryMessage('Error creating invoice. Please try again.', 'danger');
+            }
+        });
+}
+
+function addRowToTable(itemData) {
+        console.log('🔄 Adding row to table:', itemData);
+        
+        const tbody = $('#serialItemsBody');
+        const noItemsMessage = $('#noItemsMessage');
+        
+        // Hide no items message
+        noItemsMessage.hide();
+        
+        const validationBadge = '<span class="badge badge-success">Valid</span>';
+        
+        const row = `
+            <tr class="table-row-item" data-item-id="${itemData.id}">
+                <td><strong>${itemData.line_number}</strong></td>
+                <td><code>${itemData.serial_number}</code></td>
+                <td><strong>${itemData.item_code}</strong></td>
+                <td>${itemData.item_description}</td>
+                <td><span class="badge badge-info" title="${itemData.warehouse_name || ''}">${itemData.warehouse_code}</span>${itemData.warehouse_name ? '<br><small class="text-muted">' + itemData.warehouse_name + '</small>' : ''}</td>
+                <td>${validationBadge}</td>
+                <td><strong>${itemData.quantity}</strong></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-danger" onclick="removeLineItem(${itemData.id})" title="Remove Item">
+                        <i data-feather="trash-2" style="width: 14px; height: 14px;"></i> Delete
+                    </button>
+                </td>
+            </tr>
+        `;
+        
+        tbody.append(row);
+        
+        // Re-initialize feather icons for the new row
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+        
+        console.log('✅ Row added to table successfully');
+        updateItemCount();
+}
+
+function loadExistingItems() {
+        // This would load existing items from the database for the current invoice
+        // For now, we'll start with an empty table since it's a new draft
+        console.log('🔄 Loading existing items for invoice:', currentInvoiceId);
+        updateItemCount();
+}
+
+function loadBusinessPartners() {
+        console.log('🔄 Loading business partners...');
+        
+        // Add manual input option first
+        let customerSelect = $('#customerCode');
+        customerSelect.empty().append('<option value="">Select Customer...</option>');
+        customerSelect.append('<option value="manual">Enter Customer Code Manually</option>');
+        
+        $.ajax({
+            url: '/invoice_creation/api/business-partners',
+            method: 'GET',
+            timeout: 15000,
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response) {
+                console.log('Business partners response:', response);
+                if (response.success && response.business_partners) {
+                    // Clear and rebuild dropdown
+                    customerSelect.empty().append('<option value="">Select Customer...</option>');
+                    customerSelect.append('<option value="manual">Enter Customer Code Manually</option>');
+                    
+                    response.business_partners.forEach(function(partner) {
+                        let cardName = partner.CardName || 'N/A';
+                        customerSelect.append(`<option value="${partner.CardCode}">${partner.CardCode} - ${cardName}</option>`);
+                    });
+                    console.log('Loaded', response.business_partners.length, 'business partners');
+                } else {
+                    console.warn('SAP B1 unavailable - using offline mode');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.warn('Business partners API error:', error);
+                console.log('Running in offline mode - no fallback needed, handled by server');
+            }
+        });
+    }
+
+    function autoFetchSerialDetails() {
+        let serialNumber = $('#serialNumberInput').val().trim();
+        let customerCodes = $('#customerCode').val().trim();
+        if (!serialNumber) {
+            console.log('⚠️ No serial number entered');
+            showTemporaryMessage('Please enter a serial number first', 'warning');
+            return;
+        }
+
+        console.log('🔍 Fetching details for serial number:', serialNumber);
+
+
+        $.ajax({
+            url: '/invoice_creation/api/validate-serial-number',
+            method: 'GET',
+            data: { serial_number: serialNumber,
+             cusCode:customerCodes},
+            timeout: 15000,
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response) {
+                hideLoading();
+                console.log('Serial validation response:', response);
+                
+                if (response.success && response.item_data) {
+                    // Store the validated data for adding
+                    window.currentSerialData = response.item_data;
+                    window.currentSerialData.serialNumber = serialNumber;
+                    console.log('Serial data validated and stored:', response.item_data);
+                    
+                    // Auto-fill customer if CardCode is available
+                    if (response.item_data.CardCode && response.item_data.CardCode !== '') {
+                        let customerSelect = $('#customerCode');
+                        let existingOption = customerSelect.find(`option[value="${response.item_data.CardCode}"]`);
+                        
+                        if (existingOption.length > 0) {
+                            customerSelect.val(response.item_data.CardCode);
+                            console.log('Auto-filled customer:', response.item_data.CardCode);
+                        } else {
+                            // Add customer option if not exists
+                            let customerName = response.item_data.CardName || response.item_data.CustomerName || 'Unknown Customer';
+                            customerSelect.append(`<option value="${response.item_data.CardCode}">${response.item_data.CardCode} - ${customerName}</option>`);
+                            customerSelect.val(response.item_data.CardCode);
+                            console.log('Added and auto-filled customer:', response.item_data.CardCode);
+                        }
+                    }
+                    
+                    // Show success message and auto-add the item (like Serial Item Transfer)
+                    showTemporaryMessage(`✅ Serial number "${serialNumber}" validated successfully! Customer auto-filled. Adding to invoice...`, 'success');
+                    
+                    // Auto-add the item immediately after validation (like Serial Item Transfer)
+                    setTimeout(function() {
+                        addSerialNumber();
+                    }, 500);
+                } else {
+                    console.warn('Serial number not found:', response.error || 'Unknown error');
+                    showTemporaryMessage(`⚠️ Serial number "${serialNumber}" not found in SAP B1 inventory.`, 'warning');
+                    window.currentSerialData = null;
+                }
+            },
+            error: function(xhr, status, error) {
+                hideLoading();
+                console.error('❌ Serial validation error:', error, xhr.responseJSON);
+                let errorMessage = 'SAP B1 connection failed. Using offline mode.';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMessage = xhr.responseJSON.error;
+                }
+                showTemporaryMessage(errorMessage, 'warning');
+                
+                // Try to use fallback data for demo
+                window.currentSerialData = {
+                    ItemCode: 'MI Phone',
+                    ItemName: 'RAHUL PHONE',
+                    DistNumber: serialNumber,
+                    WhsCode: '7000-FG',
+                    CardCode: 'CUS0028',
+                    CardName: 'RAHUL PHONE CUSTOMER'
+                };
+                
+                // Auto-fill customer with fallback data
+                let customerSelect = $('#customerCode');
+                if (customerSelect.find('option[value="CUS0028"]').length === 0) {
+                    customerSelect.append('<option value="CUS0028">CUS0028 - RAHUL PHONE CUSTOMER</option>');
+                }
+                customerSelect.val('CUS0028');
+                
+                showTemporaryMessage('🔄 Using offline mode. Press Enter to add item.', 'info');
+            }
+        });
+    }
+
+    function addSerialNumber() {
+        let serialNumber = $('#serialNumberInput').val().trim();
+        let cusCode = $('#customerCode').val().trim();
+        if (!serialNumber) {
+            showTemporaryMessage('Please enter a serial number first.', 'warning');
+            return;
+        }
+
+        // Check if serial number already exists in current table
+        let alreadyExists = false;
+        $('#serialItemsBody tr').each(function() {
+            const existingSerial = $(this).find('td:nth-child(2) code').text().trim();
+            if (existingSerial === serialNumber) {
+                alreadyExists = true;
+                return false; // break the loop
+            }
+        });
+        
+        if (alreadyExists) {
+            showTemporaryMessage('Serial number already added to this invoice.', 'warning');
+            return;
+        }
+
+        let itemData = window.currentSerialData;
+        console.log('🔍 Current serial data for adding:', itemData);
+        
+        if (!itemData) {
+            showTemporaryMessage('Please validate the serial number first by pressing Tab.', 'warning');
+            return;
+        }
+
+        // Create draft invoice if this is the first item being added
+        if (!currentInvoiceId) {
+            console.log('🔄 No draft invoice exists, creating one for first item...');
+            createDraftInvoiceAndAddItem(serialNumber);
+            return;
+        }
+
+        const addData = {
+            serial_number: serialNumber,
+            custCode:cusCode
+        };
+
+        console.log('📤 Adding serial item with data:', addData);
+
+
+        $.ajax({
+            url: `/invoice_creation/${currentInvoiceId}/add_line_item`,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(addData),
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response) {
+                hideLoading();
+                console.log('✅ Serial item added successfully:', response);
+                
+                if (response.success && response.item_added && response.item_data) {
+                    console.log('✅ Item added to database:', response.item_data);
+                    
+                    // Add row to table immediately
+                    addRowToTable(response.item_data);
+                    
+                    // Update customer dropdown if auto-detected
+                    if (response.item_data.customer_code) {
+                        let customerSelect = $('#customerCode');
+                        let existingOption = customerSelect.find(`option[value="${response.item_data.customer_code}"]`);
+                        
+                        if (existingOption.length > 0) {
+                            customerSelect.val(response.item_data.customer_code);
+                        } else {
+                            // Add customer option if not exists
+                            let customerName = response.item_data.customer_name || 'Unknown Customer';
+                            customerSelect.append(`<option value="${response.item_data.customer_code}">${response.item_data.customer_code} - ${customerName}</option>`);
+                            customerSelect.val(response.item_data.customer_code);
+                        }
+                    }
+                    
+                    // Update summary and counters
+                    updateSummaryCards();
+                    
+                    // Clear input and move to next line
+                    $('#serialNumberInput').val('');
+                    currentLine++;
+                    $('#currentLineNumber').text(currentLine);
+                    $('#currentLineDisplay').text(currentLine);
+                    window.currentSerialData = null;
+                    
+                    // Enable submit button if we have validated items
+                    $('#submitForQCBtn').prop('disabled', false);
+                    
+                    // Focus back to input
+                    $('#serialNumberInput').focus();
+                    
+                    showTemporaryMessage(`✅ Added "${serialNumber}" to invoice!`, 'success');
+                } else {
+                    showTemporaryMessage('Failed to add item: ' + (response.error || 'Unknown error'), 'danger');
+                }
+            },
+            error: function(xhr, status, error) {
+                hideLoading();
+                console.error('❌ Failed to add serial item:', error, xhr.responseJSON);
+                let errorMsg = 'Failed to add item to invoice';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMsg = xhr.responseJSON.error;
+                }
+                showTemporaryMessage(errorMsg, 'danger');
+            }
+        });
+    }
+
+    function updateItemCount() {
+        const itemCount = $('#serialItemsBody tr').length;
+        $('#itemCount').text(`${itemCount} items`);
+        
+        if (itemCount > 0) {
+            $('#noItemsMessage').hide();
+            $('#summaryCards').show();
+            $('#submitForQCBtn').prop('disabled', false);
+        } else {
+            $('#noItemsMessage').show();
+            $('#summaryCards').hide();
+            $('#submitForQCBtn').prop('disabled', true);
+        }
+        
+        updateSummaryCards();
+    }
+    
+    function updateSummaryCards() {
+        const totalItems = $('#serialItemsBody tr').length;
+        const validatedItems = $('#serialItemsBody tr').length; // All items are validated when added
+        const totalQuantity = totalItems; // Each item has quantity 1
+        
+        $('#totalItems').text(totalItems);
+        $('#validatedCount').text(validatedItems);
+        $('#totalQuantity').text(totalQuantity);
+    }
+    
+    function removeLineItem(lineId) {
+        if (!confirm('Are you sure you want to remove this line item?')) {
+            return;
+        }
+        
+        console.log('🗑️ Removing line item:', lineId);
+
+        
+        $.ajax({
+            url: `/invoice_creation/lines/${lineId}/delete`,
+            method: 'POST',
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response) {
+                hideLoading();
+                console.log('✅ Line item removed:', response);
+                
+                if (response.success) {
+                    // Remove the row from table
+                    $(`tr[data-item-id="${lineId}"]`).remove();
+                    
+                    // Update counters and line numbers
+                    updateItemCount();
+                    updateLineNumbers();
+                    
+                    showTemporaryMessage('Line item removed successfully', 'success');
+                } else {
+                    showTemporaryMessage('Failed to remove line item: ' + (response.error || 'Unknown error'), 'danger');
+                }
+            },
+            error: function(xhr, status, error) {
+                hideLoading();
+                console.error('❌ Failed to remove line item:', error, xhr.responseJSON);
+                let errorMsg = 'Failed to remove line item';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMsg = xhr.responseJSON.error;
+                }
+                showTemporaryMessage(errorMsg, 'danger');
+            }
+        });
+    }
+    
+    function updateLineNumbers() {
+        $('#serialItemsBody tr').each(function(index) {
+            $(this).find('td:first strong').text(index + 1);
+        });
+        
+        // Update current line number
+        const nextLine = $('#serialItemsBody tr').length + 1;
+        currentLine = nextLine;
+        $('#currentLineNumber').text(nextLine);
+        $('#currentLineDisplay').text(nextLine);
+    }
+
+    function updateSerialItemsTable() {
+        console.log('🔄 Updating Serial Items Table with', serialNumbers.length, 'items');
+        
+        const tbody = $('#serialItemsBody');
+        const noItemsMessage = $('#noItemsMessage');
+        
+        if (serialNumbers.length === 0) {
+            console.log('📝 No items - showing empty message');
+            tbody.empty();
+            noItemsMessage.show();
+            return;
+        }
+        
+        console.log('📋 Adding', serialNumbers.length, 'items to table');
+        noItemsMessage.hide();
+        tbody.empty();
+        
+        serialNumbers.forEach(function(item, index) {
+            const validationBadge = item.status === 'validated' ? 
+                '<span class="badge badge-success">Valid</span>' : 
+                '<span class="badge badge-danger">Failed</span>';
+            
+            const row = `
+                <tr class="table-row-item">
+                    <td><strong>${item.line}</strong></td>
+                    <td><code>${item.serialNumber}</code></td>
+                    <td><strong>${item.itemCode}</strong></td>
+                    <td>${item.itemName}</td>
+                    <td><span class="badge badge-info">${item.fromWH}</span></td>
+                    <td><span class="badge badge-secondary">${item.toWH}</span></td>
+                    <td>${validationBadge}</td>
+                    <td><strong>${item.qty}</strong></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeSerial(${index})" title="Remove Item">
+                            <i data-feather="trash-2" style="width: 14px; height: 14px;"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+            tbody.append(row);
+        });
+        
+        // Re-initialize feather icons
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+        
+        console.log('✅ Table updated successfully');
+    }
+
+function updateSummaryCards() {
+    updateItemCount();
+}
+
+function removeLineItem(itemId) {
+        if (!currentInvoiceId) {
+            showTemporaryMessage('No invoice available', 'danger');
+            return;
+        }
+        
+        console.log('🗑️ Removing line item:', itemId);
+
+        
+        $.ajax({
+            url: `/invoice_creation/${currentInvoiceId}/remove_line_item/${itemId}`,
+            method: 'DELETE',
+            success: function(response) {
+                hideLoading();
+                if (response.success) {
+                    // Remove the row from table
+                    $(`tr[data-item-id="${itemId}"]`).remove();
+                    
+                    // Update counters
+                    updateItemCount();
+                    
+                    // Show empty message if no items
+                    if ($('#serialItemsBody tr').length === 0) {
+                        $('#noItemsMessage').show();
+                    }
+                    
+                    showTemporaryMessage('Item removed successfully', 'success');
+                } else {
+                    showTemporaryMessage('Failed to remove item: ' + (response.error || 'Unknown error'), 'danger');
+                }
+            },
+            error: function(xhr, status, error) {
+                hideLoading();
+                console.error('❌ Error removing item:', error);
+                showTemporaryMessage('Error removing item', 'danger');
+            }
+        });
+}
+
+function clearAllItems() {
+        // For now, we'll disable this function since items are in database
+        // Could implement by deleting all items from current invoice
+        showTemporaryMessage('Clear all function not implemented yet', 'info');
+}
+
+function submitInvoice() {
+        // Implementation for submitting invoice for QC
+        showTemporaryMessage('Submit function not implemented yet', 'info');
+}
+
+// Updated summary calculation
+function updateItemCountOld() {
+        const validatedItems = [];
+        const failedItems = serialNumbers.filter(item => item.status === 'failed').length;
+        const totalItems = serialNumbers.length;
+        
+        $('#validatedCount').text(validatedItems);
+        $('#failedCount').text(failedItems);
+        $('#totalCount').text(totalItems);
+    }
+
+    function updateItemCount() {
+        const itemCount = $('#serialItemsBody tr').length;
+        $('#itemCount').text(itemCount + ' Items');
+        
+        // Update summary cards based on actual table data
+        let validatedCount = 0;
+        let failedCount = 0;
+        
+        $('#serialItemsBody tr').each(function() {
+            const validationBadge = $(this).find('td:nth-child(7)').text().trim();
+            if (validationBadge === 'Valid') {
+                validatedCount++;
+            } else {
+                failedCount++;
+            }
+        });
+        
+        $('#validatedCount').text(validatedCount);
+        $('#failedCount').text(failedCount);
+        $('#totalCount').text(itemCount);
+    }
+
+    function clearAllItems() {
+        if (serialNumbers.length === 0) {
+            showTemporaryMessage('No items to clear.', 'info');
+            return;
+        }
+        
+        if (confirm('Are you sure you want to clear all serial items?')) {
+
+            
+            $.ajax({
+                url: '/invoice_creation/clear-session-items',
+                method: 'POST',
+                success: function(response) {
+                    hideLoading();
+                    if (response.success) {
+                        serialNumbers = [];
+                        currentLine = 1;
+                        $('#currentLineNumber').text(currentLine);
+                        $('#currentLineDisplay').text(currentLine);
+                        $('#serialNumberInput').val('');
+                        
+                        updateSerialItemsTable();
+                        updateSummaryCards();
+                        updateItemCount();
+                        
+                        $('#submitForQCBtn').prop('disabled', true);
+                        showTemporaryMessage('✅ All items cleared.', 'success');
+                    } else {
+                        showTemporaryMessage('Failed to clear items: ' + response.error, 'danger');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoading();
+                    console.error('❌ Failed to clear items:', error);
+                    showTemporaryMessage('Failed to clear items.', 'danger');
+                }
+            });
+        }
+    }
+
+    function submitInvoice() {
+        const customerCode = $('#customerCode').val();
+        const invoiceDate = $('#invoiceDate').val();
+        
+        if (!customerCode) {
+            showTemporaryMessage('Please select a customer first.', 'warning');
+            return;
+        }
+        
+        if (!currentInvoiceId) {
+            showTemporaryMessage('No draft invoice available. Please refresh the page.', 'danger');
+            return;
+        }
+        
+        // Check if invoice has items in the table
+        const itemCount = $('#serialItemsBody tr').length;
+        if (itemCount === 0) {
+            showTemporaryMessage('Please add at least one validated serial number.', 'warning');
+            return;
+        }
+        
+        // Get customer name from selected option
+        const customerName = $('#customerCode option:selected').text().split(' - ')[1] || '';
+        
+        const submitData = {
+            customer_code: customerCode,
+            customer_name: customerName
+        };
+        
+        console.log('📤 Submitting invoice for QC approval:', submitData);
+        showLoading('Submitting invoice for QC approval...');
+        
+        $.ajax({
+            url: `/invoice_creation/${currentInvoiceId}/submit_for_qc`,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(submitData),
+            success: function(response) {
+                hideLoading();
+                if (response.success) {
+                    showTemporaryMessage(`✅ Invoice submitted for QC approval successfully!`, 'success');
+                    
+                    // Disable further editing
+                    $('#serialNumberInput').prop('disabled', true);
+                    $('#customerCode').prop('disabled', true);
+                    $('#submitForQCBtn').prop('disabled', true);
+                    $('#clearAllBtn').prop('disabled', true);
+                    
+                    // Show success message and redirect
+                    setTimeout(function() {
+                        window.location.href = '/invoice_creation/';
+                    }, 3000);
+                } else {
+                    showTemporaryMessage('❌ Failed to submit invoice: ' + response.error, 'danger');
+                }
+            },
+            error: function(xhr, status, error) {
+                hideLoading();
+                console.error('❌ Invoice submission error:', error, xhr.responseJSON);
+                let errorMsg = 'Error submitting invoice';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMsg = xhr.responseJSON.error;
+                }
+                showTemporaryMessage('❌ ' + errorMsg, 'danger');
+            }
+        });
+    }
+
+    // Global function for removing serial numbers (using item ID like Serial Item Transfer)
+    window.removeSerial = function(index) {
+        const item = serialNumbers[index];
+        if (!item) return;
+        
+        if (confirm(`Are you sure you want to remove serial number "${item.serialNumber}"?`)) {
+
+            
+            $.ajax({
+                url: `/invoice_creation/remove-serial-item/${item.id}`,
+                method: 'POST',
+                success: function(response) {
+                    hideLoading();
+                    if (response.success) {
+                        // Remove from local array
+                        serialNumbers.splice(index, 1);
+                        
+                        // Update displays
+                        updateSerialItemsTable();
+                        updateSummaryCards();
+                        updateItemCount();
+                        
+                        const hasValidItems = serialNumbers.some(item => item.status === 'validated');
+                        $('#submitForQCBtn').prop('disabled', !hasValidItems);
+                        
+                        showTemporaryMessage(`✅ Removed "${item.serialNumber}" from invoice.`, 'success');
+                    } else {
+                        showTemporaryMessage('Failed to remove item: ' + response.error, 'danger');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoading();
+                    console.error('❌ Failed to remove item:', error);
+                    showTemporaryMessage('Failed to remove item.', 'danger');
+                }
+            });
+        }
+    };
+
+    function showLoading(message) {
+        $('#loadingMessage').text(message);
+        $('#loadingModal').modal('show');
+    }
+
+    function hideLoading() {
+        $('#loadingModal').modal('hide');
+    }
+
+    function showTemporaryMessage(message, type) {
+        const alertClass = `alert-${type}`;
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+                ${message}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        `;
+        
+        $('body').append(alertHtml);
+        
+        // Auto-dismiss after 3 seconds
+        setTimeout(function() {
+            $('.alert').alert('close');
+        }, 3000);
+    }
+
+</script>
+{% endblock %}

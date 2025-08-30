@@ -1,0 +1,44 @@
+PS E:\SAP_Integ\Git Change\20250720\3\Emerging_BarCode_Integration>  python fix_mysql_database.py
+INFO:__main__:🔧 Starting MySQL database fix...
+INFO:__main__:✅ Connected to MySQL database
+ERROR:__main__:❌ Database fix failed: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on '123@localhost' ([Errno 11003] getaddrinfo failed)")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:__main__:Please check your MySQL connection and credentials in the .env file
+PS E:\SAP_Integ\Git Change\20250720\3\Emerging_BarCode_Integration>  python fix_mysql_database.py
+INFO:__main__:🔧 Starting MySQL database fix...
+INFO:__main__:✅ Connected to MySQL database
+ERROR:__main__:❌ Database fix failed: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on '123@localhost' ([Errno 11003] getaddrinfo failed)")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:__main__:Please check your MySQL connection and credentials in the .env file
+PS E:\SAP_Integ\Git Change\20250720\3\Emerging_BarCode_Integration>  python fix_mysql_database.py
+INFO:__main__:🔧 Starting MySQL database fix...
+INFO:__main__:✅ Connected to MySQL database
+ERROR:__main__:❌ Database fix failed: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on '123@localhost' ([Errno 11003] getaddrinfo failed)")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:__main__:Please check your MySQL connection and credentials in the .env file
+PS E:\SAP_Integ\Git Change\20250720\3\Emerging_BarCode_Integration> python run_mysql_setup.bat   
+  File "E:\SAP_Integ\Git Change\20250720\3\Emerging_BarCode_Integration\run_mysql_setup.bat", line 1
+    @echo off
+          ^^^
+SyntaxError: invalid syntax
+PS E:\SAP_Integ\Git Change\20250720\3\Emerging_BarCode_Integration>  python fix_mysql_database.py
+INFO:__main__:🔧 Starting MySQL database fix...
+INFO:__main__:✅ Connected to MySQL database
+ERROR:__main__:❌ Database fix failed: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on '123@localhost' ([Errno 11003] getaddrinfo failed)")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:__main__:Please check your MySQL connection and credentials in the .env file
+PS E:\SAP_Integ\Git Change\20250720\3\Emerging_BarCode_Integration> python setup_mysql_local.py  
+🔧 MySQL Local Setup for WMS Application
+This script will create the database and tables for local development
+Make sure MySQL is installed and running on your system
+
+Continue with setup? (y/n): y
+Enter MySQL root password: root@123
+INFO:__main__:✅ Connected to MySQL server
+INFO:__main__:✅ Database 'wms_db_dev' created/verified
+INFO:__main__:✅ Branches table created
+ERROR:__main__:❌ MySQL Error: 1054 (42S22): Unknown column 'name' in 'field list'
+INFO:__main__:MySQL connection closed
+
+❌ Setup failed. Please check MySQL installation and try again.
+PS E:\SAP_Integ\Git Change\20250720\3\Emerging_BarCode_Integration> 

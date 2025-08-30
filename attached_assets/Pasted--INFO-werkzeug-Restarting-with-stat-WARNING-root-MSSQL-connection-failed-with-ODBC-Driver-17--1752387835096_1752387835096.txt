@@ -1,0 +1,26 @@
+
+INFO:werkzeug: * Restarting with stat
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 with TCP/IP: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft][ODBC Driver 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 without Named Pipes: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft][ODBC Driver 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with SQL Server driver: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53); [08001] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:root:❌ All MSSQL connection attempts failed for DESKTOP-PLFK2B5\SQLEXPRESS/WMS_DB
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 888-243-362
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:52:47] "GET / HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:52:47] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:52:47] "GET /static/js/barcode-scanner.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:52:47] "GET /static/css/style.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:52:48] "GET /static/js/app.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:52:50] "GET /grpo HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:52:50] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:52:50] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:52:50] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:53:07] "POST /grpo/create HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:53:07] "GET /grpo HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:53:08] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:53:08] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:53:08] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 11:53:08] "POST /api/validate_po HTTP/1.1" 200 -

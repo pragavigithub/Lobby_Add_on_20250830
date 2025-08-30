@@ -1,0 +1,106 @@
+{
+    "odata.metadata": "https://192.168.0.172:50000/b1s/v1/$metadata#BusinessPartners",
+    "value": [
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "ML",
+            "CardName": null
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "CUS0071",
+            "CardName": "\"FORD MOTOR COMPANY OF AUSTRALIA"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "SMDES",
+            "CardName": "\"S.M.D Engg. Services"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "3D SEALS",
+            "CardName": "3D SEALS PRIVATE LIMITED"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "3D SPL",
+            "CardName": "3D SEALS PRIVATE LIMITED"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "4S Cargo",
+            "CardName": "4S Cargo Services"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "AJT",
+            "CardName": "A.J Traders"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "AAB",
+            "CardName": "AAB INDUSTRIAL LOGISTICS AND WAREHOUSING PRIVATE LIMITED"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "AR",
+            "CardName": "AARTHI RUBBER"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "CUS0016",
+            "CardName": "ABB Power Products and Systems India Ltd"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "AFPL",
+            "CardName": "Abreco Freight Private Limited"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "ABSI",
+            "CardName": "ABS Instruments Pvt ltd"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "APW",
+            "CardName": "ABSOLUTE PRECISION WORKS"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "AFIPL",
+            "CardName": "Acme Fabcon India Pvt Ltd"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "ADM Joinflex",
+            "CardName": "ADM JOINFLEX INDIA PVT.LTD"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "CUS0031",
+            "CardName": "ADM JOINFLEX INDIA PVT.LTD"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "ADR Automation",
+            "CardName": "ADR Automation and Technologies"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "AGFI",
+            "CardName": "Aerotrans Global Forwarding India Pvt Ltd"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "AIS",
+            "CardName": "AIRA INDUSTRIAL SOLUTIONS"
+        },
+        {
+            "odata.etag": "W/\"356A192B7913B04C54574D18C28D46E6395428AB\"",
+            "CardCode": "AMD",
+            "CardName": "AJAY MOULDS AND DIES"
+        }
+    ],
+    "odata.nextLink": "BusinessPartners?$select=CardCode,CardName&$skip=20"
+}

@@ -1,0 +1,146 @@
+OperationalError
+sqlalchemy.exc.OperationalError: (pymysql.err.OperationalError) (1054, "Unknown column 'grpo_documents.notes' in 'field list'")
+[SQL: SELECT grpo_documents.id AS grpo_documents_id, grpo_documents.po_number AS grpo_documents_po_number, grpo_documents.sap_document_number AS grpo_documents_sap_document_number, grpo_documents.supplier_code AS grpo_documents_supplier_code, grpo_documents.supplier_name AS grpo_documents_supplier_name, grpo_documents.po_date AS grpo_documents_po_date, grpo_documents.po_total AS grpo_documents_po_total, grpo_documents.status AS grpo_documents_status, grpo_documents.user_id AS grpo_documents_user_id, grpo_documents.qc_user_id AS grpo_documents_qc_user_id, grpo_documents.qc_notes AS grpo_documents_qc_notes, grpo_documents.notes AS grpo_documents_notes, grpo_documents.draft_or_post AS grpo_documents_draft_or_post, grpo_documents.created_at AS grpo_documents_created_at, grpo_documents.updated_at AS grpo_documents_updated_at 
+FROM grpo_documents 
+WHERE grpo_documents.po_number = %(po_number_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'po_number_1': '232430694', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+Traceback (most recent call last)
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+self.dialect.do_execute(
+^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+cursor.execute(statement, parameters)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+result = self._query(query)
+         ^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+conn.query(q)
+^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 563, in query
+self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+result.read()
+^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 1199, in read
+first_packet = self.connection._read_packet()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+packet.raise_for_error()
+^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+err.raise_mysql_exception(self._data)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+raise errorclass(errno, errval)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The above exception was the direct cause of the following exception:
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1478, in __call__
+return self.wsgi_app(environ, start_response)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\werkzeug\middleware\proxy_fix.py", line 182, in __call__
+return self.app(environ, start_response)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1458, in wsgi_app
+response = self.handle_exception(e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1455, in wsgi_app
+response = self.full_dispatch_request()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 869, in full_dispatch_request
+rv = self.handle_user_exception(e)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 867, in full_dispatch_request
+rv = self.dispatch_request()
+     ^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 852, in dispatch_request
+return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+return current_app.ensure_sync(func)(*args, **kwargs)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "E:\SAP_Integ\Git Change\20250713\13\Emerging_BarCode_Integration\routes.py", line 115, in create_grpo
+existing_grpo = GRPODocument.query.filter_by(po_number=po_number).first()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\query.py", line 2748, in first
+return self.limit(1)._iter().first()  # type: ignore
+       ^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\query.py", line 2847, in _iter
+result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                              
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\session.py", line 2308, in execute
+return self._execute_internal(
+       
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\session.py", line 2190, in _execute_internal
+result: Result[Any] = compile_state_cls.orm_execute_statement(
+                      
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\context.py", line 293, in orm_execute_statement
+result = conn.execute(
+         
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+return meth(
+       
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\sql\elements.py", line 516, in _execute_on_connection
+return connection._execute_clauseelement(
+       
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+ret = self._execute_context(
+      
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+return self._exec_single_context(
+       
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+self._handle_dbapi_exception(
+^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 2343, in _handle_dbapi_exception
+raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+self.dialect.do_execute(
+^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+cursor.execute(statement, parameters)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+result = self._query(query)
+         ^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+conn.query(q)
+^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 563, in query
+self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+result.read()
+^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 1199, in read
+first_packet = self.connection._read_packet()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+packet.raise_for_error()
+^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+err.raise_mysql_exception(self._data)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+raise errorclass(errno, errval)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.OperationalError: (pymysql.err.OperationalError) (1054, "Unknown column 'grpo_documents.notes' in 'field list'")
+[SQL: SELECT grpo_documents.id AS grpo_documents_id, grpo_documents.po_number AS grpo_documents_po_number, grpo_documents.sap_document_number AS grpo_documents_sap_document_number, grpo_documents.supplier_code AS grpo_documents_supplier_code, grpo_documents.supplier_name AS grpo_documents_supplier_name, grpo_documents.po_date AS grpo_documents_po_date, grpo_documents.po_total AS grpo_documents_po_total, grpo_documents.status AS grpo_documents_status, grpo_documents.user_id AS grpo_documents_user_id, grpo_documents.qc_user_id AS grpo_documents_qc_user_id, grpo_documents.qc_notes AS grpo_documents_qc_notes, grpo_documents.notes AS grpo_documents_notes, grpo_documents.draft_or_post AS grpo_documents_draft_or_post, grpo_documents.created_at AS grpo_documents_created_at, grpo_documents.updated_at AS grpo_documents_updated_at
+FROM grpo_documents
+WHERE grpo_documents.po_number = %(po_number_1)s
+LIMIT %(param_1)s]
+[parameters: {'po_number_1': '232430694', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+The debugger caught an exception in your WSGI application. You can now look at the traceback which led to the error.
+To switch between the interactive traceback and the plaintext one, you can click on the "Traceback" headline. From the text traceback you can also create a paste of it. For code execution mouse-over the frame you want to debug and click on the console icon on the right side.
+
+You can execute arbitrary Python code in the stack frames and there are some extra helpers available for introspection:
+
+dump() shows all variables in the frame
+dump(obj) dumps all that's known about the object
+Brought to you by DON'T PANIC, your friendly Werkzeug powered traceback interpreter.

@@ -1,0 +1,69 @@
+PS E:\SAP_Integ\Git Change\20250713\8\Emerging_BarCode_Integration> python fix_local_sql_server.py       
+============================================================
+ SQL Server Local Environment Fix
+============================================================
+Detected system: Windows 10
+
+🔍 Checking SQL Server services...
+❓ MSSQLSERVER status unknown
+✅ MSSQL$SQLEXPRESS is running
+✅ SQLBrowser is running
+❓ SQLSERVERAGENT status unknown
+💻 Computer name: DESKTOP-PLFK2B5
+
+🔍 Testing SQL Server connections...
+❌ Local SQL Express with computer name: Port 1433 not accessible
+❌ Local SQL Express with dot notation: Port 1433 not accessible
+❌ Local SQL Express with localhost: Port 1433 not accessible
+❌ Local SQL Express with (local): Port 1433 not accessible
+❌ Default instance on computer name: Port 1433 not accessible
+❌ Default instance on localhost: Port 1433 not accessible
+💻 Computer name: DESKTOP-PLFK2B5
+✅ Created optimized .env file for your local SQL Server
+❌ Error creating test script: 'charmap' codec can't encode character '\u2705' in position 692: character maps to <undefined>
+
+============================================================
+ Summary and Next Steps
+============================================================
+✅ SQL Server services are running
+❌ No accessible SQL Server connections found
+
+🔧 SQL Server Configuration Recommendations:
+
+1. Enable TCP/IP Protocol:
+   - Open SQL Server Configuration Manager
+   - Go to SQL Server Network Configuration > Protocols for SQLEXPRESS
+   - Right-click TCP/IP > Enable
+   - Restart SQL Server Express service
+
+2. Configure SQL Server Authentication:
+   - Open SQL Server Management Studio
+   - Connect to your instance
+   - Right-click server > Properties > Security
+   - Select 'SQL Server and Windows Authentication mode'
+   - Restart SQL Server service
+
+3. Create/Reset SA Password:
+   - In SSMS, expand Security > Logins
+   - Right-click 'sa' > Properties
+   - Set password to: Ea@12345
+   - Uncheck 'Enforce password policy'
+   - On Status tab, set Login to 'Enabled'
+
+4. Create WMS_DB Database:
+   - In SSMS, right-click Databases > New Database
+   - Database name: WMS_DB
+   - Click OK
+
+5. Configure Windows Firewall:
+   - Allow SQL Server through Windows Firewall
+   - Default port: 1433
+
+📋 To test your configuration:
+1. Run: python test_sql_connection.py
+2. Run: python main.py
+3. Check for successful database connection in logs
+
+💡 If issues persist, try running WMS in SQLite mode:
+   - Comment out all MSSQL_ variables in .env
+   - The app will automatically use SQLite

@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Edit GRPO Item{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('grpo') }}">GRPO</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('grpo_detail', grpo_id=grpo_doc.id) }}">{{ grpo_doc.po_number }}</a></li>
+                    <li class="breadcrumb-item active">Edit Item</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i data-feather="edit-2"></i> 
+                        Edit GRPO Item - {{ grpo_item.item_code }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="item_code" class="form-label">Item Code</label>
+                                    <input type="text" class="form-control" id="item_code" value="{{ grpo_item.item_code }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="item_name" class="form-label">Item Name</label>
+                                    <input type="text" class="form-control" id="item_name" value="{{ grpo_item.item_name }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="po_quantity" class="form-label">PO Quantity</label>
+                                    <input type="number" class="form-control" id="po_quantity" value="{{ grpo_item.po_quantity or 0 }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="open_quantity" class="form-label">Open Quantity</label>
+                                    <input type="number" class="form-control" id="open_quantity" value="{{ grpo_item.open_quantity or 0 }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="received_quantity" class="form-label">Received Quantity *</label>
+                                    <input type="number" class="form-control" id="received_quantity" name="received_quantity" 
+                                           value="{{ grpo_item.received_quantity }}" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="unit_of_measure" class="form-label">Unit of Measure</label>
+                                    <input type="text" class="form-control" id="unit_of_measure" value="{{ grpo_item.unit_of_measure }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="bin_location" class="form-label">Bin Location</label>
+                                    <input type="text" class="form-control" id="bin_location" name="bin_location" 
+                                           value="{{ grpo_item.bin_location }}" placeholder="Enter bin location">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="batch_number" class="form-label">Batch Number</label>
+                                    <input type="text" class="form-control" id="batch_number" name="batch_number" 
+                                           value="{{ grpo_item.batch_number or '' }}" placeholder="Enter batch number">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="expiration_date" class="form-label">Expiration Date</label>
+                                    <input type="date" class="form-control" id="expiration_date" name="expiration_date" 
+                                           value="{{ grpo_item.expiration_date.strftime('%Y-%m-%d') if grpo_item.expiration_date else '' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="generated_barcode" class="form-label">Generated Barcode</label>
+                                    <input type="text" class="form-control" id="generated_barcode" 
+                                           value="{{ grpo_item.generated_barcode or 'Auto-generated' }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('grpo_detail', grpo_id=grpo_doc.id) }}" class="btn btn-secondary">
+                                <i data-feather="arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i data-feather="save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i data-feather="info"></i> 
+                        Item Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>GRPO Number:</strong> {{ grpo_doc.po_number }}</p>
+                    <p><strong>Status:</strong> {{ grpo_doc.status.title() }}</p>
+                    <p><strong>QC Status:</strong> 
+                        {% if grpo_item.qc_status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% elif grpo_item.qc_status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                        {% elif grpo_item.qc_status == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Unit Price:</strong> ${{ "%.2f"|format(grpo_item.unit_price or 0) }}</p>
+                    <p><strong>Total Value:</strong> ${{ "%.2f"|format((grpo_item.unit_price or 0) * grpo_item.received_quantity) }}</p>
+                    
+                    {% if grpo_item.qc_notes %}
+                    <div class="mt-3">
+                        <strong>QC Notes:</strong>
+                        <p class="text-muted">{{ grpo_item.qc_notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize feather icons
+    feather.replace();
+    
+    // Focus on received quantity field
+    document.getElementById('received_quantity').focus();
+    
+    // Validate received quantity
+    document.getElementById('received_quantity').addEventListener('input', function() {
+        const value = parseFloat(this.value);
+        const openQty = parseFloat(document.getElementById('open_quantity').value);
+        
+        if (value > openQty && openQty > 0) {
+            this.setCustomValidity('Received quantity cannot exceed open quantity');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+});
+</script>
+{% endblock %}

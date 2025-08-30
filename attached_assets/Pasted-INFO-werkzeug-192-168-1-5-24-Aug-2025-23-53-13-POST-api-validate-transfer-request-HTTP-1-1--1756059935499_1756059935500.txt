@@ -1,0 +1,32 @@
+INFO:werkzeug:192.168.1.5 - - [24/Aug/2025 23:53:13] "POST /api/validate_transfer_request HTTP/1.1" 200 -
+ERROR:root:❌ Could not fetch SAP data: Entity namespace for "inventory_transfer_items" has no property "transfer_id"
+ERROR:root:Traceback (most recent call last):
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\sql\base.py", line 2192, in _entity_namespace_key
+    return getattr(ns, key)  # type: ignore
+           ^^^^^^^^^^^^^^^^
+AttributeError: type object 'InventoryTransferItem' has no attribute 'transfer_id'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\SAP_Integ\Git Change\20250824\15\Barcode_Dev_Project_20250823\modules\inventory_transfer\routes.py", line 83, in detail
+    wms_item = InventoryTransferItem.query.filter_by(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\query.py", line 2003, in filter_by
+    clauses = [
+              ^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\query.py", line 2004, in <listcomp>
+    _entity_namespace_key(from_entity, key) == value
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\sql\base.py", line 2194, in _entity_namespace_key
+    raise exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Entity namespace for "inventory_transfer_items" has no property "transfer_id"
+
+INFO:werkzeug:192.168.1.5 - - [24/Aug/2025 23:53:14] "GET /inventory_transfer/detail/14 HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [24/Aug/2025 23:53:14] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [24/Aug/2025 23:53:14] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [24/Aug/2025 23:53:14] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [24/Aug/2025 23:53:19] "GET /inventory_transfer HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [24/Aug/2025 23:53:19] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [24/Aug/2025 23:53:19] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [24/Aug/2025 23:53:19] "GET /static/js/app.js HTTP/1.1" 304 -

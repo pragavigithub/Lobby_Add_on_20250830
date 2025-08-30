@@ -1,0 +1,168 @@
+OperationalError
+sqlalchemy.exc.OperationalError: (pymysql.err.OperationalError) (1054, "Unknown column 'po_date' in 'field list'")
+[SQL: INSERT INTO grpo_documents (po_number, sap_document_number, supplier_code, supplier_name, po_date, po_total, status, user_id, qc_user_id, qc_notes, notes, draft_or_post, created_at, updated_at) VALUES (%(po_number)s, %(sap_document_number)s, %(supplier_code)s, %(supplier_name)s, %(po_date)s, %(po_total)s, %(status)s, %(user_id)s, %(qc_user_id)s, %(qc_notes)s, %(notes)s, %(draft_or_post)s, %(created_at)s, %(updated_at)s)]
+[parameters: {'po_number': '23243', 'sap_document_number': None, 'supplier_code': 'V001', 'supplier_name': 'Sample Vendor Ltd', 'po_date': datetime.datetime(2025, 1, 8, 0, 0), 'po_total': 15000.0, 'status': 'draft', 'user_id': 1, 'qc_user_id': None, 'qc_notes': None, 'notes': None, 'draft_or_post': 'draft', 'created_at': datetime.datetime(2025, 7, 20, 14, 50, 1, 734281), 'updated_at': datetime.datetime(2025, 7, 20, 14, 50, 1, 734281)}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+Traceback (most recent call last)
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+self.dialect.do_execute(
+^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+cursor.execute(statement, parameters)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+result = self._query(query)
+         ^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+conn.query(q)
+^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 563, in query
+self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+result.read()
+^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 1199, in read
+first_packet = self.connection._read_packet()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+packet.raise_for_error()
+^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+err.raise_mysql_exception(self._data)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+raise errorclass(errno, errval)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The above exception was the direct cause of the following exception:
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1478, in __call__
+return self.wsgi_app(environ, start_response)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\werkzeug\middleware\proxy_fix.py", line 182, in __call__
+return self.app(environ, start_response)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1458, in wsgi_app
+response = self.handle_exception(e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1455, in wsgi_app
+response = self.full_dispatch_request()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 869, in full_dispatch_request
+rv = self.handle_user_exception(e)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 867, in full_dispatch_request
+rv = self.dispatch_request()
+     ^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 852, in dispatch_request
+return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+return current_app.ensure_sync(func)(*args, **kwargs)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "E:\SAP_Integ\Git Change\20250720\4\Emerging_BarCode_Integration\routes.py", line 187, in create_grpo
+db.session.commit()
+^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\scoping.py", line 598, in commit
+return self._proxied.commit()
+       ^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\session.py", line 1969, in commit
+trans.commit(_to_root=True)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "<string>", line 2, in commit
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+ret_value = fn(self, *arg, **kw)
+            ^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\session.py", line 1256, in commit
+self._prepare_impl()
+^^^^^^^^^^^^^^^^^^^^
+File "<string>", line 2, in _prepare_impl
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+ret_value = fn(self, *arg, **kw)
+            ^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\session.py", line 1231, in _prepare_impl
+self.session.flush()
+^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+self._flush(objects)
+^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+with util.safe_reraise():
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+raise exc_value.with_traceback(exc_tb)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+flush_context.execute()
+^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+rec.execute(self)
+^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+util.preloaded.orm_persistence.save_obj(
+^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+_emit_insert_statements(
+^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1226, in _emit_insert_statements
+result = connection.execute(
+         
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+return meth(
+       
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\sql\elements.py", line 516, in _execute_on_connection
+return connection._execute_clauseelement(
+       
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+ret = self._execute_context(
+      
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+return self._exec_single_context(
+       
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+self._handle_dbapi_exception(
+^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 2343, in _handle_dbapi_exception
+raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+self.dialect.do_execute(
+^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+cursor.execute(statement, parameters)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+result = self._query(query)
+         ^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+conn.query(q)
+^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 563, in query
+self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+result.read()
+^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 1199, in read
+first_packet = self.connection._read_packet()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\connections.py", line 775, in _read_packet
+packet.raise_for_error()
+^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\protocol.py", line 219, in raise_for_error
+err.raise_mysql_exception(self._data)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\pymysql\err.py", line 150, in raise_mysql_exception
+raise errorclass(errno, errval)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.OperationalError: (pymysql.err.OperationalError) (1054, "Unknown column 'po_date' in 'field list'")
+[SQL: INSERT INTO grpo_documents (po_number, sap_document_number, supplier_code, supplier_name, po_date, po_total, status, user_id, qc_user_id, qc_notes, notes, draft_or_post, created_at, updated_at) VALUES (%(po_number)s, %(sap_document_number)s, %(supplier_code)s, %(supplier_name)s, %(po_date)s, %(po_total)s, %(status)s, %(user_id)s, %(qc_user_id)s, %(qc_notes)s, %(notes)s, %(draft_or_post)s, %(created_at)s, %(updated_at)s)]
+[parameters: {'po_number': '23243', 'sap_document_number': None, 'supplier_code': 'V001', 'supplier_name': 'Sample Vendor Ltd', 'po_date': datetime.datetime(2025, 1, 8, 0, 0), 'po_total': 15000.0, 'status': 'draft', 'user_id': 1, 'qc_user_id': None, 'qc_notes': None, 'notes': None, 'draft_or_post': 'draft', 'created_at': datetime.datetime(2025, 7, 20, 14, 50, 1, 734281), 'updated_at': datetime.datetime(2025, 7, 20, 14, 50, 1, 734281)}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+The debugger caught an exception in your WSGI application. You can now look at the traceback which led to the error.
+To switch between the interactive traceback and the plaintext one, you can click on the "Traceback" headline. From the text traceback you can also create a paste of it. For code execution mouse-over the frame you want to debug and click on the console icon on the right side.
+
+You can execute arbitrary Python code in the stack frames and there are some extra helpers available for introspection:
+
+dump() shows all variables in the frame
+dump(obj) dumps all that's known about the object

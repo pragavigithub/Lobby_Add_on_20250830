@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - WMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>Welcome, {{ current_user.first_name }}!</h1>
+        <p class="text-muted">{{ current_user.role|title }} - {{ current_user.branch_name or 'No Branch Selected' }}</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+<!--    {% if current_user.has_permission('grpo') %}-->
+<!--    <div class="col-md-3 col-sm-6 mb-3">-->
+<!--        <div class="card dashboard-card" data-url="{{ url_for('grpo') }}">-->
+<!--            <div class="card-body text-center">-->
+<!--                <i data-feather="package" class="mb-3" style="width: 48px; height: 48px;"></i>-->
+<!--                <h3>{{ stats.grpo_count }}</h3>-->
+<!--                <p>GRN Documents</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    {% endif %}-->
+
+    {% if current_user.has_permission('serial_item_transfer')%}
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card dashboard-card" data-url="{{ url_for('serial_item_transfer.index') }}">
+            <div class="card-body text-center">
+                <i data-feather="package" class="mb-3" style="width: 48px; height: 48px;"></i>
+<!--                <h3>{{ stats.grpo_count }}</h3>-->
+                <p>Serial Item Transfer</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+<!--    {% if current_user.has_permission('inventory_transfer') %}-->
+<!--    <div class="col-md-3 col-sm-6 mb-3">-->
+<!--        <div class="card dashboard-card" data-url="{{ url_for('inventory_transfer') }}">-->
+<!--            <div class="card-body text-center">-->
+<!--                <i data-feather="move" class="mb-3" style="width: 48px; height: 48px;"></i>-->
+<!--                <h3>{{ stats.transfer_count }}</h3>-->
+<!--                <p>Inventory Transfers</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    {% endif %}-->
+
+    {% if current_user.has_permission('serial_item_transfer')%}
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card dashboard-card" data-url="{{ url_for('inventory_transfer.serial_index') }}">
+            <div class="card-body text-center">
+                <i data-feather="move" class="mb-3" style="width: 48px; height: 48px;"></i>
+<!--                <h3>{{ stats.transfer_count }}</h3>-->
+                <p>Serial Transfer</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if current_user.has_permission('invoice_creation') %}
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card dashboard-card" data-url="{{ url_for('invoice_creation.index') }}">
+            <div class="card-body text-center">
+                <i data-feather="file-text" class="mb-3" style="width: 48px; height: 48px;"></i>
+                <p>Invoice Creation</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+<!--    {% if current_user.has_permission('pick_list') %}-->
+<!--    <div class="col-md-3 col-sm-6 mb-3">-->
+<!--        <div class="card dashboard-card" data-url="{{ url_for('pick_list') }}">-->
+<!--            <div class="card-body text-center">-->
+<!--                <i data-feather="list" class="mb-3" style="width: 48px; height: 48px;"></i>-->
+<!--                <h3>{{ stats.pick_list_count }}</h3>-->
+<!--                <p>Pick Lists</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    {% endif %}-->
+<!--    -->
+<!--    {% if current_user.has_permission('inventory_counting') %}-->
+<!--    <div class="col-md-3 col-sm-6 mb-3">-->
+<!--        <div class="card dashboard-card" data-url="{{ url_for('inventory_counting') }}">-->
+<!--            <div class="card-body text-center">-->
+<!--                <i data-feather="check-square" class="mb-3" style="width: 48px; height: 48px;"></i>-->
+<!--                <h3>{{ stats.count_tasks }}</h3>-->
+<!--                <p>Count Tasks</p>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    {% endif %}-->
+</div>
+
+<!-- Quick Actions -->
+<!--<div class="row mb-4">-->
+<!--    <div class="col-12">-->
+<!--        <div class="card">-->
+<!--            <div class="card-header">-->
+<!--                <h5 class="mb-0">Quick Actions</h5>-->
+<!--            </div>-->
+<!--            <div class="card-body">-->
+<!--                <div class="row">-->
+<!--                    {% if current_user.has_permission('bin_scanning') %}-->
+<!--                    <div class="col-md-4 mb-3">-->
+<!--                        <a href="{{ url_for('bin_scanning') }}" class="btn btn-outline-primary w-100">-->
+<!--                            <i data-feather="search"></i> Scan Bin-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                    {% endif %}-->
+<!--                    {% if current_user.has_permission('label_printing') %}-->
+<!--                    <div class="col-md-4 mb-3">-->
+<!--                        <a href="{{ url_for('label_printing') }}" class="btn btn-outline-success w-100">-->
+<!--                            <i data-feather="printer"></i> Print Labels-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                    {% endif %}-->
+<!--                    {% if current_user.has_permission('bin_scanning') or current_user.has_permission('grpo') %}-->
+<!--                    <div class="col-md-4 mb-3">-->
+<!--                        <button class="btn btn-outline-warning w-100" onclick="startQuickScan()">-->
+<!--                            <i data-feather="camera"></i> Quick Scan-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                    {% endif %}-->
+<!--                </div>-->
+<!--                -->
+<!--                {% if current_user.has_permission('user_management') or current_user.role in ['admin', 'manager'] %}-->
+<!--                <hr>-->
+<!--                <div class="row">-->
+<!--                    <div class="col-md-4 mb-3">-->
+<!--                        <form action="{{ url_for('sync_sap_data') }}" method="POST" style="display: inline;">-->
+<!--                            <button type="submit" class="btn btn-outline-primary w-100" onclick="return confirm('This will sync warehouses, bins, and business partners from SAP B1. Continue?')">-->
+<!--                                <i data-feather="refresh-cw"></i> Sync SAP Data-->
+<!--                            </button>-->
+<!--                        </form>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-4 mb-3">-->
+<!--                        <a href="{{ url_for('user_management') }}" class="btn btn-outline-secondary w-100">-->
+<!--                            <i data-feather="users"></i> Manage Users-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-4 mb-3">-->
+<!--                        <a href="{{ url_for('branch_management') }}" class="btn btn-outline-info w-100">-->
+<!--                            <i data-feather="map-pin"></i> Manage Branches-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                {% endif %}-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% if recent_activities %}
+                        {% for activity in recent_activities %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ activity.type }}</strong>
+                                <small class="text-muted d-block">{{ activity.description }}</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                {% if activity.status == 'draft' %}
+                                    <span class="badge bg-secondary">Draft</span>
+                                {% elif activity.status == 'submitted' %}
+                                    <span class="badge bg-warning text-dark">Submitted</span>
+                                {% elif activity.status == 'qc_approved' or activity.status == 'posted' %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% elif activity.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% else %}
+                                    <span class="badge bg-info">{{ activity.status|title }}</span>
+                                {% endif %}
+                                <small class="text-muted">{{ activity.created_at.strftime('%m/%d %H:%M') }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="list-group-item">
+                            <div class="text-center text-muted py-3">
+                                <i data-feather="activity" class="mb-2"></i>
+                                <p class="mb-0">No recent activity found</p>
+                                <small>Start creating GRPO, transfers, or pick lists to see activity here</small>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Scan Modal -->
+<div class="modal fade" id="quickScanModal" tabindex="-1" aria-labelledby="quickScanModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="quickScanModalLabel">Quick Scan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="scanner-container">
+                    <video id="quickScanVideo" class="scanner-video" autoplay></video>
+                    <div class="scanner-overlay"></div>
+                </div>
+                <div class="mt-3">
+                    <input type="text" class="form-control" id="quickScanInput" placeholder="Or enter barcode manually">
+                </div>
+                <div class="mt-3" id="quickScanResult" style="display: none;">
+                    <div class="alert alert-info">
+                        <strong>Scanned:</strong> <span id="scannedCode"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="processQuickScan()">Process</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function startQuickScan() {
+    const modal = new bootstrap.Modal(document.getElementById('quickScanModal'));
+    modal.show();
+    
+    modal._element.addEventListener('shown.bs.modal', function () {
+        const video = document.getElementById('quickScanVideo');
+        startBarcodeScanner('quickScanVideo', function(code) {
+            document.getElementById('scannedCode').textContent = code;
+            document.getElementById('quickScanResult').style.display = 'block';
+            document.getElementById('quickScanInput').value = code;
+        });
+    });
+    
+    modal._element.addEventListener('hidden.bs.modal', function () {
+        stopBarcodeScanner();
+    });
+}
+
+function processQuickScan() {
+    const code = document.getElementById('quickScanInput').value;
+    if (code) {
+        // Determine what to do with the scanned code
+        if (code.startsWith('PO-')) {
+            window.location.href = '/grpo';
+        } else if (code.startsWith('IT-')) {
+            window.location.href = '/inventory_transfer';
+        } else if (code.startsWith('PL-')) {
+            window.location.href = '/pick_list';
+        } else {
+            // Generic item scan
+            window.location.href = '/bin_scanning';
+        }
+    }
+}
+
+// Handle manual input
+document.getElementById('quickScanInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        processQuickScan();
+    }
+});
+
+// Update activity periodically
+setInterval(function() {
+    // This could fetch real-time updates from the server
+    console.log('Checking for updates...');
+}, 30000); // Check every 30 seconds
+</script>
+{% endblock %}

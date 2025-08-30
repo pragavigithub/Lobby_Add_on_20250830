@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}GRPO - WMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Goods Receipt PO (GRPO)</h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createGRPOModal">
+                <i data-feather="plus"></i> Create GRPO
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- GRPO Documents -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">GRPO Documents</h5>
+            </div>
+            <div class="card-body">
+                {% if documents %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>GRPO ID</th>
+                                <th>PO Number</th>
+                                <th>Status</th>
+                                <th>SAP Document</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in documents %}
+                            <tr>
+                                <td>{{ doc.id }}</td>
+                                <td>{{ doc.po_number }}</td>
+                                <td>
+                                    {% if doc.status == 'draft' %}
+                                        <span class="badge bg-warning">Draft</span>
+                                    {% elif doc.status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% elif doc.status == 'rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ doc.sap_document_number or 'N/A' }}</td>
+                                <td>{{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <a href="{{ url_for('grpo_detail', grpo_id=doc.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i data-feather="eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i data-feather="package" style="width: 48px; height: 48px;" class="text-muted mb-3"></i>
+                    <h5>No GRPO Documents</h5>
+                    <p class="text-muted">Create your first GRPO document to get started.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create GRPO Modal -->
+<div class="modal fade" id="createGRPOModal" tabindex="-1" aria-labelledby="createGRPOModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createGRPOModalLabel">Create GRPO</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('create_grpo') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="po_number" class="form-label">PO Number</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="po_number" name="po_number" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="scanPO()">
+                                <i data-feather="camera"></i> Scan
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="scanner-container" id="poScannerContainer" style="display: none;">
+                        <video id="poScanVideo" class="scanner-video" autoplay></video>
+                        <div class="scanner-overlay"></div>
+                    </div>
+                    
+                    <div id="poValidationResult" style="display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create GRPO</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function scanPO() {
+    const container = document.getElementById('poScannerContainer');
+    const video = document.getElementById('poScanVideo');
+    
+    container.style.display = 'block';
+    
+    startBarcodeScanner('poScanVideo', function(code) {
+        document.getElementById('po_number').value = code;
+        container.style.display = 'none';
+        stopBarcodeScanner();
+        
+        // Validate PO
+        validatePO(code);
+    });
+}
+
+async function validatePO(poNumber) {
+    try {
+        const response = await fetch('/api/validate_po', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ po_number: poNumber })
+        });
+        
+        const data = await response.json();
+        const resultDiv = document.getElementById('poValidationResult');
+        
+        if (data.valid) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <strong>Valid PO:</strong> ${data.po_data.CardName || 'Unknown Supplier'}
+                    <br><small>Document Total: ${data.po_data.DocTotal || 'N/A'}</small>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>Invalid PO:</strong> ${data.error}
+                </div>
+            `;
+        }
+        
+        resultDiv.style.display = 'block';
+    } catch (error) {
+        console.error('Error validating PO:', error);
+    }
+}
+
+// Auto-validate when PO number is entered manually
+document.getElementById('po_number').addEventListener('blur', function() {
+    const poNumber = this.value.trim();
+    if (poNumber) {
+        validatePO(poNumber);
+    }
+});
+
+// Clean up scanner when modal is closed
+document.getElementById('createGRPOModal').addEventListener('hidden.bs.modal', function () {
+    stopBarcodeScanner();
+    document.getElementById('poScannerContainer').style.display = 'none';
+});
+</script>
+{% endblock %}

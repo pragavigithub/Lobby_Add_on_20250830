@@ -1,0 +1,356 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> python setup_local_env.py      
+=== WMS Local Environment Setup ===
+
+🔧 Setting up environment variables for local development
+
+💡 Connection Options:
+1. Local SQL Server (recommended for development)
+2. Remote SQL Server (requires network access)
+3. Skip MSSQL (use SQLite for development)
+
+Choose option (1-3): Traceback (most recent call last):
+  File "E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration\setup_local_env.py", line 134, in <module>
+    main()
+  File "E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration\setup_local_env.py", line 121, in main
+    create_env_file()
+  File "E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration\setup_local_env.py", line 29, in create_env_file
+    choice = input("Choose option (1-3): ").strip()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> python fix_network_connection.py
+E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration\fix_network_connection.py:11: DeprecationWarning: 'telnetlib' is deprecated and slated for removal in Python 3.13
+  import telnetlib
+🌐 Remote SQL Server Connection Diagnostics
+============================================================
+Target Server: Not set
+Database: Not set
+Username: Not set
+
+❌ MSSQL_SERVER environment variable not set
+Run: python setup_local_env.py
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> python setup_local_env.py       
+=== WMS Local Environment Setup ===
+
+🔧 Setting up environment variables for local development
+
+💡 Connection Options:
+1. Local SQL Server (recommended for development)
+2. Remote SQL Server (requires network access)
+3. Skip MSSQL (use SQLite for development)
+
+Choose option (1-3): 1
+Server name options:
+1. localhost\SQLEXPRESS
+2. .\SQLEXPRESS
+3. DESKTOP-PLFK2B5\SQLEXPRESS
+4. Custom
+Choose server (1-4) or press Enter for default [localhost\SQLEXPRESS]: 1
+Enter MSSQL_DATABASE [WMS_DB]: WMS_DB
+Enter MSSQL_USERNAME [sa]: sa
+Enter MSSQL_PASSWORD [Ea@12345]: Ea@12345
+
+✅ Environment variables saved to .env file
+Server: localhost\SQLEXPRESS
+Database: WMS_DB
+Username: sa
+
+📋 To use the .env file, install python-dotenv:
+pip install python-dotenv
+
+Then add this to your main.py:
+from dotenv import load_dotenv
+load_dotenv()
+
+Or set system environment variables manually.
+
+🎉 Setup complete!
+
+Next steps:
+1. Make sure SQL Server is running
+2. Create WMS_DB database
+3. Run: python fix_mssql_connection.py (to test connection)
+4. Run: python main.py (to start the app)
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> python fix_mssql_connection.py
+INFO: 🔍 MSSQL Connection Diagnostics
+INFO: ==================================================
+INFO: Server: None
+INFO: Database: None
+INFO: Username: None
+INFO: Password: Not set
+ERROR: ❌ Missing environment variables
+INFO: Set: MSSQL_SERVER, MSSQL_DATABASE, MSSQL_USERNAME, MSSQL_PASSWORD
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> python fix_mssql_connection.py
+INFO: 🔍 MSSQL Connection Diagnostics
+INFO: ==================================================
+INFO: Server: None
+INFO: Database: None
+INFO: Username: None
+INFO: Password: Not set
+ERROR: ❌ Missing environment variables
+INFO: Set: MSSQL_SERVER, MSSQL_DATABASE, MSSQL_USERNAME, MSSQL_PASSWORD
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> python setup_local_env.py     
+=== WMS Local Environment Setup ===
+
+.env file already exists. Overwrite? (y/n): y
+🔧 Setting up environment variables for local development
+
+💡 Connection Options:
+1. Local SQL Server (recommended for development)
+2. Remote SQL Server (requires network access)
+3. Skip MSSQL (use SQLite for development)
+
+Choose option (1-3): 1
+Server name options:
+1. localhost\SQLEXPRESS
+2. .\SQLEXPRESS
+3. DESKTOP-PLFK2B5\SQLEXPRESS
+4. Custom
+Choose server (1-4) or press Enter for default [localhost\SQLEXPRESS]: 1
+Enter MSSQL_DATABASE [WMS_DB]: WMS_DB
+Enter MSSQL_USERNAME [sa]: sa
+Enter MSSQL_PASSWORD [Ea@12345]: Ea@12345
+
+✅ Environment variables saved to .env file
+Server: localhost\SQLEXPRESS
+Database: WMS_DB
+Username: sa
+
+📋 To use the .env file, install python-dotenv:
+pip install python-dotenv
+
+Then add this to your main.py:
+from dotenv import load_dotenv
+load_dotenv()
+
+Or set system environment variables manually.
+
+🎉 Setup complete!
+
+Next steps:
+1. Make sure SQL Server is running
+2. Create WMS_DB database
+3. Run: python fix_mssql_connection.py (to test connection)
+4. Run: python main.py (to start the app)
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> python fix_mssql_connection.py
+INFO: 🔍 MSSQL Connection Diagnostics
+INFO: ==================================================
+INFO: Server: None
+INFO: Database: None
+INFO: Username: None
+INFO: Password: Not set
+ERROR: ❌ Missing environment variables
+INFO: Set: MSSQL_SERVER, MSSQL_DATABASE, MSSQL_USERNAME, MSSQL_PASSWORD
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration>  python main.py                 
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 with TCP/IP: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Providerr
+: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft][ODBC Dr
+iver 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 without Named Pipes: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes  
+Provider: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft]
+[ODBC Driver 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with SQL Server driver: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist  
+or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53); [08001] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:root:❌ All MSSQL connection attempts failed for localhost\SQLEXPRESS/WMS_DB
+Traceback (most recent call last):
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 145, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 3292, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 452, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 1269, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 716, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\impl.py", line 169, in _do_get
+    with util.safe_reraise():
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\impl.py", line 167, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 393, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 678, in __init__
+    self.__connect()
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 902, in __connect
+    with util.safe_reraise():
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 898, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\create.py", line 637, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\default.py", line 616, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pyodbc.OperationalError: ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53); [08001] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration\main.py", line 1, in <module>
+    from app import app
+  File "E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration\app.py", line 176, in <module>
+    db.create_all()
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask_sqlalchemy\extension.py", line 900, in create_all
+    self._call_for_binds(bind_key, "create_all")
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask_sqlalchemy\extension.py", line 881, in _call_for_binds
+    getattr(metadata, op_name)(bind=engine)
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\sql\schema.py", line 5828, in create_all
+    bind._run_ddl_visitor(
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 3242, in _run_ddl_visitor
+    with self.begin() as conn:
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 3232, in begin
+    with self.connect() as conn:
+         ^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 3268, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 147, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 2430, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 145, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\base.py", line 3292, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 452, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 1269, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 716, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\impl.py", line 169, in _do_get
+    with util.safe_reraise():
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\impl.py", line 167, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 393, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 678, in __init__
+    self.__connect()
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 902, in __connect
+    with util.safe_reraise():
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\pool\base.py", line 898, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\create.py", line 637, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Programs\Python\Python311\Lib\site-packages\sqlalchemy\engine\default.py", line 616, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.OperationalError: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist or access denied. (17) (SQLDriv
+erConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53); [08001] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> python setup_local_env.py     
+=== WMS Local Environment Setup ===
+
+.env file already exists. Overwrite? (y/n): y
+🔧 Setting up environment variables for local development
+
+💡 Connection Options:
+1. Local SQL Server (recommended for development)
+2. Remote SQL Server (requires network access)
+3. Skip MSSQL (use SQLite for development)
+
+Choose option (1-3): 1
+Server name options:
+1. localhost\SQLEXPRESS
+2. .\SQLEXPRESS
+3. DESKTOP-PLFK2B5\SQLEXPRESS
+4. Custom
+Choose server (1-4) or press Enter for default [192.168.1.5\SQLEXPRESS]: 1
+Enter MSSQL_DATABASE [WMS_DB]: WMS_DB
+Enter MSSQL_USERNAME [sa]: sa
+Enter MSSQL_PASSWORD [Ea@12345]: Ea@12345
+
+✅ Environment variables saved to .env file
+Server: localhost\SQLEXPRESS
+Database: WMS_DB
+Username: sa
+
+📋 To use the .env file, install python-dotenv:
+pip install python-dotenv
+
+Then add this to your main.py:
+from dotenv import load_dotenv
+load_dotenv()
+
+Or set system environment variables manually.
+
+🎉 Setup complete!
+
+Next steps:
+1. Make sure SQL Server is running
+2. Create WMS_DB database
+3. Run: python fix_mssql_connection.py (to test connection)
+4. Run: python main.py (to start the app)
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> python fix_mssql_connection.py
+INFO: 🔍 MSSQL Connection Diagnostics
+INFO: ==================================================
+INFO: Server: None
+INFO: Database: None
+INFO: Username: None
+INFO: Password: Not set
+ERROR: ❌ Missing environment variables
+INFO: Set: MSSQL_SERVER, MSSQL_DATABASE, MSSQL_USERNAME, MSSQL_PASSWORD
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> python fix_mssql_connection.py
+INFO: 🔍 MSSQL Connection Diagnostics
+INFO: ==================================================
+INFO: Server: None
+INFO: Database: None
+INFO: Username: None
+INFO: Password: Not set
+ERROR: ❌ Missing environment variables
+INFO: Set: MSSQL_SERVER, MSSQL_DATABASE, MSSQL_USERNAME, MSSQL_PASSWORD
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> python fix_network_connection.py
+E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration\fix_network_connection.py:11: DeprecationWarning: 'telnetlib' is deprecated and slated for removal in Python 3.13
+  import telnetlib
+🌐 Remote SQL Server Connection Diagnostics
+============================================================
+Target Server: Not set
+Database: Not set
+Username: Not set
+
+❌ MSSQL_SERVER environment variable not set
+Run: python setup_local_env.py
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> python fix_mssql_connection.py  
+INFO: 🔍 MSSQL Connection Diagnostics
+INFO: ==================================================
+INFO: Server: None
+INFO: Database: None
+INFO: Username: None
+INFO: Password: Not set
+ERROR: ❌ Missing environment variables
+INFO: Set: MSSQL_SERVER, MSSQL_DATABASE, MSSQL_USERNAME, MSSQL_PASSWORD
+PS E:\SAP_Integ\Git Change\20250713\3\Emerging_BarCode_Integration> 

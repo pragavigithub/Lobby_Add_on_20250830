@@ -1,0 +1,226 @@
+[notice] A new release of pip is available: 24.0 -> 25.1.1
+[notice] To update, run: python.exe -m pip install --upgrade pip
+✓ Successfully installed gunicorn==21.2.0
+Requirement already satisfied: psycopg2-binary==2.9.9 in c:\users\lenovo\appdata\local\programs\python\python311\lib\site-packages (2.9.9)
+
+[notice] A new release of pip is available: 24.0 -> 25.1.1
+[notice] To update, run: python.exe -m pip install --upgrade pip
+✓ Successfully installed psycopg2-binary==2.9.9
+Requirement already satisfied: PyJWT==2.8.0 in c:\users\lenovo\appdata\local\programs\python\python311\lib\site-packages (2.8.0)
+
+[notice] A new release of pip is available: 24.0 -> 25.1.1
+[notice] To update, run: python.exe -m pip install --upgrade pip
+✓ Successfully installed PyJWT==2.8.0
+
+✓ All packages installed successfully!
+⚠ .env file already exists. Skipping creation to avoid overwriting.
+
+Setup complete!
+
+To run the application:
+1. Update the .env file with your actual SAP B1 credentials
+2. Run: python main.py
+3. Open your browser to: http://localhost:5000
+4. Login with: admin / admin123
+PS E:\SAP_Integ\Git Change\20250713\5\Emerging_BarCode_Integration>  python main.py          
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 with TCP/IP: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Providerr
+: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft][ODBC Dr
+iver 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 without Named Pipes: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes  
+Provider: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft]
+[ODBC Driver 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with SQL Server driver: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist  
+or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53); [08001] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:root:❌ All MSSQL connection attempts failed for 192.168.1.5\SQLEXPRESS/WMS_DB
+ * Serving Flask app 'app'
+ * Debug mode: on
+INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.5:5000
+INFO:werkzeug:Press CTRL+C to quit
+INFO:werkzeug: * Restarting with stat
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 with TCP/IP: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Providerr
+: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft][ODBC Dr
+iver 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 without Named Pipes: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes  
+Provider: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft]
+[ODBC Driver 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with SQL Server driver: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist  
+or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53); [08001] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:root:❌ All MSSQL connection attempts failed for 192.168.1.5\SQLEXPRESS/WMS_DB
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 888-243-362
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:21] "GET / HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:21] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:22] "GET /static/js/app.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:22] "GET /static/js/barcode-scanner.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:22] "GET /static/css/style.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:25] "GET /grpo HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:25] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:25] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:25] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+WARNING:root:SAP B1 login failed: {
+   "error" : {
+      "code" : -304,
+      "message" : {
+         "lang" : "en-us",
+         "value" : "Fail to NONE-SSO login from SLD."
+      }
+   }
+}
+. Running in offline mode.
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:41] "POST /grpo/create HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:41] "GET /grpo HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:42] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:42] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:42] "GET /static/js/app.js HTTP/1.1" 304 -
+WARNING:root:SAP B1 login failed: {
+   "error" : {
+      "code" : -304,
+      "message" : {
+         "lang" : "en-us",
+         "value" : "Fail to NONE-SSO login from SLD."
+      }
+   }
+}
+. Running in offline mode.
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:42] "POST /api/validate_po HTTP/1.1" 200 -
+WARNING:root:SAP B1 login failed: {
+   "error" : {
+      "code" : -304,
+      "message" : {
+         "lang" : "en-us",
+         "value" : "Fail to NONE-SSO login from SLD."
+      }
+   }
+}
+. Running in offline mode.
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:54] "POST /api/validate_po HTTP/1.1" 200 -
+WARNING:root:SAP B1 login failed: {
+   "error" : {
+      "code" : -304,
+      "message" : {
+         "lang" : "en-us",
+         "value" : "Fail to NONE-SSO login from SLD."
+      }
+   }
+}
+. Running in offline mode.
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:54] "POST /grpo/create HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:54] "GET /grpo HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:54] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:54] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:01:54] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+WARNING:root:SAP B1 login failed: {
+   "error" : {
+      "code" : -304,
+      "message" : {
+         "lang" : "en-us",
+         "value" : "Fail to NONE-SSO login from SLD."
+      }
+   }
+}
+. Running in offline mode.
+WARNING:root:SAP B1 login failed: {
+   "error" : {
+      "code" : -304,
+      "message" : {
+         "lang" : "en-us",
+         "value" : "Fail to NONE-SSO login from SLD."
+      }
+   }
+}
+. Running in offline mode.
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:02:57] "POST /grpo/create HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:02:57] "POST /api/validate_po HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:02:57] "GET /grpo HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:02:57] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:02:57] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:02:57] "GET /static/js/app.js HTTP/1.1" 304 -
+WARNING:root:SAP B1 login failed: {
+   "error" : {
+      "code" : -304,
+      "message" : {
+         "lang" : "en-us",
+         "value" : "Fail to NONE-SSO login from SLD."
+      }
+   }
+}
+. Running in offline mode.
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:22] "POST /api/validate_po HTTP/1.1" 200 -
+WARNING:root:SAP B1 login failed: {
+   "error" : {
+      "code" : -304,
+      "message" : {
+         "lang" : "en-us",
+         "value" : "Fail to NONE-SSO login from SLD."
+      }
+   }
+}
+. Running in offline mode.
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:22] "POST /grpo/create HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:22] "GET /grpo HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:22] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:22] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:22] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:26] "GET /inventory_transfer HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:26] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:26] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:26] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:33] "POST /api/validate_transfer_request HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:38] "POST /api/validate_transfer_request HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:38] "POST /inventory_transfer/create HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:38] "GET /inventory_transfer/1 HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:39] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:39] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:39] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:45] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:45] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:45] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:05:45] "GET /static/js/app.js HTTP/1.1" 304 -
+WARNING:root:SAP B1 login failed: {
+   "error" : {
+      "code" : -304,
+      "message" : {
+         "lang" : "en-us",
+         "value" : "Fail to NONE-SSO login from SLD."
+      }
+   }
+}
+. Running in offline mode.
+WARNING:root:Cannot sync warehouses - SAP B1 not available
+WARNING:root:SAP B1 login failed: {
+   "error" : {
+      "code" : -304,
+      "message" : {
+         "lang" : "en-us",
+         "value" : "Fail to NONE-SSO login from SLD."
+      }
+   }
+}
+. Running in offline mode.
+WARNING:root:Cannot sync bins - SAP B1 not available
+WARNING:root:SAP B1 login failed: {
+   "error" : {
+      "code" : -304,
+      "message" : {
+         "lang" : "en-us",
+         "value" : "Fail to NONE-SSO login from SLD."
+      }
+   }
+}
+. Running in offline mode.
+WARNING:root:Cannot sync business partners - SAP B1 not available
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:06:37] "POST /sync-sap-data HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:06:37] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:06:37] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:06:37] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 09:06:37] "GET /static/js/app.js HTTP/1.1" 304 -
+

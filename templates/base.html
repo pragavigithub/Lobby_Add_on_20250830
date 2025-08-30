@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <meta name="description" content="Complete Warehouse Management System with SAP B1 integration">
+    <meta name="keywords" content="warehouse, management, SAP, B1, inventory, barcode">
+    <meta name="author" content="WMS Team">
+
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="WMS">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
+
+    <!-- Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ url_for('static', filename='icons/icon-512x512.png') }}">
+
+    <title>{% block title %}Warehouse Management System{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery (required for Invoice Creation functionality) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Feather Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+{% if current_user.is_authenticated %}
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+            <i data-feather="package"></i> WMS
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dashboard') }}">
+                        <i data-feather="home"></i> Dashboard
+                    </a>
+                </li>
+                <!--                    {% if current_user.has_permission('grpo') %}-->
+                <!--                    <li class="nav-item">-->
+                <!--                        <a class="nav-link" href="{{ url_for('grpo') }}">-->
+                <!--                            <i data-feather="package"></i> GRN-->
+                <!--                        </a>-->
+                <!--                    </li>-->
+                <!--                    {% endif %}-->
+                <!--                    {% if current_user.has_permission('inventory_transfer') %}-->
+                <!--                    <li class="nav-item">-->
+                <!--                        <a class="nav-link" href="{{ url_for('inventory_transfer') }}">-->
+                <!--                            <i data-feather="move"></i> Batch Transfer-->
+                <!--                        </a>-->
+                <!--                    </li>-->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('inventory_transfer.serial_index') }}">
+                        <i data-feather="hash"></i> Serial Transfer
+                    </a>
+                </li>
+                {% endif %}
+                {% if current_user.has_permission('serial_item_transfer')%}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('serial_item_transfer.index') }}">
+                        <i data-feather="tag"></i> Serial Item Transfer
+                    </a>
+                </li>
+                {% endif %}
+                {% if current_user.has_permission('invoice_creation') %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('invoice_creation.index') }}">
+                        <i data-feather="file-text"></i> Invoice Creation
+                    </a>
+                </li>
+                {% endif %}
+                <!--                    {% if current_user.has_permission('pick_list') %}-->
+                <!--                    <li class="nav-item">-->
+                <!--                        <a class="nav-link" href="{{ url_for('pick_list') }}">-->
+                <!--                            <i data-feather="list"></i> Pick List-->
+                <!--                        </a>-->
+                <!--                    </li>-->
+                <!--                    {% endif %}-->
+                <!--                    {% if current_user.has_permission('inventory_counting') %}-->
+                <!--                    <li class="nav-item">-->
+                <!--                        <a class="nav-link" href="{{ url_for('inventory_counting') }}">-->
+                <!--                            <i data-feather="check-square"></i> Counting-->
+                <!--                        </a>-->
+                <!--                    </li>-->
+                <!--                    {% endif %}-->
+                <!--                    {% if current_user.has_permission('bin_scanning') %}-->
+                <!--                    <li class="nav-item">-->
+                <!--                        <a class="nav-link" href="{{ url_for('bin_scanning') }}">-->
+                <!--                            <i data-feather="search"></i> Bin Scan-->
+                <!--                        </a>-->
+                <!--                    </li>-->
+                <!--                    {% endif %}-->
+                {% if current_user.has_permission('qc_dashboard') %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('qc_dashboard') }}">
+                        <i data-feather="clipboard"></i> QC Dashboard
+                    </a>
+                </li>
+                {% endif %}
+                <!--                    {% if current_user.has_permission('label_printing') %}-->
+                <!--                    <li class="nav-item dropdown">-->
+                <!--                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">-->
+                <!--                            <i data-feather="printer"></i> Labels-->
+                <!--                        </a>-->
+                <!--                        <ul class="dropdown-menu">-->
+                <!--                            <li><a class="dropdown-item" href="{{ url_for('label_printing') }}">Print Labels</a></li>-->
+                <!--                            <li><a class="dropdown-item" href="{{ url_for('barcode_reprint') }}">Reprint Labels</a></li>-->
+                <!--                        </ul>-->
+                <!--                    </li>-->
+                <!--                    {% endif %}-->
+            </ul>
+
+            <ul class="navbar-nav">
+                {% if current_user.has_permission('user_management') or current_user.role == 'admin' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('user_management') }}">
+                        <i data-feather="users"></i> Users
+                    </a>
+                </li>
+                {% endif %}
+                <!--                    {% if current_user.role == 'admin' %}-->
+                <!--                    <li class="nav-item">-->
+                <!--                        <a class="nav-link" href="{{ url_for('branch_management') }}">-->
+                <!--                            <i data-feather="git-branch"></i> Branches-->
+                <!--                        </a>-->
+                <!--                    </li>-->
+                <!--                    {% endif %}-->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                       data-bs-toggle="dropdown">
+                        <i data-feather="user"></i> {{ current_user.first_name }} {{ current_user.last_name }}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endif %}
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
+             role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</main>
+
+<!-- Install PWA Prompt -->
+<div class="modal fade" id="installModal" tabindex="-1" aria-labelledby="installModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="installModalLabel">Install WMS App</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Install the WMS app on your device for a better experience and offline access.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Maybe Later</button>
+                <button type="button" class="btn btn-primary" id="installBtn">Install Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.min.js"></script>
+
+<!-- Custom Scripts -->
+<script src="{{ url_for('static', filename='js/barcode-scanner.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+<script>
+    // Initialize Feather icons
+    feather.replace();
+
+    // PWA Installation
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+
+        // Show install modal after 3 seconds
+        setTimeout(() => {
+            if (deferredPrompt) {
+                const installModal = new bootstrap.Modal(document.getElementById('installModal'));
+                installModal.show();
+            }
+        }, 3000);
+    });
+
+    document.getElementById('installBtn').addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+
+            if (outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+            } else {
+                console.log('User dismissed the install prompt');
+            }
+
+            deferredPrompt = null;
+
+            // Hide modal
+            const installModal = bootstrap.Modal.getInstance(document.getElementById('installModal'));
+            installModal.hide();
+        }
+    });
+
+    // Check if already installed
+    window.addEventListener('appinstalled', () => {
+        console.log('PWA was installed');
+    });
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block title %}Serial Item Transfer{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Serial Item Transfer</h1>
+        <a href="{{ url_for('serial_item_transfer.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New Transfer
+        </a>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label for="search" class="form-label">Search</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search }}" placeholder="Transfer number, warehouse...">
+                </div>
+                <div class="col-md-2">
+                    <label for="per_page" class="form-label">Items per page</label>
+                    <select class="form-select" id="per_page" name="per_page">
+                        <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                        <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+                        <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                        <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="user_based" class="form-label">Filter</label>
+                    <select class="form-select" id="user_based" name="user_based">
+                        <option value="true" {% if user_based == 'true' %}selected{% endif %}>My Transfers Only</option>
+                        {% if current_user.role in ['admin', 'manager'] %}
+                        <option value="false" {% if user_based == 'false' %}selected{% endif %}>All Transfers</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-primary me-2">Filter</button>
+                    <a href="{{ url_for('serial_item_transfer.index') }}" class="btn btn-outline-secondary">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transfers Table -->
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Serial Item Transfers</h6>
+        </div>
+        <div class="card-body">
+            {% if transfers %}
+            <div class="table-responsive">
+                <table class="table table-bordered" id="transfersTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%">Transfer Number</th>
+                            <th width="12%">From WH</th>
+                            <th width="12%">To WH</th>
+                            <th width="8%">Items</th>
+                            <th width="8%">Valid</th>
+                            <th width="10%">Status</th>
+                            <th width="8%">Priority</th>
+                            <th width="12%">Created</th>
+                            <th width="15%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transfer in transfers %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('serial_item_transfer.detail', transfer_id=transfer.id) }}" 
+                                   class="text-decoration-none">
+                                    {{ transfer.transfer_number }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ transfer.from_warehouse }}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-success">{{ transfer.to_warehouse }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary">{{ transfer.items|length }}</span>
+                            </td>
+                            <td class="text-center">
+                                {% set validated_count = transfer.items|selectattr("validation_status", "equalto", "validated")|list|length %}
+                                {% if validated_count == transfer.items|length and transfer.items|length > 0 %}
+                                    <span class="badge bg-success">{{ validated_count }}</span>
+                                {% elif validated_count > 0 %}
+                                    <span class="badge bg-warning">{{ validated_count }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">0</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if transfer.status == 'draft' %}
+                                    <span class="badge bg-secondary">Draft</span>
+                                {% elif transfer.status == 'submitted' %}
+                                    <span class="badge bg-warning">Submitted</span>
+                                {% elif transfer.status == 'qc_approved' %}
+                                    <span class="badge bg-success">QC Approved</span>
+                                {% elif transfer.status == 'posted' %}
+                                    <span class="badge bg-primary">Posted</span>
+                                {% elif transfer.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if transfer.priority == 'urgent' %}
+                                    <span class="badge bg-danger">Urgent</span>
+                                {% elif transfer.priority == 'high' %}
+                                    <span class="badge bg-warning">High</span>
+                                {% elif transfer.priority == 'normal' %}
+                                    <span class="badge bg-info">Normal</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Low</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ transfer.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <a href="{{ url_for('serial_item_transfer.detail', transfer_id=transfer.id) }}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if pagination.pages > 1 %}
+            <nav aria-label="Transfers pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if pagination.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('serial_item_transfer.index', 
+                                page=pagination.prev_num, per_page=per_page, search=search, user_based=user_based) }}">
+                                Previous
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                        {% if page_num %}
+                            {% if page_num != pagination.page %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('serial_item_transfer.index', 
+                                        page=page_num, per_page=per_page, search=search, user_based=user_based) }}">
+                                        {{ page_num }}
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ page_num }}</span>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if pagination.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('serial_item_transfer.index', 
+                                page=pagination.next_num, per_page=per_page, search=search, user_based=user_based) }}">
+                                Next
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-4">
+                <p class="text-muted">No serial item transfers found.</p>
+                <a href="{{ url_for('serial_item_transfer.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create First Transfer
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Auto-submit form when filters change
+    $('#per_page, #user_based').change(function() {
+        $(this).closest('form').submit();
+    });
+});
+</script>
+{% endblock %}

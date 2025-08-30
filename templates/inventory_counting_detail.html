@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}Count Task {{ count.count_number }} - WMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>Count Task: {{ count.count_number }}</h1>
+                <p class="text-muted mb-0">{{ count.warehouse_code }} - {{ count.bin_location }}</p>
+            </div>
+            <div>
+                {% if count.status == 'assigned' %}
+                <form method="POST" action="{{ url_for('start_count_task', count_id=count.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-success">
+                        <i data-feather="play"></i> Start Count
+                    </button>
+                </form>
+                {% elif count.status == 'in_progress' %}
+                <form method="POST" action="{{ url_for('complete_count_task', count_id=count.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-feather="check"></i> Complete Count
+                    </button>
+                </form>
+                {% endif %}
+                <a href="{{ url_for('inventory_counting') }}" class="btn btn-outline-secondary ms-2">
+                    <i data-feather="arrow-left"></i> Back to Counts
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Count Status -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Count Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p><strong>Count Number:</strong><br>{{ count.count_number }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>Status:</strong><br>
+                            {% if count.status == 'assigned' %}
+                                <span class="badge bg-warning">Assigned</span>
+                            {% elif count.status == 'in_progress' %}
+                                <span class="badge bg-info">In Progress</span>
+                            {% elif count.status == 'completed' %}
+                                <span class="badge bg-success">Completed</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>Warehouse:</strong><br>{{ count.warehouse_code }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>Bin Location:</strong><br>{{ count.bin_location }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>Assigned To:</strong><br>{{ count.user.first_name }} {{ count.user.last_name }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>Created:</strong><br>{{ count.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Barcode Scanner</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if count.status == 'in_progress' %}
+                <button class="btn btn-primary btn-lg" onclick="startBarcodeScanner('countScanVideo', processScannedItem)">
+                    <i data-feather="camera" style="width: 24px; height: 24px;"></i><br>
+                    Start Scanner
+                </button>
+                <div class="scanner-container mt-3" id="countScannerContainer" style="display: none;">
+                    <video id="countScanVideo" class="scanner-video" autoplay></video>
+                    <div class="scanner-overlay"></div>
+                </div>
+                {% else %}
+                <p class="text-muted">Start the count task to enable scanning</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Count Items -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Count Items</h5>
+                    {% if count.status == 'in_progress' %}
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCountItemModal">
+                        <i data-feather="plus"></i> Add Item
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                {% if count.items %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>System Qty</th>
+                                <th>Counted Qty</th>
+                                <th>Variance</th>
+                                <th>Unit</th>
+                                <th>Batch</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in count.items %}
+                            <tr>
+                                <td>{{ item.item_code }}</td>
+                                <td>{{ item.item_name }}</td>
+                                <td>{{ item.system_quantity }}</td>
+                                <td>{{ item.counted_quantity }}</td>
+                                <td>
+                                    {% if item.variance != 0 %}
+                                        <span class="badge bg-warning">{{ item.variance }}</span>
+                                    {% else %}
+                                        <span class="badge bg-success">{{ item.variance }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.unit_of_measure }}</td>
+                                <td>{{ item.batch_number or 'N/A' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i data-feather="package" style="width: 48px; height: 48px;" class="text-muted mb-3"></i>
+                    <h6>No Items Counted</h6>
+                    <p class="text-muted">Start scanning items to begin the count.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Count Item Modal -->
+<div class="modal fade" id="addCountItemModal" tabindex="-1" aria-labelledby="addCountItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCountItemModalLabel">Add Count Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addCountItemForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="item_code" class="form-label">Item Code</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="item_code" name="item_code" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="scanItemCode()">
+                                <i data-feather="camera"></i> Scan
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="system_quantity" class="form-label">System Quantity</label>
+                        <input type="number" class="form-control" id="system_quantity" name="system_quantity" step="0.01" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="counted_quantity" class="form-label">Counted Quantity</label>
+                        <input type="number" class="form-control" id="counted_quantity" name="counted_quantity" step="0.01" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="batch_number" class="form-label">Batch Number (Optional)</label>
+                        <input type="text" class="form-control" id="batch_number" name="batch_number">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function processScannedItem(barcode) {
+    // Process scanned barcode for count item
+    document.getElementById('item_code').value = barcode;
+    $('#addCountItemModal').modal('show');
+    stopBarcodeScanner();
+}
+
+function scanItemCode() {
+    startBarcodeScanner('countScanVideo', function(barcode) {
+        document.getElementById('item_code').value = barcode;
+        stopBarcodeScanner();
+    });
+}
+
+// Form submission
+document.getElementById('addCountItemForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const systemQty = parseFloat(formData.get('system_quantity'));
+    const countedQty = parseFloat(formData.get('counted_quantity'));
+    const variance = countedQty - systemQty;
+    
+    // Add variance calculation
+    formData.append('variance', variance);
+    formData.append('count_id', '{{ count.id }}');
+    
+    // Here you would typically send to server
+    // For now, just close modal
+    $('#addCountItemModal').modal('hide');
+    this.reset();
+});
+</script>
+{% endblock %}

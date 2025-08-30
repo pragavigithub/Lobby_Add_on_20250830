@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice {{ invoice.invoice_number or invoice.id }} - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Invoice {{ invoice.invoice_number or 'Draft' }}</h2>
+                <div>
+                    <a href="{{ url_for('invoice_creation.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Invoices
+                    </a>
+                    {% if invoice.status == 'created' and invoice.sap_doc_entry %}
+                    <a href="#" class="btn btn-primary ml-2" onclick="printInvoice()">
+                        <i class="fas fa-print"></i> Print
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Invoice Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Invoice Number:</strong></td>
+                                            <td>{{ invoice.invoice_number or 'Draft' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Customer Code:</strong></td>
+                                            <td>{{ invoice.customer_code }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Customer Name:</strong></td>
+                                            <td>{{ invoice.customer_name or '-' }}</td>
+                                        </tr>
+<!--                                        <tr>-->
+<!--                                            <td><strong>Branch:</strong></td>-->
+<!--                                            <td>{{ invoice.branch_name or '-' }}</td>-->
+<!--                                        </tr>-->
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Status:</strong></td>
+                                            <td>
+                                                {% if invoice.status == 'draft' %}
+                                                <span class="badge badge-secondary">{{ invoice.status.title() }}</span>
+                                                {% elif invoice.status == 'created' %}
+                                                <span class="badge badge-success">{{ invoice.status.title() }}</span>
+                                                {% elif invoice.status == 'failed' %}
+                                                <span class="badge badge-danger">{{ invoice.status.title() }}</span>
+                                                {% elif invoice.status == 'posted' %}
+                                                <span class="badge bg-primary">{{ invoice.status.title() }}</span>
+                                                {% elif invoice.status == 'rejected' %}
+                                                <span class="badge bg-danger">{{ invoice.status.title() }}</span>
+                                                {% else %}
+                                                <span class="badge badge-info">{{ invoice.status.title() }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Date Created:</strong></td>
+                                            <td>{{ invoice.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>SAP Doc Entry:</strong></td>
+                                            <td>{{ invoice.sap_doc_entry or '-' }}</td>
+                                        </tr>
+<!--                                        <tr>-->
+<!--                                            <td><strong>Total Amount:</strong></td>-->
+<!--                                            <td>-->
+<!--                                                {% if invoice.total_amount %}-->
+<!--                                                ₹{{ "{:,.2f}".format(invoice.total_amount) }}-->
+<!--                                                {% else %}-->
+<!--                                                - -->
+<!--                                                {% endif %}-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Invoice Lines</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if invoice.lines %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Line #</th>
+                                        <th>Item Code</th>
+                                        <th>Description</th>
+                                        <th>Quantity</th>
+                                        <th>Warehouse</th>
+                                        <th>Tax Code</th>
+                                        <th>Serial Numbers</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for line in invoice.lines %}
+                                    <tr>
+                                        <td>{{ line.line_number }}</td>
+                                        <td>{{ line.item_code }}</td>
+                                        <td>{{ line.item_description }}</td>
+                                        <td>{{ line.quantity }}</td>
+                                        <td>{{ line.warehouse_code }}</td>
+                                        <td>{{ line.tax_code }}</td>
+                                        <td>
+                                            {% if line.serial_numbers %}
+                                            <button class="btn btn-sm btn-outline-info"
+                                                    data-line-id="{{ line.id }}"
+                                                    onclick="showSerials(this)">
+                                                {{ line.serial_numbers|length }} Serial(s)
+                                            </button>
+                                            <!-- Hidden data for serials -->
+                                            <div id="serials-{{ line.id }}" style="display:none;">
+                                                {% for serial in line.serial_numbers %}
+                                                <span class="serial-item" data-serial="{{ serial.serial_number }}"
+                                                      data-item="{{ serial.item_code }}">{{ serial.serial_number }}</span>
+                                                {% endfor %}
+                                            </div>
+                                            {% else %}
+                                            -
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No invoice lines found</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Created By</h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>{{ invoice.user.first_name }} {{ invoice.user.last_name }}</strong></p>
+                            <p class="text-muted">{{ invoice.user.username }}</p>
+                            <p class="text-muted">{{ invoice.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        </div>
+                    </div>
+
+                    {% if invoice.notes %}
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Notes</h6>
+                        </div>
+                        <div class="card-body">
+                            <p>{{ invoice.notes }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if invoice.status == 'failed' and invoice.sap_response %}
+                    <div class="card mt-3">
+                        <div class="card-header bg-danger text-white">
+                            <h6 class="mb-0">Error Details</h6>
+                        </div>
+                        <div class="card-body">
+                            <pre class="small">{{ invoice.sap_response }}</pre>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Serial Numbers Modal -->
+<div class="modal fade" id="serialModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Serial Numbers</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="serialsList"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showSerials(button) {
+        console.log('🔍 Loading serial numbers for line...');
+        const lineId = button.getAttribute('data-line-id');
+        const serialsDiv = document.getElementById('serials-' + lineId);
+
+        console.log('📋 Looking for serials div:', 'serials-' + lineId);
+        console.log('📋 Found serials div:', serialsDiv);
+
+        if (serialsDiv) {
+            const serialItems = serialsDiv.querySelectorAll('.serial-item');
+            console.log('📋 Found serial items:', serialItems.length);
+
+            let serialsHtml = '<div class="table-responsive"><table class="table table-sm"><thead><tr><th>Serial Number</th><th>Item Code</th><th>Status</th></tr></thead><tbody>';
+
+            if (serialItems.length > 0) {
+                serialItems.forEach(function(item, index) {
+                    const serialNumber = item.getAttribute('data-serial') || item.textContent.trim();
+                    const itemCode = item.getAttribute('data-item') || 'N/A';
+
+                    serialsHtml += `
+                        <tr>
+                            <td><code class="text-primary">${serialNumber}</code></td>
+                            <td><strong>${itemCode}</strong></td>
+                            <td><span class="badge badge-success">Valid</span></td>
+                        </tr>
+                    `;
+
+                    console.log(`📋 Serial ${index + 1}: ${serialNumber} (${itemCode})`);
+                });
+            } else {
+                serialsHtml += '<tr><td colspan="3" class="text-center text-muted">No serial numbers found</td></tr>';
+            }
+
+            serialsHtml += '</tbody></table></div>';
+
+            document.getElementById('serialsList').innerHTML = serialsHtml;
+            $('#serialModal').modal('show');
+
+            console.log('✅ Serial numbers modal displayed with', serialItems.length, 'items');
+        } else {
+            console.error('❌ Could not find serials div for line:', lineId);
+            document.getElementById('serialsList').innerHTML = '<p class="text-danger">Error loading serial numbers</p>';
+            $('#serialModal').modal('show');
+        }
+    }
+
+    function printInvoice() {
+        // This would typically open a print-friendly version or PDF
+        alert('Print functionality would be implemented here');
+    }
+</script>
+{% endblock %}

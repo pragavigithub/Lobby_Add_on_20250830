@@ -1,0 +1,699 @@
+{% extends "base.html" %}
+
+{% block title %}Pick List {{ pick_list.pick_list_number }} - WMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>Pick List: {{ pick_list.pick_list_number }}</h1>
+                <p class="text-muted mb-0">Sales Order: {{ pick_list.sales_order_number }}</p>
+            </div>
+            <div>
+                {% if current_user.role in ['admin', 'manager'] and pick_list.status == 'pending' %}
+                <form method="POST" action="{{ url_for('approve_pick_list', pick_list_id=pick_list.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-success">
+                        <i data-feather="check"></i> Approve
+                    </button>
+                </form>
+                <button class="btn btn-danger ms-2" onclick="rejectPickList('{{ pick_list.id }}')">
+                    <i data-feather="x"></i> Reject
+                </button>
+                {% endif %}
+                
+                <!-- Show Mark as Picked button for SAP pick lists -->
+                {% if pick_list.absolute_entry %}
+                <button class="btn btn-primary ms-2" onclick="markAsPicked('{{ pick_list.id }}', '{{ pick_list.absolute_entry }}')">
+                    <i data-feather="package"></i> Mark as Picked
+                </button>
+                {% else %}
+                <!-- Show for testing purposes when no absolute_entry -->
+                <button class="btn btn-secondary ms-2" disabled title="No SAP connection">
+                    <i data-feather="package"></i> Mark as Picked (SAP Required)
+                </button>
+                {% endif %}
+                
+                <!-- Debug: Show button conditions -->
+<!--                <div class="small text-muted mt-2">-->
+<!--                    Debug: absolute_entry={{ pick_list.absolute_entry or 'None' }}, status={{ pick_list.status }}, -->
+<!--                    user_role={{ current_user.role }}, has_permission={{ current_user.has_permission('pick_list') }}-->
+<!--                </div>-->
+                
+                <a href="{{ url_for('pick_list') }}" class="btn btn-outline-secondary ms-2">
+                    <i data-feather="arrow-left"></i> Back to Pick Lists
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pick List Status -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Pick List Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p><strong>Pick List Number:</strong><br>{{ pick_list.pick_list_number }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>Status:</strong><br>
+                            {% if pick_list.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif pick_list.status == 'approved' %}
+                                <span class="badge bg-success">Approved</span>
+                            {% elif pick_list.status == 'rejected' %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% elif pick_list.status == 'completed' %}
+                                <span class="badge bg-info">Completed</span>
+                            {% elif pick_list.status == 'ps_Open' %}
+                                <span class="badge bg-primary">SAP Open</span>
+                            {% elif pick_list.status == 'ps_Closed' %}
+                                <span class="badge bg-success">SAP Closed</span>
+                            {% elif pick_list.status == 'ps_Picked' %}
+                                <span class="badge bg-info">SAP Picked</span>
+                            {% elif pick_list.status == 'ps_PartiallyPicked' %}
+                                <span class="badge bg-warning">Partially Picked</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ pick_list.status }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>SAP Entry:</strong><br>
+                            {% if pick_list.absolute_entry %}
+                                #{{ pick_list.absolute_entry }}
+                            {% else %}
+                                {{ pick_list.sales_order_number or 'N/A' }}
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>Assigned To:</strong><br>{{ pick_list.user.first_name }} {{ pick_list.user.last_name }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>Approver:</strong><br>
+                            {% if pick_list.approver %}
+                                {{ pick_list.approver.first_name }} {{ pick_list.approver.last_name }}
+                            {% else %}
+                                <span class="text-muted">Not approved yet</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>Created:</strong><br>{{ pick_list.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Barcode Scanner</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if pick_list.status == 'approved' %}
+                <button class="btn btn-primary btn-lg" onclick="startBarcodeScanner('pickScanVideo', processPickedItem)">
+                    <i data-feather="camera" style="width: 24px; height: 24px;"></i><br>
+                    Start Scanner
+                </button>
+                <div class="scanner-container mt-3" id="pickScannerContainer" style="display: none;">
+                    <video id="pickScanVideo" class="scanner-video" autoplay></video>
+                    <div class="scanner-overlay"></div>
+                </div>
+                {% else %}
+                <p class="text-muted">Pick list must be approved to enable scanning</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pick List Items -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Pick List Items</h5>
+                    {% if pick_list.status == 'approved' %}
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addPickItemModal">
+                        <i data-feather="plus"></i> Add Item
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                {% if sap_pick_list and sap_pick_list.PickListsLines %}
+                <!-- Display SAP B1 Pick List Lines -->
+                <div class="alert alert-info mb-3">
+                    <i data-feather="database"></i> Displaying data from SAP B1 ({{ sap_pick_list.PickListsLines|length }} line items)
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Line #</th>
+                                <th>Item Code</th>
+                                <th>Description</th>
+                                <th>Picked Qty</th>
+                                <th>Released Qty</th>
+                                <th>Status</th>
+<!--                                <th>Bin Allocations</th>-->
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in sap_pick_list.PickListsLines %}
+                            <tr>
+                                <td><strong>{{ line.LineNumber }}</strong></td>
+                                <td>
+                                    {% if line.ItemCode %}
+                                        <strong>{{ line.ItemCode }}</strong>
+                                        {% if line.SalesOrderDocNum %}
+                                            <br><small class="text-muted">SO: {{ line.SalesOrderDocNum }}</small>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">{{ line.OrderEntry }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if line.ItemDescription %}
+                                        {{ line.ItemDescription }}
+                                        {% if line.CustomerName %}
+                                            <br><small class="text-info">{{ line.CustomerName }}</small>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">Row ID: {{ line.OrderRowID }}</span>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge bg-success">{{ "{:,.0f}".format(line.PickedQuantity) }}</span></td>
+                                <td>{{ "{:,.0f}".format(line.ReleasedQuantity) }}</td>
+                                <td>
+                                    {% if line.PickStatus == 'ps_Open' %}
+                                        <span class="badge bg-warning">Open</span>
+                                    {% elif line.PickStatus == 'ps_Picked' %}
+                                        <span class="badge bg-success">Picked</span>
+                                    {% elif line.PickStatus == 'ps_Closed' %}
+                                        <span class="badge bg-secondary">Closed</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ line.PickStatus }}</span>
+                                    {% endif %}
+                                </td>
+<!--                                <td>-->
+<!--                                    {% if line.DocumentLinesBinAllocations %}-->
+<!--                                    <button class="btn btn-sm btn-outline-info" data-bs-toggle="collapse" -->
+<!--                                            data-bs-target="#binDetails{{ loop.index0 }}" -->
+<!--                                            aria-expanded="false">-->
+<!--                                        <i data-feather="map-pin"></i> {{ line.DocumentLinesBinAllocations|length }} Bins-->
+<!--                                    </button>-->
+<!--                                    {% else %}-->
+<!--                                    <button class="btn btn-sm btn-outline-warning" data-bs-toggle="collapse"-->
+<!--                                            data-bs-target="#binDetails{{ loop.index0 }}"-->
+<!--                                            aria-expanded="false">-->
+<!--                                        <i data-feather="map-pin"></i> {{ line.BinCode or 'Unknown' }}-->
+<!--                                    </button>-->
+<!--                                    {% endif %}-->
+<!--                                </td>-->
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="viewLineDetails('{{ line.LineNumber }}')">
+                                        <i data-feather="eye"></i>
+                                    </button>
+                                    {% if line.PickStatus != 'ps_Picked' %}
+                                    <button class="btn btn-sm btn-success ms-1" onclick="markSAPLineAsPicked('{{ line.LineNumber }}', '{{ line.ItemCode or line.OrderEntry }}', '{{ pick_list.absolute_entry }}', '{{ line.ReleasedQuantity }}')">
+                                        <i data-feather="check"></i> Pick
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <!-- Bin Allocations Details -->
+                            <tr class="collapse" id="binDetails{{ loop.index0 }}">
+                                <td colspan="8">
+                                    <div class="card card-body">
+                                        <h6>Bin Allocations for Line {{ line.LineNumber }}:</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Warehouse</th>
+                                                        <th>Bin Code</th>
+                                                        <th>Quantity</th>
+                                                        <th>Allow Negative</th>
+<!--                                                        <th>Base Line</th>-->
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% if line.DocumentLinesBinAllocations %}
+                                                        {% for bin_alloc in line.DocumentLinesBinAllocations %}
+                                                        <tr>
+                                                            <td><span class="badge bg-info">{{ bin_alloc.Warehouse or 'Unknown' }}</span></td>
+                                                            <td><span class="badge bg-primary">{{ bin_alloc.BinCode or ('Bin-' + bin_alloc.BinAbsEntry|string) }}</span></td>
+                                                            <td>{{ "{:,.0f}".format(bin_alloc.Quantity) }}</td>
+                                                            <td>
+                                                                {% if bin_alloc.AllowNegativeQuantity == 'tNO' %}
+                                                                    <span class="text-danger"><i data-feather="x"></i> No</span>
+                                                                {% else %}
+                                                                    <span class="text-success"><i data-feather="check"></i> Yes</span>
+                                                                {% endif %}
+                                                            </td>
+<!--                                                            <td>{{ bin_alloc.BaseLineNumber }}</td>-->
+                                                        </tr>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <!-- Show default warehouse/bin when no allocations exist -->
+                                                        <tr>
+                                                            <td><span class="badge bg-info">{{ line.WarehouseCode or 'Unknown' }}</span></td>
+                                                            <td><span class="badge bg-primary">{{ line.BinCode or 'Unknown' }}</span></td>
+                                                            <td>{{ "{:,.0f}".format(line.ReleasedQuantity) }}</td>
+                                                            <td><span class="text-danger"><i data-feather="x"></i> No</span></td>
+<!--                                                            <td>{{ line.LineNumber }}</td>-->
+                                                        </tr>
+                                                    {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- SAP Summary Statistics -->
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-3">
+                                        <h5 class="text-primary">{{ sap_pick_list.PickListsLines|length }}</h5>
+                                        <small class="text-muted">Total Lines</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="text-success">{{ "{:,.0f}".format(sap_pick_list.PickListsLines|sum(attribute='PickedQuantity')) }}</h5>
+                                        <small class="text-muted">Total Picked Qty</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="text-info">{{ sap_pick_list.PickListsLines|selectattr('PickStatus', 'equalto', 'ps_Closed')|list|length }}</h5>
+                                        <small class="text-muted">Closed Lines</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="text-warning">
+                                            {% set ns = namespace(count=0) %}
+                                            {% for line in sap_pick_list.PickListsLines %}
+                                                {% if line.DocumentLinesBinAllocations %}
+                                                    {% set ns.count = ns.count + (line.DocumentLinesBinAllocations|length) %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            {{ ns.count }}
+                                        </h5>
+                                        <small class="text-muted">Total Bin Allocations</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% elif pick_list_lines %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Line #</th>
+                                <th>Item Code</th>
+                                <th>Picked Qty</th>
+                                <th>Released Qty</th>
+                                <th>Previously Released</th>
+                                <th>Status</th>
+                                <th>Base Object</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in pick_list_lines %}
+                            <tr>
+                                <td><strong>{{ line.line_number }}</strong></td>
+                                <td>{{ line.item_code if line.item_code else line.order_entry }}</td>
+                                <td><span class="badge bg-success">{{ "{:,.0f}".format(line.picked_quantity) }}</span></td>
+                                <td>{{ "{:,.0f}".format(line.released_quantity) }}</td>
+                                <td>{{ "{:,.0f}".format(line.previously_released_quantity) }}</td>
+                                <td>
+                                    {% if line.pick_status == 'ps_Open' %}
+                                        <span class="badge bg-primary">Open</span>
+                                    {% elif line.pick_status == 'ps_Closed' %}
+                                        <span class="badge bg-success">Closed</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ line.pick_status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ line.base_object_type }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-info" onclick="showBinAllocations({{ line.id }})">
+                                        <i data-feather="map-pin"></i> Bins
+                                    </button>
+                                    {% if line.pick_status != 'ps_Picked' %}
+                                    <button class="btn btn-sm btn-success ms-1" onclick="markLineAsPicked({{ line.id }}, '{{ line.item_code }}')">
+                                        <i data-feather="check"></i> Pick
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Summary Card -->
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-3">
+                                        <h5 class="text-primary">{{ pick_list_lines|length }}</h5>
+                                        <small class="text-muted">Total Lines</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="text-success">{{ pick_list.picked_items }}</h5>
+                                        <small class="text-muted">Picked Items</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="text-info">{{ "{:,.0f}".format(pick_list_lines|sum(attribute='picked_quantity')) }}</h5>
+                                        <small class="text-muted">Total Picked Qty</small>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="text-warning">{{ "{:,.0f}".format(pick_list_lines|sum(attribute='previously_released_quantity')) }}</h5>
+                                        <small class="text-muted">Total Released</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% elif pick_list.items %}
+                <!-- Legacy items display for backward compatibility -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Required Qty</th>
+                                <th>Picked Qty</th>
+                                <th>Remaining</th>
+                                <th>Unit</th>
+                                <th>Bin Location</th>
+                                <th>Batch</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in pick_list.items %}
+                            <tr>
+                                <td>{{ item.item_code }}</td>
+                                <td>{{ item.item_name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.picked_quantity }}</td>
+                                <td>{{ item.quantity - item.picked_quantity }}</td>
+                                <td>{{ item.unit_of_measure }}</td>
+                                <td>{{ item.bin_location }}</td>
+                                <td>{{ item.batch_number or 'N/A' }}</td>
+                                <td>
+                                    {% if item.picked_quantity >= item.quantity %}
+                                        <span class="badge bg-success">Complete</span>
+                                    {% elif item.picked_quantity > 0 %}
+                                        <span class="badge bg-warning">Partial</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i data-feather="package" style="width: 48px; height: 48px;" class="text-muted mb-3"></i>
+                    <h6>No Items in Pick List</h6>
+                    {% if pick_list.absolute_entry %}
+                    <p class="text-muted">SAP Entry {{ pick_list.absolute_entry }} - Loading data from SAP B1...</p>
+                    <button class="btn btn-primary btn-sm" onclick="location.reload()">
+                        <i data-feather="refresh-cw"></i> Refresh
+                    </button>
+                    {% else %}
+                    <p class="text-muted">Add items to the pick list to get started.</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Pick Item Modal -->
+<div class="modal fade" id="addPickItemModal" tabindex="-1" aria-labelledby="addPickItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPickItemModalLabel">Add Pick Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addPickItemForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="item_code" class="form-label">Item Code</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="item_code" name="item_code" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="scanPickItemCode()">
+                                <i data-feather="camera"></i> Scan
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Required Quantity</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" step="0.01" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="bin_location" class="form-label">Bin Location</label>
+                        <input type="text" class="form-control" id="bin_location" name="bin_location" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="batch_number" class="form-label">Batch Number (Optional)</label>
+                        <input type="text" class="form-control" id="batch_number" name="batch_number">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function processPickedItem(barcode) {
+    // Process scanned barcode for pick item
+    document.getElementById('item_code').value = barcode;
+    $('#addPickItemModal').modal('show');
+    stopBarcodeScanner();
+}
+
+function scanPickItemCode() {
+    startBarcodeScanner('pickScanVideo', function(barcode) {
+        document.getElementById('item_code').value = barcode;
+        stopBarcodeScanner();
+    });
+}
+
+async function rejectPickList(pickListId) {
+    if (confirm('Are you sure you want to reject this pick list?')) {
+        try {
+            const response = await fetch(`/pick_list/${pickListId}/reject`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error rejecting pick list');
+            }
+        } catch (error) {
+            console.error('Error rejecting pick list:', error);
+            alert('Error rejecting pick list');
+        }
+    }
+}
+
+async function markAsPicked(pickListId, absoluteEntry) {
+    if (confirm('Are you sure you want to mark this pick list as picked? This will update the status in SAP B1.')) {
+        try {
+            // Show loading indicator
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i data-feather="loader" class="spinner"></i> Processing...';
+            button.disabled = true;
+            
+            const response = await fetch(`/api/pick-list/${pickListId}/mark-picked`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    absolute_entry: absoluteEntry
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                alert('Pick list marked as picked successfully!');
+                location.reload();
+            } else {
+                alert(`Error marking pick list as picked: ${result.error || 'Unknown error'}`);
+                // Restore button
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        } catch (error) {
+            console.error('Error marking pick list as picked:', error);
+            alert('Error marking pick list as picked');
+            // Restore button
+            const button = event.target;
+            button.innerHTML = '<i data-feather="package"></i> Mark as Picked';
+            button.disabled = false;
+        }
+    }
+}
+
+async function markSAPLineAsPicked(lineNumber, itemCode, absoluteEntry, releasedQuantity) {
+    if (confirm(`Are you sure you want to mark line ${lineNumber} (${itemCode}) as picked?`)) {
+        try {
+            // Show loading indicator on the button
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i data-feather="loader" class="spinner"></i> Picking...';
+            button.disabled = true;
+            
+            const response = await fetch(`/api/pick-list/line/${absoluteEntry}/mark-picked`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    line_number: lineNumber,
+                    item_code: itemCode,
+                    picked_quantity: releasedQuantity,
+                    absolute_entry: absoluteEntry
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                alert(`Line ${lineNumber} marked as picked successfully!`);
+                location.reload();
+            } else {
+                alert(`Error marking line as picked: ${result.error || 'Unknown error'}`);
+                // Restore button
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        } catch (error) {
+            console.error('Error marking line as picked:', error);
+            alert('Error marking line as picked');
+            // Restore button
+            const button = event.target;
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+    }
+}
+
+async function markLineAsPicked(lineId, itemCode) {
+    if (confirm(`Are you sure you want to mark ${itemCode} as picked?`)) {
+        try {
+            // Show loading indicator on the button
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i data-feather="loader" class="spinner"></i> Picking...';
+            button.disabled = true;
+            
+            const response = await fetch(`/api/pick-list-line/${lineId}/mark-picked`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                alert(`${itemCode} marked as picked successfully!`);
+                location.reload();
+            } else {
+                alert(`Error marking line as picked: ${result.error || 'Unknown error'}`);
+                // Restore button
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        } catch (error) {
+            console.error('Error marking line as picked:', error);
+            alert('Error marking line as picked');
+            // Restore button
+            const button = event.target;
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+    }
+}
+
+// View line details function
+function viewLineDetails(lineNumber) {
+    // Toggle the bin details collapse for this line
+    const binDetailsId = `#binDetails${lineNumber}`;
+    const binDetailsElement = document.querySelector(binDetailsId);
+    
+    if (binDetailsElement) {
+        // Use Bootstrap's collapse functionality
+        const collapse = new bootstrap.Collapse(binDetailsElement, {
+            toggle: true
+        });
+    } else {
+        // If no bin details available, show a simple alert
+        alert(`Line ${lineNumber} details: No bin allocation details available for this line.`);
+    }
+}
+
+// Form submission
+document.getElementById('addPickItemForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    formData.append('pick_list_id', '{{ pick_list.id }}');
+    
+    // Here you would typically send to server
+    // For now, just close modal
+    $('#addPickItemModal').modal('hide');
+    this.reset();
+});
+</script>
+{% endblock %}

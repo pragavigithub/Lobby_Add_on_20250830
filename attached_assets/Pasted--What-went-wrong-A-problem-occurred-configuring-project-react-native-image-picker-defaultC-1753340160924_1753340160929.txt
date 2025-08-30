@@ -1,0 +1,56 @@
+* What went wrong:
+A problem occurred configuring project ':react-native-image-picker'.
+> defaultConfig contains custom BuildConfig fields, but the feature is disabled.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 1m 57s
+5 actionable tasks: 5 up-to-date
+PS E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\android> ./gradlew clean
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring project ':react-native-image-picker'.
+> defaultConfig contains custom BuildConfig fields, but the feature is disabled.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 29s
+5 actionable tasks: 5 up-to-date
+PS E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\android> cd..
+PS E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app> npx react-native run-android  
+warn Package react-native-sqlite-storage contains invalid configuration: "dependency.platforms.ios.project" is not allowed. Please verify it's properly linked using "react-native config" command and contact the package maintainers about this.
+info JS server already running.
+info Installing the app...
+5 actionable tasks: 5 up-to-date
+
+info 💡 Tip: Make sure that you have set up your development environment correctly, by running react-native doctor. To read more about doctor command visit: https://github.com/react-native-community/cli/blob/main/packages/cli-doctor/README.md#doctor 
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring project ':react-native-image-picker'.
+> defaultConfig contains custom BuildConfig fields, but the feature is disabled.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 30s
+error Failed to install the app.
+info Run CLI with --verbose flag for more details.

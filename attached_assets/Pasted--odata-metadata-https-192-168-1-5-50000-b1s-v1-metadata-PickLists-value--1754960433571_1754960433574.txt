@@ -1,0 +1,1005 @@
+{
+    "odata.metadata": "https://192.168.1.5:50000/b1s/v1/$metadata#PickLists",
+    "value": [
+        {
+            "Absoluteentry": 613,
+            "Name": "SCM-ORD",
+            "OwnerCode": 15,
+            "OwnerName": null,
+            "PickDate": "2024-02-02T00:00:00Z",
+            "Remarks": null,
+            "Status": "ps_Closed",
+            "ObjectType": "156",
+            "UseBaseUnits": "tNO",
+            "PickListsLines": [
+                {
+                    "AbsoluteEntry": 613,
+                    "LineNumber": 0,
+                    "OrderEntry": 1236,
+                    "OrderRowID": 0,
+                    "PickedQuantity": 42000.0,
+                    "PickStatus": "ps_Closed",
+                    "ReleasedQuantity": 0.0,
+                    "PreviouslyReleasedQuantity": 42000.0,
+                    "BaseObjectType": 17,
+                    "SerialNumbers": [],
+                    "BatchNumbers": [],
+                    "DocumentLinesBinAllocations": [
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 21000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 0
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 21000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 0
+                        }
+                    ]
+                },
+                {
+                    "AbsoluteEntry": 613,
+                    "LineNumber": 1,
+                    "OrderEntry": 1236,
+                    "OrderRowID": 1,
+                    "PickedQuantity": 30000.0,
+                    "PickStatus": "ps_Closed",
+                    "ReleasedQuantity": 0.0,
+                    "PreviouslyReleasedQuantity": 30000.0,
+                    "BaseObjectType": 17,
+                    "SerialNumbers": [],
+                    "BatchNumbers": [],
+                    "DocumentLinesBinAllocations": [
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 1
+                        }
+                    ]
+                },
+                {
+                    "AbsoluteEntry": 613,
+                    "LineNumber": 2,
+                    "OrderEntry": 1236,
+                    "OrderRowID": 2,
+                    "PickedQuantity": 50000.0,
+                    "PickStatus": "ps_Closed",
+                    "ReleasedQuantity": 0.0,
+                    "PreviouslyReleasedQuantity": 50000.0,
+                    "BaseObjectType": 17,
+                    "SerialNumbers": [],
+                    "BatchNumbers": [],
+                    "DocumentLinesBinAllocations": [
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 2
+                        }
+                    ]
+                },
+                {
+                    "AbsoluteEntry": 613,
+                    "LineNumber": 3,
+                    "OrderEntry": 1236,
+                    "OrderRowID": 3,
+                    "PickedQuantity": 50400.0,
+                    "PickStatus": "ps_Closed",
+                    "ReleasedQuantity": 0.0,
+                    "PreviouslyReleasedQuantity": 50400.0,
+                    "BaseObjectType": 17,
+                    "SerialNumbers": [],
+                    "BatchNumbers": [],
+                    "DocumentLinesBinAllocations": [
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 1800.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 3
+                        }
+                    ]
+                },
+                {
+                    "AbsoluteEntry": 613,
+                    "LineNumber": 4,
+                    "OrderEntry": 1236,
+                    "OrderRowID": 4,
+                    "PickedQuantity": 50000.0,
+                    "PickStatus": "ps_Closed",
+                    "ReleasedQuantity": 0.0,
+                    "PreviouslyReleasedQuantity": 50000.0,
+                    "BaseObjectType": 17,
+                    "SerialNumbers": [],
+                    "BatchNumbers": [],
+                    "DocumentLinesBinAllocations": [
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 5000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 4
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 5000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 4
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 5000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 4
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 5000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 4
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 5000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 4
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 5000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 4
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 5000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 4
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 5000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 4
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 5000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 4
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 5000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 4
+                        }
+                    ]
+                },
+                {
+                    "AbsoluteEntry": 613,
+                    "LineNumber": 5,
+                    "OrderEntry": 1236,
+                    "OrderRowID": 5,
+                    "PickedQuantity": 30000.0,
+                    "PickStatus": "ps_Closed",
+                    "ReleasedQuantity": 0.0,
+                    "PreviouslyReleasedQuantity": 30000.0,
+                    "BaseObjectType": 17,
+                    "SerialNumbers": [],
+                    "BatchNumbers": [],
+                    "DocumentLinesBinAllocations": [
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 10000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 5
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 10000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 5
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 10000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 5
+                        }
+                    ]
+                },
+                {
+                    "AbsoluteEntry": 613,
+                    "LineNumber": 6,
+                    "OrderEntry": 1236,
+                    "OrderRowID": 6,
+                    "PickedQuantity": 30000.0,
+                    "PickStatus": "ps_Closed",
+                    "ReleasedQuantity": 0.0,
+                    "PreviouslyReleasedQuantity": 30000.0,
+                    "BaseObjectType": 17,
+                    "SerialNumbers": [],
+                    "BatchNumbers": [],
+                    "DocumentLinesBinAllocations": [
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 10000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 6
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 10000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 6
+                        },
+                        {
+                            "BinAbsEntry": 1,
+                            "Quantity": 10000.0,
+                            "AllowNegativeQuantity": "tNO",
+                            "SerialAndBatchNumbersBaseLine": 0,
+                            "BaseLineNumber": 6
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

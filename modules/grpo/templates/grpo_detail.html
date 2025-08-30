@@ -1,0 +1,580 @@
+{% extends "base.html" %}
+
+{% block title %}GRPO Detail - {{ grpo_doc.sap_document_number }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i data-feather="file-text"></i>
+                            SAP Document: {{ grpo_doc.sap_document_number }}
+                        </h5>
+                        <div class="text-end">
+                            <small class="text-muted">Updated At: {{ grpo_doc.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Status:</strong> 
+                                {% if grpo_doc.status == 'draft' %}
+                                    <span class="badge bg-secondary">Draft</span>
+                                {% elif grpo_doc.status == 'submitted' %}
+                                    <span class="badge bg-warning">Submitted</span>
+                                {% elif grpo_doc.status == 'approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif grpo_doc.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% elif grpo_doc.status == 'posted' %}
+                                    <span class="badge bg-primary">Posted</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Mode:</strong> 
+                                {% if grpo_doc.status == 'draft' %}
+                                    <span class="badge bg-info">Draft Mode</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">View Mode</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Order Items -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i data-feather="package"></i> 
+                        Purchase Order Items
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>Ordered</th>
+                                    <th>Open</th>
+                                    <th>UoM</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>ITM001</strong></td>
+                                    <td>Sample Item 1</td>
+                                    <td>100</td>
+                                    <td>100</td>
+                                    <td>EA</td>
+                                    <td>$50.00</td>
+                                    <td><span class="badge bg-success">Open</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="addPOItemToGRPO('ITM001', 'Sample Item 1', 'EA', 'WH001')">
+                                            <i data-feather="plus"></i> Add
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ITM002</strong></td>
+                                    <td>Sample Item 2</td>
+                                    <td>50</td>
+                                    <td>30</td>
+                                    <td>KGS</td>
+                                    <td>$200.00</td>
+                                    <td><span class="badge bg-success">Open</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="addPOItemToGRPO('ITM002', 'Sample Item 2', 'KGS', 'WH001')">
+                                            <i data-feather="plus"></i> Add
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Received Items -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i data-feather="check-square"></i> 
+                            Received Items
+                        </h6>
+                        <button class="btn btn-sm btn-success" onclick="showAddItemModal()">
+                            <i data-feather="plus"></i> Add Item
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if grpo_doc.items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>Received Qty</th>
+                                    <th>UoM</th>
+                                    <th>Warehouse</th>
+                                    <th>Batch</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in grpo_doc.items %}
+                                <tr>
+                                    <td><strong>{{ item.item_code }}</strong></td>
+                                    <td>{{ item.item_name }}</td>
+                                    <td><strong>{{ item.received_quantity }}</strong></td>
+                                    <td>{{ item.unit_of_measure or 'EA' }}</td>
+                                    <td>{{ item.bin_location or 'N/A' }}</td>
+                                    <td>{{ item.batch_number or '-' }}</td>
+                                    <td>
+                                        {% if grpo_doc.status in ['draft', 'rejected'] %}
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="editItem('{{ item.id }}')">
+                                                <i data-feather="edit-2"></i> Edit
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="removeItem('{{ item.id }}')">
+                                                <i data-feather="trash-2"></i>
+                                            </button>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i data-feather="info"></i>
+                        No items have been received yet. Add items from the purchase order above.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('grpo') }}" class="btn btn-secondary">
+                            <i data-feather="arrow-left"></i> Back to GRPO List
+                        </a>
+                        <div>
+                            {% if grpo_doc.status == 'draft' %}
+                            <button class="btn btn-success" onclick="submitGRPO('{{ grpo_doc.id }}')">
+                                <i data-feather="check"></i> Submit for QC Approval
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Item Modal with Cascading Dropdowns -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Item to GRN</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addItemForm" method="POST" action="{{ url_for('add_grpo_item', grpo_id=grpo_doc.id) }}">
+                <div class="modal-body">
+                    <!-- Item Code -->
+                    <div class="mb-3">
+                        <label for="item_code" class="form-label">Item Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="item_code" name="item_code" required onchange="onItemCodeChange()">
+                    </div>
+                    
+                    <!-- Item Name -->
+                    <div class="mb-3">
+                        <label for="item_name" class="form-label">Item Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="item_name" name="item_name" required>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Quantity -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" step="0.01" min="1" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Unit of Measure -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="unit_of_measure" class="form-label">Unit of Measure (UoM) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="unit_of_measure" name="unit_of_measure" value="EA" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Warehouse -->
+                    <div class="mb-3">
+                        <label for="warehouse" class="form-label">Warehouse <span class="text-danger">*</span></label>
+                        <div class="d-flex">
+                            <select class="form-select me-2" id="warehouse_dropdown" name="warehouse_code" onchange="onWarehouseChange()" disabled>
+                                <option value="">Select Warehouse...</option>
+                            </select>
+                            <button type="button" class="btn btn-outline-secondary" onclick="toggleManualWarehouse()">
+                                <i data-feather="edit-2"></i>
+                            </button>
+                        </div>
+                        <input type="text" class="form-control mt-2" id="warehouse_manual" name="warehouse_manual" placeholder="Enter warehouse code manually" style="display: none;">
+                    </div>
+                    
+                    <!-- Bin Location -->
+                    <div class="mb-3">
+                        <label for="bin_location" class="form-label">Bin Location</label>
+                        <div class="d-flex">
+                            <select class="form-select me-2" id="bin_dropdown" name="bin_location" onchange="onBinChange()" disabled>
+                                <option value="">Select Bin Location...</option>
+                            </select>
+                            <button type="button" class="btn btn-outline-secondary" onclick="toggleManualBin()">
+                                <i data-feather="edit-2"></i>
+                            </button>
+                        </div>
+                        <input type="text" class="form-control mt-2" id="bin_manual" name="bin_manual" placeholder="Enter bin location manually" style="display: none;">
+                    </div>
+                    
+                    <!-- Batch Number -->
+                    <div class="mb-3">
+                        <label for="batch_number" class="form-label">Batch Number</label>
+                        <div class="d-flex">
+                            <select class="form-select me-2" id="batch_dropdown" name="batch_number" disabled>
+                                <option value="">Select Batch...</option>
+                            </select>
+                            <button type="button" class="btn btn-outline-secondary" onclick="toggleManualBatch()">
+                                <i data-feather="edit-2"></i>
+                            </button>
+                        </div>
+                        <input type="text" class="form-control mt-2" id="batch_manual" name="batch_manual" placeholder="Enter batch number manually" style="display: none;">
+                    </div>
+                    
+                    <!-- Expiration Date -->
+                    <div class="mb-3">
+                        <label for="expiration_date" class="form-label">Expiration Date</label>
+                        <input type="date" class="form-control" id="expiration_date" name="expiration_date">
+                    </div>
+                    
+                    <!-- Supplier Barcode -->
+                    <div class="mb-3">
+                        <label for="supplier_barcode" class="form-label">Supplier Barcode</label>
+                        <input type="text" class="form-control" id="supplier_barcode" name="supplier_barcode">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Global functions for GRPO management
+function showAddItemModal() {
+    console.log('Opening Add Item Modal');
+    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+    modal.show();
+}
+
+function addPOItemToGRPO(itemCode, itemName, uom, warehouse) {
+    console.log('Adding PO item to GRPO:', itemCode, itemName, uom, warehouse);
+    
+    // Pre-fill the modal with PO data
+    document.getElementById('item_code').value = itemCode;
+    document.getElementById('item_name').value = itemName;
+    document.getElementById('unit_of_measure').value = uom;
+    
+    // Trigger cascading dropdowns
+    onItemCodeChange();
+    
+    // Show the modal
+    showAddItemModal();
+}
+
+function submitGRPO(grpoId) {
+    if (confirm('Are you sure you want to submit this GRPO for QC approval?')) {
+        fetch('/grpo/' + grpoId + '/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error submitting GRPO');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error submitting GRPO');
+        });
+    }
+}
+
+function editItem(itemId) {
+    console.log('Edit item:', itemId);
+    // Implementation for edit functionality
+}
+
+function removeItem(itemId) {
+    if (confirm('Are you sure you want to remove this item?')) {
+        console.log('Remove item:', itemId);
+        // Implementation for remove functionality
+    }
+}
+
+// Cascading Dropdown Functions
+function onItemCodeChange() {
+    const itemCode = document.getElementById('item_code').value;
+    if (itemCode.trim()) {
+        loadWarehouses();
+        loadBatches(itemCode);
+    } else {
+        resetDropdowns();
+    }
+}
+
+function onWarehouseChange() {
+    const warehouseCode = getSelectedWarehouse();
+    if (warehouseCode) {
+        loadBinLocations(warehouseCode);
+    } else {
+        resetBinDropdown();
+    }
+}
+
+function onBinChange() {
+    // Handle bin location selection if needed
+    console.log('Bin location selected:', document.getElementById('bin_dropdown').value);
+}
+
+function loadWarehouses() {
+    console.log('Loading warehouses...');
+    fetch('/api/warehouses')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const warehouseDropdown = document.getElementById('warehouse_dropdown');
+                warehouseDropdown.innerHTML = '<option value="">Select Warehouse...</option>';
+                
+                data.warehouses.forEach(warehouse => {
+                    const option = document.createElement('option');
+                    option.value = warehouse.WarehouseCode;
+                    option.textContent = `${warehouse.WarehouseCode} - ${warehouse.WarehouseName}`;
+                    warehouseDropdown.appendChild(option);
+                });
+                
+                warehouseDropdown.disabled = false;
+                console.log(`Loaded ${data.warehouses.length} warehouses`);
+            } else {
+                console.error('Failed to load warehouses:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading warehouses:', error);
+        });
+}
+
+function loadBinLocations(warehouseCode) {
+    console.log('Loading bin locations for warehouse:', warehouseCode);
+    fetch(`/api/bin-locations?warehouse=${warehouseCode}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const binDropdown = document.getElementById('bin_dropdown');
+                binDropdown.innerHTML = '<option value="">Select Bin Location...</option>';
+                
+                data.bins.forEach(bin => {
+                    const option = document.createElement('option');
+                    option.value = bin.BinCode;
+                    option.textContent = `${bin.BinCode} - ${bin.BinName || bin.Description || bin.BinCode}`;
+                    binDropdown.appendChild(option);
+                });
+                
+                binDropdown.disabled = false;
+                console.log(`Loaded ${data.bins.length} bin locations`);
+            } else {
+                console.error('Failed to load bin locations:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading bin locations:', error);
+        });
+}
+
+function loadBatches(itemCode, warehouseCode = null) {
+    console.log('Loading batches for item:', itemCode, 'warehouse:', warehouseCode);
+    let url = `/api/batches?item=${itemCode}`;
+    if (warehouseCode) {
+        url += `&warehouse=${warehouseCode}`;
+    }
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const batchDropdown = document.getElementById('batch_dropdown');
+                batchDropdown.innerHTML = '<option value="">Select Batch...</option>';
+                
+                data.batches.forEach(batch => {
+                    const option = document.createElement('option');
+                    option.value = batch.BatchNumber;
+                    option.textContent = `${batch.BatchNumber} (Qty: ${batch.Quantity || 0}, Exp: ${batch.ExpirationDate || 'N/A'})`;
+                    batchDropdown.appendChild(option);
+                });
+                
+                batchDropdown.disabled = false;
+                console.log(`Loaded ${data.batches.length} batches`);
+            } else {
+                console.error('Failed to load batches:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading batches:', error);
+        });
+}
+
+// Manual Entry Toggle Functions
+function toggleManualWarehouse() {
+    const dropdown = document.getElementById('warehouse_dropdown');
+    const manual = document.getElementById('warehouse_manual');
+    
+    if (manual.style.display === 'none') {
+        manual.style.display = 'block';
+        dropdown.style.display = 'none';
+        manual.focus();
+    } else {
+        manual.style.display = 'none';
+        dropdown.style.display = 'block';
+        dropdown.focus();
+    }
+}
+
+function toggleManualBin() {
+    const dropdown = document.getElementById('bin_dropdown');
+    const manual = document.getElementById('bin_manual');
+    
+    if (manual.style.display === 'none') {
+        manual.style.display = 'block';
+        dropdown.style.display = 'none';
+        manual.focus();
+    } else {
+        manual.style.display = 'none';
+        dropdown.style.display = 'block';
+        dropdown.focus();
+    }
+}
+
+function toggleManualBatch() {
+    const dropdown = document.getElementById('batch_dropdown');
+    const manual = document.getElementById('batch_manual');
+    
+    if (manual.style.display === 'none') {
+        manual.style.display = 'block';
+        dropdown.style.display = 'none';
+        manual.focus();
+    } else {
+        manual.style.display = 'none';
+        dropdown.style.display = 'block';
+        dropdown.focus();
+    }
+}
+
+// Helper Functions
+function getSelectedWarehouse() {
+    const dropdown = document.getElementById('warehouse_dropdown');
+    const manual = document.getElementById('warehouse_manual');
+    
+    if (manual.style.display !== 'none') {
+        return manual.value;
+    } else {
+        return dropdown.value;
+    }
+}
+
+function resetDropdowns() {
+    const warehouseDropdown = document.getElementById('warehouse_dropdown');
+    const binDropdown = document.getElementById('bin_dropdown');
+    const batchDropdown = document.getElementById('batch_dropdown');
+    
+    warehouseDropdown.disabled = true;
+    binDropdown.disabled = true;
+    batchDropdown.disabled = true;
+    
+    warehouseDropdown.innerHTML = '<option value="">Select Warehouse...</option>';
+    binDropdown.innerHTML = '<option value="">Select Bin Location...</option>';
+    batchDropdown.innerHTML = '<option value="">Select Batch...</option>';
+}
+
+function resetBinDropdown() {
+    const binDropdown = document.getElementById('bin_dropdown');
+    binDropdown.disabled = true;
+    binDropdown.innerHTML = '<option value="">Select Bin Location...</option>';
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('GRPO Detail page loaded');
+    
+    // Initialize Feather icons
+    if (window.feather) {
+        feather.replace();
+    }
+    
+    // Reset form when modal is closed
+    document.getElementById('addItemModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('addItemForm').reset();
+        resetDropdowns();
+        
+        // Reset manual entry modes
+        document.getElementById('warehouse_manual').style.display = 'none';
+        document.getElementById('bin_manual').style.display = 'none';
+        document.getElementById('batch_manual').style.display = 'none';
+        document.getElementById('warehouse_dropdown').style.display = 'block';
+        document.getElementById('bin_dropdown').style.display = 'block';
+        document.getElementById('batch_dropdown').style.display = 'block';
+    });
+});
+</script>
+{% endblock %}

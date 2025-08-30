@@ -1,0 +1,1016 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory Transfer Detail - {{ transfer.transfer_request_number }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('inventory_transfer') }}">Inventory Transfer</a></li>
+                    <li class="breadcrumb-item active">{{ transfer.transfer_request_number }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Transfer Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i data-feather="arrow-right"></i> 
+                            Inventory Transfer - {{ transfer.transfer_request_number }}
+                        </h5>
+                        <div>
+                            {% if transfer.status == 'draft' %}
+                                <span class="badge bg-secondary">Draft</span>
+                            {% elif transfer.status == 'submitted' %}
+                                <span class="badge bg-warning text-dark">Submitted</span>
+                            {% elif transfer.status == 'qc_approved' %}
+                                <span class="badge bg-success">QC Approved</span>
+                            {% elif transfer.status == 'posted' %}
+                                <span class="badge bg-primary">Posted</span>
+                            {% elif transfer.status == 'rejected' %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Transfer Request:</strong> {{ transfer.transfer_request_number }}</p>
+                            <p><strong>SAP Document:</strong> {{ transfer.sap_document_number or 'Not assigned' }}</p>
+                            <p><strong>Status:</strong> {{ transfer.status.title() }}</p>
+                            <p><strong>From Warehouse:</strong> 
+                                {% set from_wh = transfer.from_warehouse or (sap_transfer_data.get('FromWarehouse') if sap_transfer_data else None) %}
+                                {% if from_wh %}
+                                    <span class="badge bg-info">{{ from_wh }}</span>
+                                {% else %}
+                                    <span class="text-warning">Not specified</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>To Warehouse:</strong> 
+                                {% set to_wh = transfer.to_warehouse or (sap_transfer_data.get('ToWarehouse') if sap_transfer_data else None) %}
+                                {% if to_wh %}
+                                    <span class="badge bg-success">{{ to_wh }}</span>
+                                {% else %}
+                                    <span class="text-warning">Not specified</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Created By:</strong> {{ transfer.user.first_name }} {{ transfer.user.last_name }}</p>
+                            <p><strong>Created At:</strong> {{ transfer.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p><strong>Updated At:</strong> {{ transfer.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transfer Items -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i data-feather="package"></i> 
+                            Transfer Items
+                        </h6>
+                        {% if transfer.status == 'draft' %}
+                        <button class="btn btn-sm btn-success" onclick="showAddItemModal()">
+                            <i data-feather="plus"></i> Add Item
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if transfer.items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>Quantity</th>
+                                    <th>UoM</th>
+                                    <th>From Warehouse/Bin</th>
+                                    <th>To Warehouse/Bin</th>
+                                    <th>Batch</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in transfer.items %}
+                                <tr>
+                                    <td><strong>{{ item.item_code }}</strong></td>
+                                    <td>{{ item.item_name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td><strong>{{ item.unit_of_measure or 'EA' }}</strong></td>
+                                    <td>
+                                        {% set from_warehouse = item.from_bin.split('-')[0] if item.from_bin and '-' in item.from_bin else item.from_bin[:4] if item.from_bin else 'N/A' %}
+                                        <strong>{{ from_warehouse }}</strong> / {{ item.from_bin or 'N/A' }}
+                                    </td>
+                                    <td>
+                                        {% set to_warehouse = item.to_bin.split('-')[0] if item.to_bin and '-' in item.to_bin else item.to_bin[:4] if item.to_bin else 'N/A' %}
+                                        <strong>{{ to_warehouse }}</strong> / {{ item.to_bin or 'N/A' }}
+                                    </td>
+                                    <td>{{ item.batch_number or '-' }}</td>
+                                    <td>
+                                        {% if transfer.status == 'draft' %}
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-primary" onclick="editItem({{ item.id }}, '{{ item.item_code }}', '{{ item.item_name }}', {{ item.quantity }}, '{{ item.unit_of_measure }}', '{{ item.from_bin }}', '{{ item.to_bin }}', '{{ item.batch_number or '' }}')">
+                                                <i data-feather="edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-success" onclick="generateTransferQRLabel('{{ item.item_code }}', '{{ item.item_name }}', '{{ item.batch_number or '' }}', {{ transfer.id }}, '{{ transfer.transfer_request_number }}')">
+                                                <i data-feather="maximize"></i> QR
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="removeItem({{ item.id }})">
+                                                <i data-feather="trash-2"></i>
+                                            </button>
+                                        </div>
+                                        {% else %}
+                                        <button class="btn btn-sm btn-success" onclick="generateTransferQRLabel('{{ item.item_code }}', '{{ item.item_name }}', '{{ item.batch_number or '' }}', {{ transfer.id }}, '{{ transfer.transfer_request_number }}')">
+                                            <i data-feather="maximize"></i> Print QR
+                                        </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i data-feather="info"></i>
+                        No items added to this transfer yet. Use the "Add Item" button to start adding items.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Items from Transfer Request (Similar to GRPO) -->
+    {% if available_items %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i data-feather="list"></i> 
+                        Available Items from Transfer Request
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>Requested Qty</th>
+                                    <th>Transferred</th>
+                                    <th>Remaining</th>
+                                    <th>UoM</th>
+                                    <th>From Warehouse</th>
+                                    <th>To Warehouse</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in available_items %}
+                                <tr>
+                                    <td><strong>{{ item.ItemCode or item.item_code }}</strong></td>
+                                    <td>{{ item.ItemDescription or item.item_description or item.ItemName or item.item_name }}</td>
+                                    <td>{{ item.Quantity or item.quantity }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ item.TransferredQuantity or 0 }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if (item.RemainingQuantity or (item.Quantity or item.quantity)) > 0 else 'secondary' }}">
+                                            {{ item.RemainingQuantity or (item.Quantity or item.quantity) }}
+                                        </span>
+                                    </td>
+                                    <td>{{ item.UnitOfMeasure or item.unit_of_measure or item.UoM }}</td>
+                                    <td>{{ item.FromWarehouseCode or item.from_warehouse_code or transfer.from_warehouse }}</td>
+                                    <td>{{ item.ToWarehouseCode or item.to_warehouse_code or transfer.to_warehouse }}</td>
+                                    <td>
+                                        {% if item.LineStatus == 'bost_Close' %}
+                                            <span class="badge bg-danger">Closed</span>
+                                        {% elif item.LineStatus == 'bost_Open' %}
+                                            <span class="badge bg-success">Open</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">{{ item.LineStatus or 'Unknown' }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if item.LineStatus == 'bost_Close' %}
+                                            <span class="badge bg-secondary">
+                                                <i data-feather="lock"></i> Closed
+                                            </span>
+                                        {% elif (item.RemainingQuantity or (item.Quantity or item.quantity)) > 0 %}
+                                        <button class="btn btn-sm btn-success" 
+                                            onclick="addItemFromRequest('{{ item.ItemCode or item.item_code }}', 
+                                                                        '{{ item.ItemDescription or item.item_description or item.ItemName or item.item_name }}', 
+                                                                        '{{ item.RemainingQuantity or (item.Quantity or item.quantity) }}',
+                                                                        '{{ item.UnitOfMeasure or item.unit_of_measure or item.UoM }}',
+                                                                        '{{ item.FromWarehouseCode or item.from_warehouse_code or transfer.from_warehouse }}',
+                                                                        '{{ item.ToWarehouseCode or item.to_warehouse_code or transfer.to_warehouse }}')">
+                                            <i data-feather="plus"></i> Add Remaining
+                                        </button>
+                                        {% else %}
+                                        <span class="badge bg-success">✓ Complete</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('inventory_transfer') }}" class="btn btn-secondary">
+                            <i data-feather="arrow-left"></i> Back to Transfer List
+                        </a>
+                        <div>
+                            {% if transfer.status == 'draft' and transfer.items %}
+                            <button class="btn btn-success" onclick="submitTransfer({{ transfer.id }})">
+                                <i data-feather="check"></i> Submit for QC Approval
+                            </button>
+                            {% elif transfer.status == 'submitted' %}
+                            <div class="alert alert-info mb-0">
+                                <i data-feather="clock"></i>
+                                Transfer submitted and waiting for QC approval. Only QC users can approve this transfer.
+                            </div>
+                            {% elif transfer.status == 'qc_approved' %}
+                            <div class="alert alert-success mb-0">
+                                <i data-feather="check-circle"></i>
+                                Transfer QC approved and posted to SAP B1. SAP Document: {{ transfer.sap_document_number }}
+                            </div>
+                            {% elif transfer.status == 'rejected' %}
+                            <div class="alert alert-danger mb-0">
+                                <i data-feather="x-circle"></i>
+                                Transfer rejected by QC. Reason: {{ transfer.qc_notes or 'No reason provided' }}
+                                <br><br>
+                                <button class="btn btn-warning btn-sm" onclick="reopenTransfer({{ transfer.id }})">
+                                    <i data-feather="refresh-cw"></i> Reopen Transfer
+                                </button>
+                                <small class="text-muted d-block mt-2">Reopening will reset the transfer to draft status so you can edit and resubmit it.</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Item to Transfer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addItemForm" method="POST" action="{{ url_for('inventory_transfer_detail', transfer_id=transfer.id) }}" onsubmit="return handleFormSubmit(event);">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="item_code" class="form-label">Item Code <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="item_code" name="item_code" required onblur="loadBatchNumbers()">
+                            <button type="button" class="btn btn-outline-primary" onclick="scanItemCode()">
+                                <i data-feather="camera"></i> Scan Item
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="item_name" class="form-label">Item Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="item_name" name="item_name" readonly>
+                        <small class="text-muted">Auto-filled from SAP B1 when item is scanned</small>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="unit_of_measure" class="form-label">UoM <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="unit_of_measure" name="unit_of_measure" value="EA" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="from_warehouse_code" class="form-label">From Warehouse <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="from_warehouse_code" name="from_warehouse_code" value="{{ transfer.from_warehouse or '' }}" readonly>
+                                    <button type="button" class="btn btn-outline-primary" onclick="scanWarehouse('from')">
+                                        <i data-feather="camera"></i> Scan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="to_warehouse_code" class="form-label">To Warehouse <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="to_warehouse_code" name="to_warehouse_code" value="{{ transfer.to_warehouse or '' }}" readonly>
+                                    <button type="button" class="btn btn-outline-primary" onclick="scanWarehouse('to')">
+                                        <i data-feather="camera"></i> Scan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="from_bin" class="form-label">From Bin Location <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="from_bin" name="from_bin" required>
+                                    <button type="button" class="btn btn-outline-primary" onclick="scanBin('from')">
+                                        <i data-feather="camera"></i> Scan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="to_bin" class="form-label">To Bin Location <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="to_bin" name="to_bin" required>
+                                    <button type="button" class="btn btn-outline-primary" onclick="scanBin('to')">
+                                        <i data-feather="camera"></i> Scan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="batch_number" class="form-label">Batch Number</label>
+                        <div class="input-group">
+                            <select class="form-select" id="batch_number" name="batch_number">
+                                <option value="">Loading batches...</option>
+                            </select>
+                            <button type="button" class="btn btn-outline-primary" onclick="loadBatchNumbers()">
+                                <i data-feather="refresh-cw"></i> Refresh
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" onclick="loadBatchNumbers()">
+                                <i data-feather="camera"></i> Scan
+                            </button>
+                        </div>
+                        <small class="text-muted" id="batch_info">Select batch with available stock</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showAddItemModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+    modal.show();
+}
+
+function scanBatchNumber() {
+    // Implement barcode scanning for batch number
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // Start barcode scanning
+        alert('Barcode scanning feature would be implemented here for batch numbers');
+    } else {
+        alert('Camera not available for scanning');
+    }
+}
+
+function addItemFromRequest(itemCode, itemName, quantity, uom, fromWarehouse, toWarehouse) {
+    // Pre-fill the add item modal with data from the transfer request
+    document.getElementById('item_code').value = itemCode;
+    document.getElementById('item_name').value = itemName;
+    document.getElementById('quantity').value = quantity;
+    document.getElementById('unit_of_measure').value = uom;
+    document.getElementById('from_warehouse_code').value = fromWarehouse;
+    document.getElementById('to_warehouse_code').value = toWarehouse;
+
+    // Load available batches for this item
+    loadBatchNumbers();
+
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+    modal.show();
+}
+
+function submitTransfer(transferId) {
+    if (confirm('Are you sure you want to submit this transfer?')) {
+        fetch(`/inventory_transfer/${transferId}/submit`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        console.log(response)
+        .then(data => {
+            if (data.success) {
+                alert(`Transfer submitted successfully! SAP Document: ${data.sap_document_number}`);
+                location.reload();
+            } else {
+                alert(`Error submitting transfer: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error submitting transfer');
+        });
+    }
+}
+
+function removeItem(itemId) {
+    if (confirm('Are you sure you want to remove this item?')) {
+        fetch(`/inventory_transfer/{{ transfer.id }}/item/${itemId}/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Item removed successfully');
+                location.reload();
+            } else {
+                alert(`Error removing item: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error removing item');
+        });
+    }
+}
+
+function editItem(itemId, itemCode, itemName, quantity, uom, fromBin, toBin, batchNumber) {
+    // Pre-fill the edit modal with current item data
+    document.getElementById('item_code').value = itemCode || '';
+    document.getElementById('item_name').value = itemName || '';
+    document.getElementById('quantity').value = quantity || '';
+    document.getElementById('unit_of_measure').value = uom || 'EA';
+    document.getElementById('from_bin').value = fromBin || '';
+    document.getElementById('to_bin').value = toBin || '';
+
+    // Handle batch number textbox (changed from dropdown)
+    const batchInput = document.getElementById('batch_number');
+    batchInput.value = batchNumber || '';
+
+    // Change form action to edit mode
+    const form = document.getElementById('addItemForm');
+    form.setAttribute('data-edit-mode', 'true');
+    form.setAttribute('data-item-id', itemId);
+
+    // Change modal title and button text
+    document.querySelector('#addItemModal .modal-title').textContent = 'Edit Transfer Item';
+    document.querySelector('#addItemForm button[type="submit"]').textContent = 'Update Item';
+
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+    modal.show();
+}
+
+function handleFormSubmit(event) {
+    const form = event.target;
+    const isEditMode = form.getAttribute('data-edit-mode') === 'true';
+    
+    if (isEditMode) {
+        event.preventDefault();
+        
+        const itemId = form.getAttribute('data-item-id');
+        const formData = new FormData(form);
+        
+        const data = {
+            quantity: formData.get('quantity'),
+            from_bin: formData.get('from_bin'),
+            to_bin: formData.get('to_bin'),
+            batch_number: formData.get('batch_number')
+        };
+        
+        fetch(`/inventory_transfer/{{ transfer.id }}/item/${itemId}/edit`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Item updated successfully');
+                location.reload();
+            } else {
+                alert(`Error updating item: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating item');
+        });
+        
+        return false;
+    }
+    
+    return true; // Allow normal form submission for add mode
+}
+
+function reopenTransfer(transferId) {
+    if (confirm('Are you sure you want to reopen this rejected transfer? This will reset it to draft status so you can edit and resubmit it.')) {
+        fetch(`/inventory_transfer/${transferId}/reopen`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Transfer reopened successfully! You can now edit and resubmit it.');
+                location.reload();
+            } else {
+                alert(`Error reopening transfer: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error reopening transfer');
+        });
+    }
+}
+
+// Reset modal when closed
+document.getElementById('addItemModal').addEventListener('hidden.bs.modal', function () {
+    const form = document.getElementById('addItemForm');
+    form.removeAttribute('data-edit-mode');
+    form.removeAttribute('data-item-id');
+    form.reset();
+    
+    // Reset modal title and button text
+    document.querySelector('#addItemModal .modal-title').textContent = 'Add Item to Transfer';
+    document.querySelector('#addItemForm button[type="submit"]').textContent = 'Add Item';
+});
+
+// Enhanced scanning functionality for warehouse codes, items, and bins
+function scanWarehouse(type) {
+    // type can be 'from' or 'to'
+    const inputId = type === 'from' ? 'from_warehouse_code' : 'to_warehouse_code';
+    scanBarcode(inputId, function(code) {
+        document.getElementById(inputId).value = code;
+        alert(`${type.charAt(0).toUpperCase() + type.slice(1)} warehouse scanned: ${code}`);
+    });
+}
+
+function scanBin(type) {
+    // type can be 'from' or 'to'
+    const inputId = type === 'from' ? 'from_bin' : 'to_bin';
+    scanBarcode(inputId, function(code) {
+        document.getElementById(inputId).value = code;
+        alert(`${type.charAt(0).toUpperCase() + type.slice(1)} bin location scanned: ${code}`);
+    });
+}
+
+function scanItemCode() {
+    scanBarcode('item_code', function(code) {
+        document.getElementById('item_code').value = code;
+        
+        // Validate item with SAP B1 and get item name
+        fetch('/api/validate_item', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ item_code: code })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid) {
+                document.getElementById('item_name').value = data.item_data.ItemName || code;
+                document.getElementById('unit_of_measure').value = data.item_data.UoMEntry || 'EA';
+                alert(`Item found: ${data.item_data.ItemName || code}`);
+            } else {
+                alert(`Item not found: ${data.error}`);
+                document.getElementById('item_name').value = '';
+            }
+        })
+        .catch(error => {
+            console.error('Error validating item:', error);
+            document.getElementById('item_name').value = code; // Fallback
+        });
+    });
+}
+
+function scanBarcode(targetInputId, callback) {
+    // Check if we're in a mobile environment with camera access
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // Use camera for scanning
+        startCameraScanner(targetInputId, callback);
+    } else {
+        // Fallback to manual input
+        const code = prompt('Enter barcode manually:');
+        if (code) {
+            callback(code);
+        }
+    }
+}
+
+// Generate Transfer QR Label
+function generateTransferQRLabel(itemCode, itemName, batchNumber, transferId, transferNumber) {
+    const data = {
+        item_code: itemCode,
+        item_name: itemName,
+        batch_number: batchNumber,
+        transfer_id: transferId,
+        transfer_number: transferNumber
+    };
+    
+    fetch('/api/generate-transfer-qr-label', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Create and show QR code modal for transfer
+            showTransferQRCodeModal(data.qr_data, data.label_info);
+        } else {
+            alert('Error generating QR label: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error generating QR label');
+    });
+}
+
+// Show Transfer QR Code Modal
+function showTransferQRCodeModal(qrData, labelInfo) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('transferQrCodeModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.innerHTML = `
+            <div class="modal fade" id="transferQrCodeModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Transfer QR Code Label</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <div id="transferQrcode"></div>
+                            <div class="mt-3">
+                                <p><strong>Item Code:</strong> <span id="transfer-qr-item-code"></span></p>
+                                <p><strong>Transfer Number:</strong> <span id="transfer-qr-number"></span></p>
+                                <p><strong>Item Name:</strong> <span id="transfer-qr-item-name"></span></p>
+                                <p><strong>Batch Number:</strong> <span id="transfer-qr-batch-number"></span></p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="printTransferQRLabel()">Print Label</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    // Update modal content
+    document.getElementById('transfer-qr-item-code').textContent = labelInfo.item_code;
+    document.getElementById('transfer-qr-number').textContent = labelInfo.transfer_number;
+    document.getElementById('transfer-qr-item-name').textContent = labelInfo.item_name;
+    document.getElementById('transfer-qr-batch-number').textContent = labelInfo.batch_number || 'N/A';
+    
+    // Generate QR code
+    const qrCodeDiv = document.getElementById('transferQrcode');
+    qrCodeDiv.innerHTML = '';
+    
+    // Load QRCode library if not already loaded
+    if (typeof QRCode === 'undefined') {
+        const script = document.createElement('script');
+
+        script.onload = function() {
+            generateTransferQRCode(qrCodeDiv, qrData);
+        };
+        document.head.appendChild(script);
+    } else {
+        generateTransferQRCode(qrCodeDiv, qrData);
+    }
+    
+    // Show modal
+    const bsModal = new bootstrap.Modal(document.getElementById('transferQrCodeModal'));
+    bsModal.show();
+}
+
+// Generate Transfer QR Code
+function generateTransferQRCode(container, data) {
+    try {
+        QRCode.toCanvas(data, { width: 200, height: 200 }, function (error, canvas) {
+            if (error) {
+                console.error('QR Code generation error:', error);
+                container.innerHTML = '<p class="text-danger">Error generating QR code</p>';
+            } else {
+                container.innerHTML = '';
+                container.appendChild(canvas);
+            }
+        });
+    } catch (error) {
+        console.error('QR Code library error:', error);
+        container.innerHTML = '<p class="text-info">QR Code: ' + data + '</p>';
+    }
+}
+
+// Print Transfer QR Label
+function printTransferQRLabel() {
+    window.print();
+}
+
+// Generate QR Label for Transfer Items
+function generateTransferQRLabel(itemCode, itemName, batchNumber, transferId, transferNumber) {
+    const data = {
+        item_code: itemCode,
+        item_name: itemName,
+        batch_number: batchNumber,
+        transfer_id: transferId,
+        transfer_number: transferNumber
+    };
+    
+    fetch('/api/generate-transfer-qr-label', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Create and show QR code modal
+            showTransferQRCodeModal(data.qr_data, data.label_info);
+        } else {
+            alert('Error generating QR label: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error generating QR label');
+    });
+}
+
+// Show Transfer QR Code Modal
+function showTransferQRCodeModal(qrData, labelInfo) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('transferQrCodeModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.innerHTML = `
+            <div class="modal fade" id="transferQrCodeModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Transfer QR Code Label</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <div id="transferQrcode"></div>
+                            <div class="mt-3">
+                                <p><strong>Item Code:</strong> <span id="transfer-qr-item-code"></span></p>
+                                <p><strong>Transfer Number:</strong> <span id="transfer-qr-transfer-number"></span></p>
+                                <p><strong>Item Name:</strong> <span id="transfer-qr-item-name"></span></p>
+                                <p><strong>Batch Number:</strong> <span id="transfer-qr-batch-number"></span></p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="printTransferQRLabel()">Print Label</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    // Update modal content
+    document.getElementById('transfer-qr-item-code').textContent = labelInfo.item_code;
+    document.getElementById('transfer-qr-transfer-number').textContent = labelInfo.transfer_number;
+    document.getElementById('transfer-qr-item-name').textContent = labelInfo.item_name;
+    document.getElementById('transfer-qr-batch-number').textContent = labelInfo.batch_number || 'N/A';
+    
+    // Generate QR code using QRCode.js library
+    const qrCodeDiv = document.getElementById('transferQrcode');
+    qrCodeDiv.innerHTML = '';
+    
+    // Load QRCode library if not already loaded
+    if (typeof QRCode === 'undefined') {
+        const script = document.createElement('script');
+
+        script.onload = function() {
+            generateTransferQRCode(qrCodeDiv, qrData);
+        };
+        document.head.appendChild(script);
+    } else {
+        generateTransferQRCode(qrCodeDiv, qrData);
+    }
+    
+    // Show modal
+    const bsModal = new bootstrap.Modal(document.getElementById('transferQrCodeModal'));
+    bsModal.show();
+}
+
+// Generate Transfer QR Code
+function generateTransferQRCode(container, data) {
+    try {
+        QRCode.toCanvas(data, { width: 200, height: 200 }, function (error, canvas) {
+            if (error) {
+                console.error('QR Code generation error:', error);
+                container.innerHTML = '<p class="text-danger">Error generating QR code</p>';
+            } else {
+                container.innerHTML = '';
+                container.appendChild(canvas);
+            }
+        });
+    } catch (error) {
+        console.error('QR Code library error:', error);
+        container.innerHTML = '<p class="text-info">QR Code: ' + data + '</p>';
+    }
+}
+
+// Print Transfer QR Label
+function printTransferQRLabel() {
+    window.print();
+}
+
+function startCameraScanner(targetInputId, callback) {
+    // This would integrate with QuaggaJS or similar barcode scanner
+    // For now, we'll use a simple prompt as fallback
+    const code = prompt('Camera scanner not available. Enter barcode manually:');
+    if (code) {
+        callback(code);
+    }
+}
+
+// Auto-populate warehouse codes from transfer request when modal opens
+document.getElementById('addItemModal').addEventListener('show.bs.modal', function () {
+    const fromWarehouse = document.getElementById('from_warehouse_code').value;
+    const toWarehouse = document.getElementById('to_warehouse_code').value;
+    
+    // Pre-fill warehouse codes in form if available
+    if (fromWarehouse) {
+        document.getElementById('from_warehouse_code').value = fromWarehouse;
+    }
+    if (toWarehouse) {
+        document.getElementById('to_warehouse_code').value = toWarehouse;
+    }
+});
+
+// Batch number management functions
+function loadBatchNumbers() {
+    const itemCode = document.getElementById('item_code').value;
+    const fromWarehouse = document.getElementById('from_warehouse_code').value;
+    const batchSelect = document.getElementById('batch_number');
+    const batchInfo = document.getElementById('batch_info');
+    
+    if (!itemCode) {
+        batchSelect.innerHTML = '<option value="">Select item first</option>';
+        batchInfo.textContent = 'Enter item code to load available batches';
+        return;
+    }
+    
+    batchSelect.innerHTML = '<option value="">Loading batches...</option>';
+    batchInfo.textContent = 'Loading available batches...';
+    fetch(`/api/get-batches?item=${itemCode}`)
+    .then(response => response.json())
+    .then(data => {
+        const batchSelect = document.getElementById('batch_number');
+        const batchInfo = document.getElementById('batch_info');
+        batchSelect.innerHTML = '';
+
+  if (data.success && data.batches && data.batches.length > 0) {
+
+                data.batches.forEach(batch => {
+                    const option = document.createElement('option');
+                    option.value = batch.Batch || batch.BatchNumber;
+                    option.textContent = `${batch.Batch || batch.BatchNumber} , Exp: ${batch.ExpirationDate || batch.ExpiryDate || 'N/A'}`;
+                    option.setAttribute('data-expiry', batch.ExpirationDate || batch.ExpiryDate);
+                    batchSelect.appendChild(option);
+                });
+
+            batchInfo.textContent = `Found ${data.batches.length} available batches`;
+        } else {
+            batchSelect.innerHTML = '<option value="">No batches available</option>';
+            batchInfo.textContent = 'No batches found or item is not batch managed';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading batches:', error);
+        batchSelect.innerHTML = '<option value="">Error loading batches</option>';
+        batchInfo.textContent = 'Error loading batches. Check connection.';
+    });
+}
+
+function refreshBatches() {
+    loadBatchNumbers();
+}
+
+<!--function validateBatchQuantity() {-->
+<!--    const itemCode = document.getElementById('item_code').value;-->
+<!--    const batchNumber = document.getElementById('batch_number').value;-->
+<!--    const warehouse = document.getElementById('from_warehouse_code').value;-->
+<!--    const quantity = parseFloat(document.getElementById('quantity').value) || 0;-->
+<!--    -->
+<!--    if (!itemCode || !batchNumber || quantity <= 0) {-->
+<!--        return;-->
+<!--    }-->
+<!--    -->
+<!--    fetch(`/api/validate_batch_quantity?item_code=${itemCode}&batch_number=${batchNumber}&warehouse=${warehouse}&quantity=${quantity}`)-->
+<!--        .then(response => response.json())-->
+<!--        .then(data => {-->
+<!--            const batchInfo = document.getElementById('batch_info');-->
+<!--            -->
+<!--            if (data.success) {-->
+<!--                if (data.valid) {-->
+<!--                    batchInfo.innerHTML = `<span class="text-success">✓ Quantity OK (Available: ${data.available_quantity})</span>`;-->
+<!--                } else {-->
+<!--                    batchInfo.innerHTML = `<span class="text-danger">⚠ Insufficient stock (Available: ${data.available_quantity}, Requested: ${data.requested_quantity})</span>`;-->
+<!--                }-->
+<!--            } else {-->
+<!--                batchInfo.innerHTML = `<span class="text-warning">Could not validate batch quantity</span>`;-->
+<!--            }-->
+<!--        })-->
+<!--        .catch(error => {-->
+<!--            console.error('Error validating batch quantity:', error);-->
+<!--        });-->
+<!--}-->
+
+// Add event listeners for real-time validation
+<!--document.addEventListener('DOMContentLoaded', function() {-->
+<!--    const quantityInput = document.getElementById('quantity');-->
+<!--    const batchSelect = document.getElementById('batch_number');-->
+<!--    -->
+<!--    if (quantityInput) {-->
+<!--        quantityInput.addEventListener('blur', validateBatchQuantity);-->
+<!--        quantityInput.addEventListener('input', debounce(validateBatchQuantity, 500));-->
+<!--    }-->
+<!--    -->
+<!--    if (batchSelect) {-->
+<!--        batchSelect.addEventListener('change', validateBatchQuantity);-->
+<!--    }-->
+<!--});-->
+
+// Debounce helper function
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+</script>
+{% endblock %}

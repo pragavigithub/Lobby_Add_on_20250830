@@ -1,0 +1,217 @@
+ What went wrong:
+A problem occurred configuring project ':app'.
+> defaultConfig contains custom BuildConfig fields, but the feature is disabled.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 4m 25s
+5 actionable tasks: 5 executed
+PS E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\android> cd..
+PS E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app> npx react-native run-android
+warn Package react-native-sqlite-storage contains invalid configuration: "dependency.platforms.ios.project" is not allowed. Please verify it's properly linked using "react-native config" command and contact the package maintainers about this.
+info JS server already running.
+info Installing the app...
+5 actionable tasks: 5 up-to-date
+
+info 💡 Tip: Make sure that you have set up your development environment correctly, by running react-native doctor. To read more about doctor command visit: https://github.com/react-native-community/cli/blob/main/packages/cli-doctor/README.md#doctor 
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring project ':app'.
+> defaultConfig contains custom BuildConfig fields, but the feature is disabled.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 49s
+error Failed to install the app.
+info Run CLI with --verbose flag for more details.
+PS E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app> npx react-native run-android
+warn Package react-native-sqlite-storage contains invalid configuration: "dependency.platforms.ios.project" is not allowed. Please verify it's properly linked using "react-native config" command and contact the package maintainers about this.
+info Starting JS server...
+info Installing the app...
+5 actionable tasks: 5 up-to-date
+
+info 💡 Tip: Make sure that you have set up your development environment correctly, by running react-native doctor. To read more about doctor command visit: https://github.com/react-native-community/cli/blob/main/packages/cli-doctor/README.md#doctor 
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring project ':app'.
+> defaultConfig contains custom BuildConfig fields, but the feature is disabled.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 1m 2s
+error Failed to install the app.
+info Run CLI with --verbose flag for more details.
+PS E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app> cd android                  
+PS E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\android> ./gradlew assembleDebug --info
+Initialized native services in: C:\Users\LENOVO\.gradle\native
+Initialized jansi services in: C:\Users\LENOVO\.gradle\native
+Received JVM installation metadata from 'C:\Program Files\Java\jdk-22': {JAVA_HOME=C:\Program Files\Java\jdk-22, JAVA_VERSION=22.0.2, JAVA_VENDOR=Oracle Corporation, RUNTIME_NAME=Java(TM) SE Runtime Environment, RUNTIME_VERSION=22.0.2+9-70, VM_NAME=Java HotSpot(TM) 64-Bit Server VM, VM_VERSION=22.0.2+9-70, VM_VENDOR=Oracle Corporation, OS_ARCH=amd64}        
+Starting process 'command 'C:\Program Files\Java\jdk-17\bin\java.exe''. Working directory: C:\Users\LENOVO\.gradle\.tmp\tmp-jvm1709033960807886742probe Command: C:\Program Files\Java\jdk-17\bin\java.exe -cp . JavaProbe
+Successfully started process 'command 'C:\Program Files\Java\jdk-17\bin\java.exe''
+Received JVM installation metadata from 'C:\Program Files\Java\jdk-17': {JAVA_HOME=C:\Program Files\Java\jdk-17, JAVA_VERSION=17.0.12, JAVA_VENDOR=Oracle Corporation, RUNTIME_NAME=
+Java(TM) SE Runtime Environment, RUNTIME_VERSION=17.0.12+8-LTS-286, VM_NAME=Java HotSpot(TM) 64-Bit Server VM, VM_VERSION=17.0.12+8-LTS-286, VM_VENDOR=Oracle Corporation, OS_ARCH=amd64}
+The client will now receive all logging from the daemon (pid: 23048). The daemon log file: C:\Users\LENOVO\.gradle\daemon\8.0.2\daemon-23048.out.log
+Starting 2nd build in daemon [uptime: 1 mins 39.565 secs, performance: 100%, GC rate: 0.00/s, heap usage: 0% of 2 GiB]
+Using 4 worker leases.
+Now considering [E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\android, E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\node_modules\@react-native\gradle-plugin] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Starting Build
+:ReactNative:Automatically adding native module 'react-native-sqlite-storage'
+:ReactNative:Automatically adding native module '@react-native-async-storage/async-storage'
+:ReactNative:Automatically adding native module '@react-native-community/netinfo'
+:ReactNative:Automatically adding native module 'react-native-device-info'
+:ReactNative:Automatically adding native module 'react-native-gesture-handler'
+:ReactNative:Automatically adding native module 'react-native-image-picker'
+:ReactNative:Automatically adding native module 'react-native-permissions'
+:ReactNative:Automatically adding native module 'react-native-safe-area-context'
+:ReactNative:Automatically adding native module 'react-native-screens'
+:ReactNative:Automatically adding native module 'react-native-sound'
+:ReactNative:Automatically adding native module 'react-native-vector-icons'
+:ReactNative:Automatically adding native module 'react-native-vision-camera'
+Settings evaluated using settings file 'E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\android\settings.gradle'.
+Now considering [E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\node_modules\@react-native\gradle-plugin, E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\android] as hierarchies to watch
+The configuration classpath is both resolvable and consumable. This is considered a legacy configuration and it will eventually only be possible to be one of these.
+The configuration classpath is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+The configuration classpath is both resolvable and consumable. This is considered a legacy configuration and it will eventually only be possible to be one of these.
+The configuration classpath is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+Projects loaded. Root project using build file 'E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\android\build.gradle'.
+Included projects: [root project 'WMSMobileApp', project ':app', project ':react-native-async-storage_async-storage', project ':react-native-community_netinfo', project ':react-nat
+ive-device-info', project ':react-native-gesture-handler', project ':react-native-image-picker', project ':react-native-permissions', project ':react-native-safe-area-context', project ':react-native-screens', project ':react-native-sound', project ':react-native-sqlite-storage', project ':react-native-vector-icons', project ':react-native-vision-camera']   
+
+> Configure project :gradle-plugin
+Evaluating project ':gradle-plugin' using build file 'E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\node_modules\@react-native\gradle-plugin\build.gradle.kts'.
+The configuration detachedConfiguration1 is both resolvable and consumable. This is considered a legacy configuration and it will eventually only be possible to be one of these.   
+The configuration detachedConfiguration1 is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+The configuration detachedConfiguration1 is both resolvable and consumable. This is considered a legacy configuration and it will eventually only be possible to be one of these.   
+The configuration detachedConfiguration1 is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+The configuration :gradle-plugin:classpath is both resolvable and consumable. This is considered a legacy configuration and it will eventually only be possible to be one of these. 
+The configuration :gradle-plugin:classpath is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+The configuration :gradle-plugin:classpath is both resolvable and consumable. This is considered a legacy configuration and it will eventually only be possible to be one of these. 
+The configuration :gradle-plugin:classpath is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+Using Kotlin Gradle Plugin gradle71 variant
+kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
+kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
+Caching disabled for Kotlin DSL accessors for project ':gradle-plugin' because:
+  Build cache is disabled
+Skipping Kotlin DSL accessors for project ':gradle-plugin' as it is up-to-date.
+Registering project ':gradle-plugin' in composite build. Will substitute for module 'com.facebook.react:react-native-gradle-plugin'.
+:gradle-plugin:compileKotlin (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:compileKotlin UP-TO-DATE
+The configuration :gradle-plugin:kotlinCompilerClasspath is both resolvable and consumable. This is considered a legacy configuration and it will eventually only be possible to be one of these.
+The configuration :gradle-plugin:kotlinCompilerClasspath is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+Caching disabled for task ':gradle-plugin:compileKotlin' because:
+  Build cache is disabled
+Skipping task ':gradle-plugin:compileKotlin' as it is up-to-date.
+Resolve mutations for :gradle-plugin:compileJava (Thread[Execution worker,5,main]) started.
+:gradle-plugin:compileJava (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:compileJava NO-SOURCE
+Skipping task ':gradle-plugin:compileJava' as it has no source files and no previous output files.
+Resolve mutations for :gradle-plugin:pluginDescriptors (Thread[Execution worker,5,main]) started.
+:gradle-plugin:pluginDescriptors (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:pluginDescriptors UP-TO-DATE
+Caching disabled for task ':gradle-plugin:pluginDescriptors' because:
+  Build cache is disabled
+Skipping task ':gradle-plugin:pluginDescriptors' as it is up-to-date.
+Resolve mutations for :gradle-plugin:processResources (Thread[Execution worker,5,main]) started.
+:gradle-plugin:processResources (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:processResources UP-TO-DATE
+Caching disabled for task ':gradle-plugin:processResources' because:
+  Build cache is disabled
+Skipping task ':gradle-plugin:processResources' as it is up-to-date.
+Resolve mutations for :gradle-plugin:classes (Thread[Execution worker,5,main]) started.
+:gradle-plugin:classes (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :gradle-plugin:classes UP-TO-DATE
+Skipping task ':gradle-plugin:classes' as it has no actions.
+Resolve mutations for :gradle-plugin:jar (Thread[Execution worker Thread 2,5,main]) started.
+:gradle-plugin:jar (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :gradle-plugin:jar UP-TO-DATE
+Caching disabled for task ':gradle-plugin:jar' because:
+  Build cache is disabled
+Skipping task ':gradle-plugin:jar' as it is up-to-date.
+Resolve mutations for :gradle-plugin:inspectClassesForKotlinIC (Thread[Execution worker Thread 2,5,main]) started.
+:gradle-plugin:inspectClassesForKotlinIC (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :gradle-plugin:inspectClassesForKotlinIC UP-TO-DATE
+Caching disabled for task ':gradle-plugin:inspectClassesForKotlinIC' because:
+  Build cache is disabled
+Skipping task ':gradle-plugin:inspectClassesForKotlinIC' as it is up-to-date.
+
+> Configure project :
+Evaluating root project 'WMSMobileApp' using build file 'E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\android\build.gradle'.
+The configuration :classpath is both resolvable and consumable. This is considered a legacy configuration and it will eventually only be possible to be one of these.
+The configuration :classpath is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+The configuration :classpath is both resolvable and consumable. This is considered a legacy configuration and it will eventually only be possible to be one of these.
+The configuration :classpath is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+Found project 'project :gradle-plugin' as substitute for module 'com.facebook.react:react-native-gradle-plugin'.
+The configuration :gradle-plugin:kotlinCompilerClasspath is both resolvable and consumable. This is considered a legacy configuration and it will eventually only be possible to be one of these.
+The configuration :gradle-plugin:kotlinCompilerClasspath is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+The configuration :gradle-plugin:mainSourceElements is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+The configuration :gradle-plugin:testResultsElementsForTest is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+The configuration :gradle-plugin:kotlinCompilerClasspath is both resolvable and consumable. This is considered a legacy configuration and it will eventually only be possible to be one of these.
+The configuration :gradle-plugin:kotlinCompilerClasspath is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+Resolve mutations for :gradle-plugin:compileKotlin (Thread[included builds,5,main]) started.
+The configuration :classpath is both resolvable and consumable. This is considered a legacy configuration and it will eventually only be possible to be one of these.
+The configuration :classpath is both consumable and declarable. This combination is incorrect, only one of these flags should be set.
+
+> Configure project :app
+Evaluating project ':app' using build file 'E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\android\app\build.gradle'.
+Using default execution profile
+:ReactNative:Automatically adding native module 'react-native-sqlite-storage'
+:ReactNative:Automatically adding native module '@react-native-async-storage/async-storage'
+:ReactNative:Automatically adding native module '@react-native-community/netinfo'
+:ReactNative:Automatically adding native module 'react-native-device-info'
+:ReactNative:Automatically adding native module 'react-native-gesture-handler'
+:ReactNative:Automatically adding native module 'react-native-image-picker'
+:ReactNative:Automatically adding native module 'react-native-permissions'
+:ReactNative:Automatically adding native module 'react-native-safe-area-context'
+:ReactNative:Automatically adding native module 'react-native-screens'
+:ReactNative:Automatically adding native module 'react-native-sound'
+:ReactNative:Automatically adding native module 'react-native-vector-icons'
+:ReactNative:Automatically adding native module 'react-native-vision-camera'
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring project ':app'.
+> defaultConfig contains custom BuildConfig fields, but the feature is disabled.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 29s
+5 actionable tasks: 5 up-to-date
+Watched directory hierarchies: [E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\node_modules\@react-native\gradle-plugin]
+PS E:\SAP_Integ\Git Change\20250724\1\Emerging_BarCode_Integration\react_native_app\android> 
+

@@ -1,0 +1,208 @@
+PS E:\SAP_Integ\Git Change\20250713\8\Emerging_BarCode_Integration> python setup_local_env.py
+==================================================
+ WMS Local Environment Setup
+==================================================
+Backed up existing .env to .env.backup
+Created .env file for local development
+Created run_local.bat for easy startup
+
+==================================================
+ Setup Complete
+==================================================
+Successfully completed 2/2 setup steps
+Local environment is ready!
+
+Next Steps:
+1. Configure SQL Server (if you want to use it):
+   a. Run as Administrator: python enable_sql_server_tcp.py
+   b. Or manually enable TCP/IP in SQL Server Configuration Manager
+
+2. Test your setup:
+   - Run: python main.py
+   - Open browser: http://localhost:5000
+   - Default login: admin / admin
+
+3. Database options:
+   - SQL Server: Requires configuration above
+   - SQLite: Works automatically (no setup needed)
+
+4. If SQL Server doesn't work:
+   - Comment out MSSQL_ lines in .env file
+   - App will use SQLite automatically
+
+Your computer name: DESKTOP-PLFK2B5
+SQL Server instance: DESKTOP-PLFK2B5\SQLEXPRESS
+PS E:\SAP_Integ\Git Change\20250713\8\Emerging_BarCode_Integration> python enable_sql_server_tcp.py
+============================================================
+ SQL Server Express TCP/IP Configuration
+============================================================
+Running as Administrator - proceeding with configuration...
+
+Configuring SQL Server Express TCP/IP settings...
+Error configuring TCP/IP: [WinError 5] Access is denied
+Configuring SQL Server authentication...
+Error configuring authentication: [WinError 5] Access is denied
+Creating Windows Firewall rule...
+Warning: Could not create firewall rule - 
+Restarting SQL Server Express service...
+Warning: Could not stop service - System error 5 has occurred.
+
+Access is denied.
+
+
+Error starting service: System error 5 has occurred.
+
+Access is denied.
+
+
+
+============================================================
+ Configuration Results
+============================================================
+Completed 0/5 configuration steps
+Configuration incomplete. Manual steps may be required.
+Please follow the SQL Server Configuration Manager steps:
+1. Open SQL Server Configuration Manager
+2. Go to SQL Server Network Configuration > Protocols for SQLEXPRESS
+3. Enable TCP/IP protocol
+4. Set static port 1433 in TCP/IP Properties > IP Addresses > IPAll
+5. Restart SQL Server Express service
+PS E:\SAP_Integ\Git Change\20250713\8\Emerging_BarCode_Integration> python test_sql_connection.py
+PS E:\SAP_Integ\Git Change\20250713\8\Emerging_BarCode_Integration> python main.py
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 with TCP/IP and timeouts: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named PP
+ipes Provider: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Micro
+soft][ODBC Driver 17 for SQL Server]Invalid connection string attribute (0); [08001] [Microsoft][ODBC Driver 17 for SQL Server]A network-related or instance-specific error has occu
+rred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 without connection pooling: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Namedd
+ Pipes Provider: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Mic
+rosoft][ODBC Driver 17 for SQL Server]Invalid connection string attribute (0); [08001] [Microsoft][ODBC Driver 17 for SQL Server]A network-related or instance-specific error has oc
+curred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 without MARS: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Providee
+r: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft][ODBC D
+river 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with SQL Server Native Client 11.0: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][SQL Server Native Client 11.0]Named Pipes Provii
+der: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][SQL Server Native Client 11.0]Login timeout expired (0); [08001] [Microsoft][SQL 
+Server Native Client 11.0]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with Legacy SQL Server driver: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does nott
+ exist or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53); [08001] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:root:❌ All MSSQL connection attempts failed for DESKTOP-PLFK2B5\SQLEXPRESS/WMS_DB
+ * Serving Flask app 'app'
+ * Debug mode: on
+INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.5:5000
+INFO:werkzeug:Press CTRL+C to quit
+INFO:werkzeug: * Restarting with stat
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 with TCP/IP and timeouts: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named PP
+ipes Provider: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Micro
+soft][ODBC Driver 17 for SQL Server]Invalid connection string attribute (0); [08001] [Microsoft][ODBC Driver 17 for SQL Server]A network-related or instance-specific error has occu
+rred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 without connection pooling: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Namedd
+ Pipes Provider: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Mic
+rosoft][ODBC Driver 17 for SQL Server]Invalid connection string attribute (0); [08001] [Microsoft][ODBC Driver 17 for SQL Server]A network-related or instance-specific error has oc
+curred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with ODBC Driver 17 without MARS: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Providee
+r: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][ODBC Driver 17 for SQL Server]Login timeout expired (0); [08001] [Microsoft][ODBC D
+river 17 for SQL Server]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with SQL Server Native Client 11.0: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][SQL Server Native Client 11.0]Named Pipes Provii
+der: Could not open a connection to SQL Server [53].  (53) (SQLDriverConnect); [08001] [Microsoft][SQL Server Native Client 11.0]Login timeout expired (0); [08001] [Microsoft][SQL 
+Server Native Client 11.0]A network-related or instance-specific error has occurred while establishing a connection to SQL Server. Server is not found or not accessible. Check if instance name is correct and if SQL Server is configured to allow remote connections. For more information see SQL Server Books Online. (53)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+WARNING:root:❌ MSSQL connection failed with Legacy SQL Server driver: (pyodbc.OperationalError) ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does nott
+ exist or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53); [08001] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:root:❌ All MSSQL connection attempts failed for DESKTOP-PLFK2B5\SQLEXPRESS/WMS_DB
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 888-243-362
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:21:51] "GET / HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:21:51] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:21:51] "GET /static/css/style.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:06] "POST /login HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:06] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:06] "GET /static/js/app.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:06] "GET /static/js/barcode-scanner.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:06] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:13] "GET /pick_list HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:13] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:13] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:13] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:16] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:16] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:16] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:16] "GET /static/js/app.js HTTP/1.1" 304 -
+ERROR:root:Error syncing bins: (sqlite3.OperationalError) no such function: NOW
+[SQL:
+                            INSERT INTO bin_locations (bin_code, warehouse_code, bin_name, is_active, created_at, updated_at)
+                            VALUES (?, ?, ?, ?, NOW(), NOW())
+                            ON CONFLICT (bin_code, warehouse_code)
+                            DO UPDATE SET
+                                bin_name = EXCLUDED.bin_name,
+                                is_active = EXCLUDED.is_active,
+                                updated_at = NOW()
+                        ]
+[parameters: ('7000-FG-SYSTEM-BIN-LOCATION', '7000-FG', None, True)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:root:Error syncing business partners: (sqlite3.OperationalError) near "(": syntax error
+[SQL:
+                    CREATE TABLE IF NOT EXISTS business_partners (
+                        id SERIAL PRIMARY KEY,
+                        card_code VARCHAR(50) UNIQUE NOT NULL,
+                        card_name VARCHAR(200) NOT NULL,
+                        card_type VARCHAR(20) NOT NULL,
+                        phone VARCHAR(50),
+                        email VARCHAR(100),
+                        address TEXT,
+                        is_active BOOLEAN DEFAULT TRUE,
+                        created_at TIMESTAMP DEFAULT NOW(),
+                        updated_at TIMESTAMP DEFAULT NOW()
+                    )
+                ]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:23] "POST /sync-sap-data HTTP/1.1" 302 -
+ERROR:root:Error syncing bins: (sqlite3.OperationalError) no such function: NOW
+[SQL:
+                            INSERT INTO bin_locations (bin_code, warehouse_code, bin_name, is_active, created_at, updated_at)
+                            VALUES (?, ?, ?, ?, NOW(), NOW())
+                            ON CONFLICT (bin_code, warehouse_code)
+                            DO UPDATE SET
+                                bin_name = EXCLUDED.bin_name,
+                                is_active = EXCLUDED.is_active,
+                                updated_at = NOW()
+                        ]
+[parameters: ('7000-FG-SYSTEM-BIN-LOCATION', '7000-FG', None, True)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:root:Error syncing business partners: (sqlite3.OperationalError) near "(": syntax error
+[SQL:
+                    CREATE TABLE IF NOT EXISTS business_partners (
+                        id SERIAL PRIMARY KEY,
+                        card_code VARCHAR(50) UNIQUE NOT NULL,
+                        card_name VARCHAR(200) NOT NULL,
+                        card_type VARCHAR(20) NOT NULL,
+                        phone VARCHAR(50),
+                        email VARCHAR(100),
+                        address TEXT,
+                        is_active BOOLEAN DEFAULT TRUE,
+                        created_at TIMESTAMP DEFAULT NOW(),
+                        updated_at TIMESTAMP DEFAULT NOW()
+                    )
+                ]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:26] "POST /sync-sap-data HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:26] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:26] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:26] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:22:26] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:25:06] "GET /logout HTTP/1.1" 302 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:25:06] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:25:06] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:25:11] "POST /login HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [13/Jul/2025 12:25:11] "GET /static/css/style.css HTTP/1.1" 304 -

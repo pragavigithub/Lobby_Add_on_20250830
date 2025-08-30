@@ -1,0 +1,58 @@
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:10:49] "GET /inventory_transfer/serial/30 HTTP/1.1" 200 -
+WARNING:root:SAP B1 login error: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10). Running in offline mode.
+WARNING:root:SAP B1 not available, cannot validate series
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:10:54] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:10:54] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:10:54] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:10:56] "GET /inventory_transfer/serial HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:10:56] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:10:56] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:10:56] "GET /static/js/app.js HTTP/1.1" 304 -
+WARNING:root:SAP B1 login error: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10). Running in offline mode.
+WARNING:root:SAP B1 not available, cannot validate series
+WARNING:root:SAP B1 login error: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10). Running in offline mode.
+WARNING:root:SAP B1 not available, cannot validate series
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:02] "GET /inventory_transfer/serial HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:02] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:02] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:02] "GET /static/js/app.js HTTP/1.1" 304 -
+WARNING:root:SAP B1 login error: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10). Running in offline mode.
+WARNING:root:SAP B1 not available, cannot validate series
+WARNING:root:SAP B1 login error: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10). Running in offline mode.
+WARNING:root:SAP B1 not available, cannot validate series
+WARNING:root:SAP B1 login error: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10). Running in offline mode.
+WARNING:root:SAP B1 login error: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10). Running in offline mode.
+WARNING:root:SAP B1 login error: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10). Running in offline mode.
+WARNING:root:SAP B1 not available, cannot validate series
+WARNING:root:SAP B1 not available, cannot validate series
+WARNING:root:SAP B1 not available, cannot validate series
+WARNING:root:SAP B1 login error: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10). Running in offline mode.
+WARNING:root:SAP B1 not available, cannot validate series
+WARNING:root:SAP B1 login error: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10). Running in offline mode.
+WARNING:root:SAP B1 not available, cannot validate series
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:04] "GET /inventory_transfer/serial/30 HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:04] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:04] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:04] "GET /static/js/app.js HTTP/1.1" 304 -
+WARNING:root:SAP B1 login error: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10). Running in offline mode.
+WARNING:root:SAP B1 not available, cannot validate series
+ERROR:root:Error validating series with SAP: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10)
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:26] "GET /inventory_transfer/serial HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:26] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:26] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:26] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:28] "GET /inventory_transfer/serial/29 HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:28] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:28] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:28] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:33] "GET /inventory_transfer/serial/items/93/serials HTTP/1.1" 200 -
+WARNING:root:SAP B1 login error: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10). Running in offline mode.
+WARNING:root:SAP B1 not available, cannot validate series
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:36] "GET /inventory_transfer/serial HTTP/1.1" 200 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:36] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:36] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.5 - - [23/Aug/2025 23:11:36] "GET /static/js/app.js HTTP/1.1" 304 -
+ERROR:root:Error validating series with SAP: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10)
+ERROR:root:Error validating series with SAP: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10)
+ERROR:root:Error validating series with SAP: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10)
+ERROR:root:Error validating series with SAP: HTTPSConnectionPool(host='192.168.1.5', port=50000): Read timed out. (read timeout=10)

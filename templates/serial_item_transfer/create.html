@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Create Serial Item Transfer{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Create Serial Item Transfer</h1>
+        <a href="{{ url_for('serial_item_transfer.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <!-- Create Transfer Form -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Transfer Details</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="from_warehouse" class="form-label">From Warehouse <span class="text-danger">*</span></label>
+                                <select class="form-select" id="from_warehouse" name="from_warehouse" required>
+                                    <option value="">Select From Warehouse</option>
+                                </select>
+                                <div class="form-text">Source warehouse for serial items</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="to_warehouse" class="form-label">To Warehouse <span class="text-danger">*</span></label>
+                                <select class="form-select" id="to_warehouse" name="to_warehouse" required>
+                                    <option value="">Select To Warehouse</option>
+                                </select>
+                                <div class="form-text">Destination warehouse for serial items</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="priority" class="form-label">Priority</label>
+                                <select class="form-select" id="priority" name="priority">
+                                    <option value="low">Low</option>
+                                    <option value="normal" selected>Normal</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Spacer for layout -->
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                      placeholder="Optional notes about this transfer"></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary me-2" onclick="history.back()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Create Transfer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">About Serial Item Transfer</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle"></i> How it works</h6>
+                        <ul class="mb-0 small">
+                            <li>Enter serial numbers one by one</li>
+                            <li>System automatically validates against SAP B1</li>
+                            <li>Item code and description are auto-populated</li>
+                            <li>Each serial number becomes a line item</li>
+                            <li>Submit for QC approval when ready</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-exclamation-triangle"></i> Requirements</h6>
+                        <ul class="mb-0 small">
+                            <li>From and To warehouses must be different</li>
+                            <li>Serial numbers must exist in From warehouse</li>
+                            <li>Serial numbers must have quantity > 0</li>
+                            <li>Each serial number can only be added once</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Load warehouses on page load
+    loadWarehouses();
+    
+    // Prevent selecting same warehouse for from and to
+    $('#from_warehouse, #to_warehouse').change(function() {
+        validateWarehouses();
+    });
+    
+    function loadWarehouses() {
+        $.ajax({
+            url: '/api/get-warehouses',
+            method: 'GET',
+            success: function(response) {
+                if (response.success && response.warehouses) {
+                    const fromSelect = $('#from_warehouse');
+                    const toSelect = $('#to_warehouse');
+                    
+                    // Clear existing options (except first)
+                    fromSelect.find('option:not(:first)').remove();
+                    toSelect.find('option:not(:first)').remove();
+                    
+                    // Add warehouse options
+                    response.warehouses.forEach(function(warehouse) {
+                        const option = `<option value="${warehouse.WarehouseCode}">${warehouse.WarehouseCode} - ${warehouse.WarehouseName}</option>`;
+                        fromSelect.append(option);
+                        toSelect.append(option);
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading warehouses:', error);
+                showAlert('Error loading warehouses. Using default options.', 'warning');
+                
+                // Add fallback warehouses
+                const fallbackWarehouses = [
+                    {WarehouseCode: '7000-FG', WarehouseName: 'Finished Goods'},
+                    {WarehouseCode: '7000-QFG', WarehouseName: 'Quality Finished Goods'},
+                    {WarehouseCode: '7000-RM', WarehouseName: 'Raw Materials'}
+                ];
+                
+                const fromSelect = $('#from_warehouse');
+                const toSelect = $('#to_warehouse');
+                
+                fallbackWarehouses.forEach(function(warehouse) {
+                    const option = `<option value="${warehouse.WarehouseCode}">${warehouse.WarehouseCode} - ${warehouse.WarehouseName}</option>`;
+                    fromSelect.append(option);
+                    toSelect.append(option);
+                });
+            }
+        });
+    }
+    
+    function validateWarehouses() {
+        const fromWarehouse = $('#from_warehouse').val();
+        const toWarehouse = $('#to_warehouse').val();
+        
+        if (fromWarehouse && toWarehouse && fromWarehouse === toWarehouse) {
+            showAlert('From Warehouse and To Warehouse must be different', 'error');
+            $('#to_warehouse').val('');
+        }
+    }
+    
+    function showAlert(message, type) {
+        const alertClass = type === 'error' ? 'alert-danger' : 
+                          type === 'warning' ? 'alert-warning' : 'alert-info';
+        
+        const alert = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        $('.container-fluid').prepend(alert);
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(function() {
+            $('.alert').alert('close');
+        }, 5000);
+    }
+});
+</script>
+{% endblock %}

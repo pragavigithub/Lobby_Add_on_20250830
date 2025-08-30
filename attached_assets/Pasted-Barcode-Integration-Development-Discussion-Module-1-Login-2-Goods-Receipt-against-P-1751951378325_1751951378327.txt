@@ -1,0 +1,488 @@
+Barcode Integration Development Discussion 
+
+ 
+Module: 
+
+1.Login  
+
+2.Goods Receipt against PO  
+
+3.Inventory Transfer  
+
+4.Packing Slip Based on Sales Order 
+
+ 5.Inventory Counting  
+
+6.Scan bin and display all items in it 
+
+ 7.Label printing automation  
+
+8.Re-Print for Barcode Sticker 
+ 
+PurchaseOrder Creation 
+
+PO is created in SAP B1. 
+
+Access GRPO Menu 
+
+In the handheld device, select the GRPO menu. 
+
+Scan PO Number 
+
+The system lists all items with open quantity. 
+
+Item Identification 
+
+If an item has a supplier barcode or QR code, scan it to retrieve details (batch number, expiration date, etc.). 
+
+If no barcode or QR code is available, generate a QR code, print it, and attach it to the product. 
+
+Scan Item 
+
+Items are scanned for verification. 
+
+BIN Selection & Quantity Entry 
+
+Scan/select the BIN location. 
+
+Enter quantity manually or by scanning. 
+
+Submit GRPO in WMS 
+
+The Barcode application creates a GRPO draft and triggers the approval process. 
+
+QC Approval 
+
+The QC person checks the GRPO draft and approves it in SAP. 
+
+After QC approval, the GRPO is posted in SAP.  
+
+Picklist Process(Sales Order) 
+	Sales Order Posted & Picklist Created in SAP B1. 
+
+A picklist is generated in SAP based on a posted sales order. 
+
+The picklist is assigned to a picker for further processing. 
+
+Accessing the Picklist on a Handheld Device with approval 
+
+The picker selects the "Pick C Pack" menu on the handheld device. 
+
+Viewing Assigned Picklists 
+
+The system displays all picklists assigned& approved to the picker on the device. 
+
+Selecting/Scanning the Picklist 
+
+The picker selects or scans the relevant picklist to begin the picking process. 
+
+Scanning Bin Code & Item 
+
+The picker scans the bin code and the item to verify and retrieve the correct stock. 
+
+Entering Quantity 
+
+The picker enters the quantity manually or by scanning the items. 
+
+Submitting the Picklist Update 
+
+Once all items are picked, the picker submits the update it will update in QC WHS 
+
+The pick list populated in mobile device need to sent an approval for approver who have the same mobile device 
+
+The approver will approve the pick list 
+
+Once approved the user who assigned with the pick list document will have udf status of approved, still pending, rejected on each document. 
+
+Only approved picklist can be able to process further addition, if rejected the picklist need to resubmitted for approval. 
+
+The picked status is updated in SAP, marking the completion of the picking process. 
+
+Inventory Transfer 
+ 
+Select Inventory Transfer Menu on Handheld Device 
+
+The user initiates the inventory transfer process by selecting the relevant menu option on a handheld device. 
+
+Scan Inventory Transfer Request Number 
+
+The user scans the inventory transfer request number. 
+
+This action retrieves and displays all items related to the transfer request. 
+
+Scan From Bin Code, Item, and To Bin Code 
+
+The user scans the bin code where the item is currently stored, the item itself, and the bin code where the item needs to be transferred. 
+
+Enter Quantity (Manually or by Scan) 
+
+The user enters the quantity of the item to be transferred. 
+
+This can be done manually or by scanning the item barcode. 
+
+Submit Inventory Transfer in WMS 
+
+Upon submission, the WMS application creates an inventory transfer draft. 
+
+This draft triggers the approval process. 
+
+QC Person Reviews and Approves in SAP 
+
+A quality control (QC) person reviews the draft document in SAP. 
+
+If everything is correct, they approve the inventory transfer. 
+
+Posting in SAP 
+
+After QC approval, the inventory transfer is officially posted in SAP, completing the process. 
+
+ 
+Inventory Counting 
+
+Assignment of Counting Task 
+
+The Inventory Controller assigns a Warehouse (WHS) and a specific bin to the counting personnel. 
+
+Accessing Inventory Counting in the Handheld Device 
+
+The counting person selects the "Inventory Counting Menu - Allocated Count" on the handheld device. 
+
+Scanning Items 
+
+The counting personnel scans the bin code and item code using the handheld device. 
+
+Entering Counted Quantity 
+
+The counted quantity is entered either manually or through scanning. 
+
+Submission & SAP Update 
+
+After completing the scan, submitting the count will create an Inventory Counting Document in SAP. 
+
+Handling Variances 
+
+This will be visible in barcode application- where user as per it will scan the items and real count will be updated and update in sap count qty – as per it correction in sap will be done 
+
+ 
+
+Below is a detailed overview of the client requirements and functionalities for the Warehouse Management System (WMS) modules, based on recent discussions. I’ve included key points, discussions, conclusions, and new development needs for your review and guidance. 
+
+1. Login Module 
+
+Requirements: 
+
+Support creation of unlimited users with configurable access rights. 
+
+Assign role-based authorization to individual users. 
+
+Enable screen-level authorization (e.g., Inventory Screen, Purchase Order Screen). 
+
+Allow password resets by users with admin rights. 
+
+Support branch-based login, with a default branch assigned if none is selected. 
+
+Discussion: 
+
+The system will manage user roles and permissions. 
+
+Screen-level access will be implemented using URL-based authorization (e.g., /purchases/list, /invoices/list). 
+
+Branch-based login requires mapping users to SAP B1 branches (e.g., via BPLId in OPOR/OINV). 
+
+Conclusion: 
+
+The login module is feasible with existing infrastructure. 
+
+New Development: Implement branch selection during login and default branch assignment. 
+
+Shape 
+
+2. Goods Receipt against Purchase Order (GRPO) 
+
+Requirements: 
+
+Scan PO number to list all items with open quantities. 
+
+Scan supplier barcode to retrieve details (e.g., batch number, expiration date). 
+
+Generate and print a new barcode if none exists, then attach it to the product. 
+
+Scan product and select bin location (warehouse locations). 
+
+Submit GRPO in WMS to create a draft in SAP B1 and trigger approval. 
+
+Quality Control (QC) personnel approve GRPO draft in SAP; approved GRPO posts to SAP. 
+
+Discussion: 
+
+Supplier barcode scanning can retrieve batch/expiration details; new barcodes can map to supplier barcodes. 
+
+GRPO can be saved as a draft or posted directly; draft with approval is preferred to reduce errors. 
+
+QC approval in SAP introduces human error risk. Industry best practices recommend automated checks or WMS-based QC to minimize manual intervention. This needs client discussion. 
+
+Conclusion: 
+
+GRPO screen is configurable with draft/post options. 
+
+Label Printing: Support printing custom labels or mapping supplier labels. 
+
+QC: Common QC functionality exists; client-specific QC needs clarification. 
+
+New Development: 
+
+Handle multiple units (e.g., NOS, KGS, Sheets, Packets). 
+
+Implement GRPO draft creation and approval workflow in WMS. 
+
+Discuss QC process with client to align with industry standards. 
+
+Shape 
+
+3. Inventory Transfer 
+
+Requirements: 
+
+Scan Inventory Transfer number to list all items. 
+
+Scan From Bin Code, Item, and To Bin Code. 
+
+Enter quantity manually or via scanning. 
+
+Submit Inventory Transfer in WMS to create a draft in SAP B1. 
+
+QC personnel approve draft in SAP; approved transfer posts to SAP. 
+
+Discussion: 
+
+Workflow mirrors existing GRPO approval process. 
+
+QC verification relies on Inventory Transfer Request approval before proceeding. 
+
+Client discussion needed to confirm QC process and approval steps. 
+
+Conclusion: 
+
+Existing workflow supports this module. 
+
+New Development: 
+
+Move approved inventory to designated warehouse; transfer rejected inventory to rejection warehouse. 
+
+Create Goods Return Request and raise finance debit note for rejections. 
+
+Discuss QC approval process with client. 
+
+Shape 
+
+4. Pick List (Based on Sales Order) 
+
+Requirements: 
+
+Sales Order posted in SAP generates a pick list assigned to a picker. 
+
+Picker accesses approved pick lists on a handheld device via “Pick & Pack” menu. 
+
+Picker scans pick list, bin code, and item; enters quantity manually or via scanning. 
+
+Submit pick list to update QC status in SAP. 
+
+Pick list requires approval on mobile device; approved/rejected status updates in SAP (UDF: Approved, Pending, Rejected). 
+
+Only approved pick lists proceed; rejected ones require resubmission. 
+
+Discussion: 
+
+Requires integration with SAP B1 pick lists and mobile device approval workflow. 
+
+UDF status tracking (Approved, Pending, Rejected ) needs custom fields in SAP. 
+
+Client clarification needed on approval process and handheld device specifications. 
+
+Conclusion: 
+
+New Development: 
+
+Implement pick list selection, scanning, and approval on handheld devices. 
+
+Add UDF for status tracking in SAP. 
+
+Discuss with client for clarity on workflow and device requirements. 
+
+Shape 
+
+5. Inventory Counting 
+
+Requirements: 
+
+Inventory Controller assigns warehouse and bin for counting. 
+
+Counting personnel access “Inventory Counting Menu - Allocated Count” on handheld device. 
+
+Scan bin code and item code; enter counted quantity manually or via scanning. 
+
+Submit count to create Inventory Counting Document in SAP. 
+
+Handle variances in WMS; scan items to update real count and correct SAP quantities. 
+
+Discussion: 
+
+Inventory counting integrates with SAP B1’s Inventory Counting module. 
+
+Variances require WMS-based correction before SAP update. 
+
+Conclusion: 
+
+Warehouse-wise scanning and batch-wise counting supported. 
+
+Verification occurs in SAP only. 
+
+New Development: Implement variance handling in WMS with real-time SAP updates. 
+
+Shape 
+
+6. Scan Bin and Display All Items 
+
+Requirements: 
+
+Scan a bin code to display all items and their details (e.g., item code, quantity, bin locations). 
+
+Discussion: 
+
+Currently not implemented; requires querying SAP B1’s bin location data (e.g., OBIN, OBTL). 
+
+ 
+
+Conclusion: 
+
+New Development: 
+
+Develop bin scanning functionality to retrieve and display item details. 
+
+Include bin locations for scanned items. 
+
+Shape 
+
+7. Label Printing Automation 
+
+Requirements: 
+
+Support automated label printing with customizable formats. 
+
+Discussion: 
+
+Propose four default label formats to the client for approval. 
+
+Conclusion: 
+
+New Development: 
+
+Create four default label formats. 
+
+Allow mapping supplier labels to custom formats. 
+
+Present formats to client for feedback. 
+
+Shape 
+
+8. Re-Print for Barcode Sticker 
+
+Requirements: 
+
+Support re-printing of barcode stickers for existing items. 
+
+Discussion: 
+
+Re-printing requires access to existing barcode data in SAP B1. 
+
+Conclusion: 
+
+New Development: 
+
+Implement re-print functionality for barcode stickers. 
+
+Integrate with existing label printing module. 
+
+Shape 
+
+Action Items 
+
+Client Discussions: 
+
+Clarify QC approval processes for GRPO and Inventory Transfer to align with industry standards. 
+
+Confirm Pick List workflow, handheld device specs, and UDF requirements. 
+
+Review proposed label formats and finalize. 
+
+Development Tasks: 
+
+Implement branch-based login and user management (Login module). 
+
+Develop GRPO draft/approval workflow and multi-unit support. 
+
+Enhance Inventory Transfer with rejection handling and debit note creation. 
+
+Build Pick List mobile approval and status tracking. 
+
+Add variance handling for Inventory Counting. 
+
+Develop bin scanning and label printing/re-printing functionalities. 
+
+Micro Level: 
+
+ 
+
+1.1.Login Form Design 
+
+2.Implement SAP Login Logig 
+
+3.Validate Credentials & Load Warehouse 
+
+Design GRPO Form 
+
+Barcode Scan & Validate PO Items 
+
+Post GRPO Document 
+
+Design Inventory Transfer UI 
+
+Scan Items & Validate Stock 
+
+Post Inventory Transfer 
+
+Design Packing Slip UI 
+
+SO Scan and Pick Validation 
+
+Generate Packing Slip 
+
+Inventory Count UI Design 
+
+Barcode Scan & Count Logic 
+
+Generate Inventory Count Document 
+
+Bin Wise Item List UI 
+
+Fetch and Display Bin Items 
+
+Label Print UI + Template Integration 
+
+Generate Barcode and Send to Printer 
+
+Reprint Screen Design 
+
+Fetch Previous Print and Print Again 
+
+Unit & Integration Testing 
+
+Bug Fixing and Optimization 
+
+Create ARD & Installer 
+
+Documentation and User Guide 
+
+Final UAT & Buffer 
+
+ 

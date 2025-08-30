@@ -1,0 +1,43 @@
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:17:04] "GET /static/js/app.js HTTP/1.1" 304 -
+ERROR:root:Error creating draft invoice: (pymysql.err.IntegrityError) (1048, "Column 'customer_code' cannot be null")
+[SQL: INSERT INTO invoice_documents (invoice_number, customer_code, customer_name, branch_id, branch_name, user_id, status, doc_date, due_date, total_amount, sap_doc_entry, sap_doc
+_num, notes, json_payload, sap_response, created_at, updated_at) VALUES (%(invoice_number)s, %(customer_code)s, %(customer_name)s, %(branch_id)s, %(branch_name)s, %(user_id)s, %(status)s, %(doc_date)s, %(due_date)s, %(total_amount)s, %(sap_doc_entry)s, %(sap_doc_num)s, %(notes)s, %(json_payload)s, %(sap_response)s, %(created_at)s, %(updated_at)s)]
+[parameters: {'invoice_number': None, 'customer_code': None, 'customer_name': None, 'branch_id': None, 'branch_name': None, 'user_id': 1, 'status': 'draft', 'doc_date': datetime.da
+te(2025, 8, 29), 'due_date': None, 'total_amount': 0.0, 'sap_doc_entry': None, 'sap_doc_num': None, 'notes': None, 'json_payload': None, 'sap_response': None, 'created_at': datetime.datetime(2025, 8, 29, 5, 47, 4, 119362), 'updated_at': datetime.datetime(2025, 8, 29, 5, 47, 4, 119362)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:17:04] "POST /invoice_creation/create_draft HTTP/1.1" 500 -
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:17:05] "GET /invoice_creation/api/business-partners HTTP/1.1" 200 -
+transfer_item (repr) --> {'odata.metadata': 'https://192.168.0.101:50000/b1s/v1/$metadata#SAPB1.SQLQueryResult', 'SqlText': "SELECT T0.[ItemCode],T0.[itemName], T0.[DistNumber], T2
+.[WhsCode],T2.[WhsName],T3.[BPLName],T2.[BPLid] FROM [OSRN] T0 INNER JOIN [OSRQ] T1 ON T0.[AbsEntry] =T1.[MdAbsEntry] INNER JOIN [OWHS] T2 ON T2.[WhsCode]=T1.[WhsCode] INNER JOIN [
+OBPL] T3 ON T3.[BPLId]=T2.[BPLid]WHERE  T1.[Quantity] >'0'AND T0.[DistNumber]=:serial_number", 'value': [{'BPLName': 'ORD-CHENNAI', 'BPLid': 5, 'DistNumber': 'IP389', 'ItemCode': 'IPhone', 'WhsCode': '7000-FG', 'WhsName': 'Finished Goods GST-ORD DC CHN - Assigned to AVS', 'itemName': '12 Series 8GB RAM/250 GB ROM Black'}]}
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:17:14] "GET /invoice_creation/api/validate-serial-number?serial_number=IP389 HTTP/1.1" 200 -
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:17:19] "GET /invoice_creation/create HTTP/1.1" 200 -
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:17:19] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:17:19] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:17:19] "GET /static/js/app.js HTTP/1.1" 304 -
+ERROR:root:Error creating draft invoice: (pymysql.err.IntegrityError) (1048, "Column 'customer_code' cannot be null")
+[SQL: INSERT INTO invoice_documents (invoice_number, customer_code, customer_name, branch_id, branch_name, user_id, status, doc_date, due_date, total_amount, sap_doc_entry, sap_doc
+_num, notes, json_payload, sap_response, created_at, updated_at) VALUES (%(invoice_number)s, %(customer_code)s, %(customer_name)s, %(branch_id)s, %(branch_name)s, %(user_id)s, %(status)s, %(doc_date)s, %(due_date)s, %(total_amount)s, %(sap_doc_entry)s, %(sap_doc_num)s, %(notes)s, %(json_payload)s, %(sap_response)s, %(created_at)s, %(updated_at)s)]
+[parameters: {'invoice_number': None, 'customer_code': None, 'customer_name': None, 'branch_id': None, 'branch_name': None, 'user_id': 1, 'status': 'draft', 'doc_date': datetime.da
+te(2025, 8, 29), 'due_date': None, 'total_amount': 0.0, 'sap_doc_entry': None, 'sap_doc_num': None, 'notes': None, 'json_payload': None, 'sap_response': None, 'created_at': datetime.datetime(2025, 8, 29, 5, 47, 19, 936504), 'updated_at': datetime.datetime(2025, 8, 29, 5, 47, 19, 936504)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:17:19] "POST /invoice_creation/create_draft HTTP/1.1" 500 -
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:17:22] "GET /invoice_creation/api/business-partners HTTP/1.1" 200 -
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:18:24] "GET /invoice_creation/create HTTP/1.1" 200 -
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:18:24] "GET /static/css/style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:18:24] "GET /static/js/barcode-scanner.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:18:24] "GET /static/js/app.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:18:24] "POST /invoice_creation/create_draft HTTP/1.1" 200 -
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:18:25] "GET /invoice_creation/api/business-partners HTTP/1.1" 200 -
+transfer_item (repr) --> {'odata.metadata': 'https://192.168.0.101:50000/b1s/v1/$metadata#SAPB1.SQLQueryResult', 'SqlText': "SELECT T0.[ItemCode],T0.[itemName], T0.[DistNumber], T2
+.[WhsCode],T2.[WhsName],T3.[BPLName],T2.[BPLid] FROM [OSRN] T0 INNER JOIN [OSRQ] T1 ON T0.[AbsEntry] =T1.[MdAbsEntry] INNER JOIN [OWHS] T2 ON T2.[WhsCode]=T1.[WhsCode] INNER JOIN [
+OBPL] T3 ON T3.[BPLId]=T2.[BPLid]WHERE  T1.[Quantity] >'0'AND T0.[DistNumber]=:serial_number", 'value': [{'BPLName': 'ORD-CHENNAI', 'BPLid': 5, 'DistNumber': 'IP379', 'ItemCode': 'IPhone', 'WhsCode': '7000-FG', 'WhsName': 'Finished Goods GST-ORD DC CHN - Assigned to AVS', 'itemName': '12 Series 8GB RAM/250 GB ROM Black'}]}
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:18:33] "GET /invoice_creation/api/validate-serial-number?serial_number=IP379 HTTP/1.1" 200 -
+ERROR:root:❌ Error adding serial item: (pymysql.err.OperationalError) (1054, "Unknown column 'warehouse_name' in 'field list'")
+[SQL: INSERT INTO invoice_lines (invoice_id, line_number, item_code, item_description, quantity, unit_price, line_total, warehouse_code, warehouse_name, tax_code, created_at, updat
+ed_at) VALUES (%(invoice_id)s, %(line_number)s, %(item_code)s, %(item_description)s, %(quantity)s, %(unit_price)s, %(line_total)s, %(warehouse_code)s, %(warehouse_name)s, %(tax_code)s, %(created_at)s, %(updated_at)s)]
+[parameters: {'invoice_id': 1, 'line_number': 1, 'item_code': 'IPhone', 'item_description': '12 Series 8GB RAM/250 GB ROM Black', 'quantity': 1.0, 'unit_price': None, 'line_total':
+ None, 'warehouse_code': '7000-FG', 'warehouse_name': 'Finished Goods GST-ORD DC CHN - Assigned to AVS', 'tax_code': 'CSGST@18', 'created_at': datetime.datetime(2025, 8, 29, 5, 48, 34, 897173), 'updated_at': datetime.datetime(2025, 8, 29, 5, 48, 34, 897173)}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+INFO:werkzeug:192.168.0.101 - - [29/Aug/2025 11:18:34] "POST /invoice_creation/1/add_line_item HTTP/1.1" 500 -
+

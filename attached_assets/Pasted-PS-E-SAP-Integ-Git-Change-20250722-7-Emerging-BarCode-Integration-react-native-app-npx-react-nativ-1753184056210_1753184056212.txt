@@ -1,0 +1,39 @@
+PS E:\SAP_Integ\Git Change\20250722\7\Emerging_BarCode_Integration\react_native_app> npx react-native start     
+warn Package react-native-sqlite-storage contains invalid configuration: "dependency.platforms.ios.project" is not allowed. Please verify it's properly linked using "react-native config" command and contact the package maintainers about this.
+error listen EADDRINUSE: address already in use :::8081.
+Error: listen EADDRINUSE: address already in use :::8081
+    at Server.setupListenHandle [as _listen2] (node:net:1817:16)
+    at listenInCluster (node:net:1865:12)
+    at Server.listen (node:net:1953:7)
+    at E:\SAP_Integ\Git Change\20250722\7\Emerging_BarCode_Integration\react_native_app\node_modules\metro\src\index.flow.js:368:14
+    at new Promise (<anonymous>)
+    at earlyPortCheck (E:\SAP_Integ\Git Change\20250722\7\Emerging_BarCode_Integration\react_native_app\node_modules\metro\src\index.flow.js:364:11)
+    at exports.runServer (E:\SAP_Integ\Git Change\20250722\7\Emerging_BarCode_Integration\react_native_app\node_modules\metro\src\index.flow.js:145:9)
+    at Object.runServer [as func] (E:\SAP_Integ\Git Change\20250722\7\Emerging_BarCode_Integration\react_native_app\node_modules\@react-native-community\cli-plugin-metro\build\commands\start\runServer.js:100:49)
+    at async Command.handleAction (E:\SAP_Integ\Git Change\20250722\7\Emerging_BarCode_Integration\react_native_app\node_modules\@react-native-community\cli\build\index.js:111:9)  
+info Run CLI with --verbose flag for more details.
+PS E:\SAP_Integ\Git Change\20250722\7\Emerging_BarCode_Integration\react_native_app> npx react-native run-android
+warn Package react-native-sqlite-storage contains invalid configuration: "dependency.platforms.ios.project" is not allowed. Please verify it's properly linked using "react-native config" command and contact the package maintainers about this.
+info JS server already running.
+info Installing the app...
+Configuration on demand is an incubating feature.
+
+info 💡 Tip: Make sure that you have set up your development environment correctly, by running react-native doctor. To read more about doctor command visit: https://github.com/react-native-community/cli/blob/main/packages/cli-doctor/README.md#doctor 
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Could not open cp_settings generic class cache for settings file 'E:\SAP_Integ\Git Change\20250722\7\Emerging_BarCode_Integration\react_native_app\android\settings.gradle' (C:\Users\LENOVO\.gradle\caches\8.5\scripts\tf3d27njx92p8k76yayeeweq).
+> BUG! exception in phase 'semantic analysis' in source unit '_BuildScript_' Unsupported class file major version 66
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 1s
+error Failed to install the app.
+info Run CLI with --verbose flag for more details.
+PS E:\SAP_Integ\Git Change\20250722\7\Emerging_BarCode_Integration\react_native_app> 

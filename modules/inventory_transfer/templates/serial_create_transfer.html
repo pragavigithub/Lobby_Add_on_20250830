@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Create Serial Number Transfer - WMS{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('inventory_transfer.serial_index') }}">Serial Number Transfer</a></li>
+                    <li class="breadcrumb-item active">Create Transfer</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i data-feather="hash"></i> Create Serial Number Stock Transfer
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+<!--                            <div class="col-md-6">-->
+<!--                                <div class="alert alert-info">-->
+<!--                                    <i data-feather="info"></i>-->
+<!--                                    <strong>Transfer Number:</strong> Will be automatically generated (Format: ST-YYYYMMDD-XXXX)-->
+<!--                                </div>-->
+<!--                            </div>-->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="from_warehouse" class="form-label">From Warehouse <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="from_warehouse" name="from_warehouse" required>
+                                        <option value="">Select warehouse...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="to_warehouse" class="form-label">To Warehouse <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="to_warehouse" name="to_warehouse" required>
+                                        <option value="">Select warehouse...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"
+                                      placeholder="Optional notes about this transfer"></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('inventory_transfer.serial_index') }}" class="btn btn-secondary">
+                                <i data-feather="arrow-left"></i> Back to List
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i data-feather="save"></i> Create Transfer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6><i data-feather="help-circle"></i> How Serial Number Transfers Work</h6>
+                    <ol class="mb-0 text-muted">
+                        <li>Create a transfer with source and destination warehouses</li>
+                        <li>Add items by specifying Item Code and Serial Numbers</li>
+                        <li>System validates each serial number against SAP B1</li>
+                        <li>Submit for QC approval once all serial numbers are validated</li>
+                        <li>QC team reviews and posts to SAP B1</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load warehouses from API on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadWarehouses();
+});
+
+function loadWarehouses() {
+    fetch('/api/warehouses')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.warehouses) {
+                const fromWarehouse = document.getElementById('from_warehouse');
+                const toWarehouse = document.getElementById('to_warehouse');
+
+                // Clear existing options except first one
+                fromWarehouse.innerHTML = '<option value="">Select warehouse...</option>';
+                toWarehouse.innerHTML = '<option value="">Select warehouse...</option>';
+
+                // Add warehouse options
+                data.warehouses.forEach(warehouse => {
+                    const option1 = new Option(
+                        `${warehouse.WarehouseCode} - ${warehouse.WarehouseName}`,
+                        warehouse.WarehouseCode
+                    );
+                    const option2 = option1.cloneNode(true);
+
+                    fromWarehouse.appendChild(option1);
+                    toWarehouse.appendChild(option2);
+                });
+
+                console.log('Loaded', data.warehouses.length, 'warehouses');
+            } else {
+                console.error('Failed to load warehouses:', data.error || 'Unknown error');
+                // Add fallback warehouses
+                addFallbackWarehouses();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading warehouses:', error);
+            addFallbackWarehouses();
+        });
+}
+
+function addFallbackWarehouses() {
+    const fallbackWarehouses = [
+
+    ];
+
+    const fromWarehouse = document.getElementById('from_warehouse');
+    const toWarehouse = document.getElementById('to_warehouse');
+
+    fallbackWarehouses.forEach(warehouse => {
+        const option1 = new Option(
+            `${warehouse.WarehouseCode} - ${warehouse.WarehouseName}`,
+            warehouse.WarehouseCode
+        );
+        const option2 = option1.cloneNode(true);
+
+        fromWarehouse.appendChild(option1);
+        toWarehouse.appendChild(option2);
+    });
+}
+</script>
+{% endblock %}

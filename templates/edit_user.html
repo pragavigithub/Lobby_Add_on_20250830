@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Edit User - WMS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Edit User - {{ user.username }}</h5>
+                    <a href="{{ url_for('user_management') }}" class="btn btn-secondary btn-sm">
+                        <i data-feather="arrow-left"></i> Back to Users
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="user" {{ 'selected' if user.role == 'user' else '' }}>User</option>
+                                    <option value="manager" {{ 'selected' if user.role == 'manager' else '' }}>Manager</option>
+                                    <option value="qc" {{ 'selected' if user.role == 'qc' else '' }}>Quality Control</option>
+                                    <option value="admin" {{ 'selected' if user.role == 'admin' else '' }}>Administrator</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="default_branch_id" class="form-label">Default Branch</label>
+                                <select class="form-select" id="default_branch_id" name="default_branch_id">
+                                    <option value="">Select Branch</option>
+                                    {% for branch in branches %}
+                                    <option value="{{ branch.id }}" {{ 'selected' if user.default_branch_id == branch.id else '' }}>
+                                        {{ branch.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {{ 'checked' if user.is_active else '' }}>
+                                    <label class="form-check-label" for="is_active">
+                                        User is Active
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="must_change_password" name="must_change_password" {{ 'checked' if user.must_change_password else '' }}>
+                                    <label class="form-check-label" for="must_change_password">
+                                        Must Change Password on Next Login
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Permissions Section -->
+                    <div class="mb-4">
+                        <h6>Permissions</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="dashboard" name="dashboard" {{ 'checked' if user.has_permission('dashboard') else '' }}>
+                                    <label class="form-check-label" for="dashboard">Dashboard</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="grpo" name="grpo" {{ 'checked' if user.has_permission('grpo') else '' }}>
+                                    <label class="form-check-label" for="grpo">Goods Receipt PO</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="inventory_transfer" name="inventory_transfer" {{ 'checked' if user.has_permission('inventory_transfer') else '' }}>
+                                    <label class="form-check-label" for="inventory_transfer">Inventory Transfer</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="serial_transfer" name="serial_transfer" {{ 'checked' if user.has_permission('serial_transfer') else '' }}>
+                                    <label class="form-check-label" for="serial_transfer">Serial Transfer</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="batch_transfer" name="batch_transfer" {{ 'checked' if user.has_permission('batch_transfer') else '' }}>
+                                    <label class="form-check-label" for="batch_transfer">Batch Transfer</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="pick_list" name="pick_list" {{ 'checked' if user.has_permission('pick_list') else '' }}>
+                                    <label class="form-check-label" for="pick_list">Pick List</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="inventory_counting" name="inventory_counting" {{ 'checked' if user.has_permission('inventory_counting') else '' }}>
+                                    <label class="form-check-label" for="inventory_counting">Inventory Counting</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="bin_scanning" name="bin_scanning" {{ 'checked' if user.has_permission('bin_scanning') else '' }}>
+                                    <label class="form-check-label" for="bin_scanning">Bin Scanning</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="label_printing" name="label_printing" {{ 'checked' if user.has_permission('label_printing') else '' }}>
+                                    <label class="form-check-label" for="label_printing">Label Printing</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="user_management" name="user_management" {{ 'checked' if user.has_permission('user_management') else '' }}>
+                                    <label class="form-check-label" for="user_management">User Management</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="qc_dashboard" name="qc_dashboard" {{ 'checked' if user.has_permission('qc_dashboard') else '' }}>
+                                    <label class="form-check-label" for="qc_dashboard">QC Dashboard</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('user_management') }}" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Update User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

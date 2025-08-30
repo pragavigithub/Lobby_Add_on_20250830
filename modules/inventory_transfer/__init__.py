@@ -1,0 +1,1 @@
+# Inventory Transfer module initialization
