@@ -51,6 +51,7 @@ class User(UserMixin, db.Model):
         permissions = {
             'dashboard': True,
             'inventory_transfer': False,
+            'serial_item_transfer': False,
             'serial_transfer': False,
             'user_management': False,
             'qc_dashboard': False,
@@ -64,6 +65,7 @@ class User(UserMixin, db.Model):
         elif self.role == 'manager':
             permissions.update({
                 'inventory_transfer': True,
+                'serial_item_transfer': True,
                 'serial_transfer': True,
                 'user_management': True,
                 'qc_dashboard': True,
@@ -76,6 +78,7 @@ class User(UserMixin, db.Model):
         elif self.role == 'user':
             permissions.update({
                 'inventory_transfer': True,
+                'serial_item_transfer': True,
                 'serial_transfer': True,
                 'invoice_creation': True
             })

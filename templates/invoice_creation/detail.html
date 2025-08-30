@@ -194,15 +194,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Serial Numbers</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="serialsList"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -245,13 +243,15 @@
             serialsHtml += '</tbody></table></div>';
 
             document.getElementById('serialsList').innerHTML = serialsHtml;
-            $('#serialModal').modal('show');
+            const modal = new bootstrap.Modal(document.getElementById('serialModal'));
+            modal.show();
 
             console.log('✅ Serial numbers modal displayed with', serialItems.length, 'items');
         } else {
             console.error('❌ Could not find serials div for line:', lineId);
             document.getElementById('serialsList').innerHTML = '<p class="text-danger">Error loading serial numbers</p>';
-            $('#serialModal').modal('show');
+            const modal = new bootstrap.Modal(document.getElementById('serialModal'));
+            modal.show();
         }
     }
 
