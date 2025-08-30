@@ -563,20 +563,15 @@ function loadBusinessPartners() {
                 
                 // Try to use fallback data for demo
                 window.currentSerialData = {
-                    ItemCode: 'MI Phone',
-                    ItemName: 'RAHUL PHONE',
-                    DistNumber: serialNumber,
-                    WhsCode: '7000-FG',
-                    CardCode: 'CUS0028',
-                    CardName: 'RAHUL PHONE CUSTOMER'
+
                 };
                 
                 // Auto-fill customer with fallback data
                 let customerSelect = $('#customerCode');
-                if (customerSelect.find('option[value="CUS0028"]').length === 0) {
-                    customerSelect.append('<option value="CUS0028">CUS0028 - RAHUL PHONE CUSTOMER</option>');
+                if (customerSelect.find('option[value=""]').length === 0) {
+                    customerSelect.append('<option value=""></option>');
                 }
-                customerSelect.val('CUS0028');
+                customerSelect.val('');
                 
                 showTemporaryMessage('🔄 Using offline mode. Press Enter to add item.', 'info');
             }
