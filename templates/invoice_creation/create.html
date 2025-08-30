@@ -255,12 +255,16 @@ function initializeInvoiceCreation() {
     // Customer selection change handler with freeze protection
     $('#customerCode').on('change', function() {
         const hasItems = $('#serialItemsBody tr').length > 0;
-        if (hasItems) {
+        const selectedValue = $(this).val();
+        
+        if (hasItems && !$(this).prop('disabled')) {
             console.log('🚫 Preventing customer change - line items already added');
             showTemporaryMessage('Cannot change customer after adding line items', 'warning');
-            // Revert to previous value (this will be handled by the disabled property)
+            // This should not happen if properly frozen, but extra safety
             return false;
         }
+        
+        console.log('✅ Customer selection changed to:', selectedValue);
     });
 
     $('#clearAllBtn').on('click', clearAllItems);
@@ -444,6 +448,47 @@ function addRowToTable(itemData) {
         
         console.log('✅ Row added to table successfully');
         updateItemCount();
+        
+        // FREEZE CUSTOMER SELECTION immediately after adding any row
+        freezeCustomerSelection();
+}
+
+function freezeCustomerSelection() {
+        const customerSelect = $('#customerCode');
+        const itemCount = $('#serialItemsBody tr').length;
+        
+        // Only freeze if we have items and customer is not already frozen
+        if (itemCount > 0 && !customerSelect.prop('disabled')) {
+            console.log('🔒 Freezing customer selection - items exist in table');
+            
+            // Disable the dropdown
+            customerSelect.prop('disabled', true);
+            customerSelect.css('background-color', '#f8f9fa');
+            
+            // Add visual indicator if not already present
+            if (!customerSelect.parent().find('.customer-locked-indicator').length) {
+                customerSelect.after('<small class="form-text text-muted customer-locked-indicator"><i data-feather="lock" style="width:12px;height:12px;"></i> Customer locked after adding line items</small>');
+                if (typeof feather !== 'undefined') {
+                    feather.replace();
+                }
+            }
+            
+            console.log('✅ Customer selection frozen successfully');
+        }
+}
+
+function unfreezeCustomerSelection() {
+        const customerSelect = $('#customerCode');
+        console.log('🔓 Unfreezing customer selection');
+        
+        // Re-enable the dropdown
+        customerSelect.prop('disabled', false);
+        customerSelect.css('background-color', '');
+        
+        // Remove visual indicator
+        $('.customer-locked-indicator').remove();
+        
+        console.log('✅ Customer selection unfrozen successfully');
 }
 
 function loadExistingItems() {
@@ -451,6 +496,12 @@ function loadExistingItems() {
         // For now, we'll start with an empty table since it's a new draft
         console.log('🔄 Loading existing items for invoice:', currentInvoiceId);
         updateItemCount();
+        
+        // Check if customer should be frozen based on existing items
+        const itemCount = $('#serialItemsBody tr').length;
+        if (itemCount > 0) {
+            freezeCustomerSelection();
+        }
 }
 
 function loadBusinessPartners() {
@@ -863,6 +914,8 @@ function removeLineItem(itemId) {
                     // Show empty message if no items
                     if ($('#serialItemsBody tr').length === 0) {
                         $('#noItemsMessage').show();
+                        // Unfreeze customer selection if no items left
+                        unfreezeCustomerSelection();
                     }
                     
                     showTemporaryMessage('Item removed successfully', 'success');
@@ -905,10 +958,7 @@ function clearAllItems() {
                         $('#currentLineDisplay').text(currentLine);
                         
                         // Re-enable customer selection
-                        let customerSelect = $('#customerCode');
-                        customerSelect.prop('disabled', false);
-                        customerSelect.css('background-color', '');
-                        $('.customer-locked-indicator').remove();
+                        unfreezeCustomerSelection();
                         
                         // Disable submit button
                         $('#submitForQCBtn').prop('disabled', true);
