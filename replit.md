@@ -135,6 +135,14 @@ A Flask-based warehouse management system with SAP integration for barcode scann
 - **Enhanced Fallback Data**: Added comprehensive fallback customer and serial number data for offline operation
 - **Improved Tab Functionality**: Enhanced serial number auto-fetch with Tab key for better user experience
 - **Error Handling**: Added robust error handling with visual feedback for SAP B1 connection issues
+- **2025-08-30**: Invoice Creation Draft Mode Implementation
+- **Document Draft Mode**: Added comprehensive draft mode workflow where invoices remain editable until QC approval
+- **QC Approval Workflow**: Implemented submit for QC, approve, and reject functionality with proper status transitions
+- **Status-Based UI Controls**: Enhanced detail view with edit controls that appear/disappear based on document status (draft/pending_qc/posted)
+- **Edit Mode Restrictions**: Documents are fully editable in draft mode, locked during QC review, and read-only after approval
+- **SAP Integration**: QC approval automatically posts invoice to SAP B1 and locks the document
+- **MySQL Migration**: Created comprehensive migration file for Invoice Creation draft mode enhancement
+- **User Experience**: Added clear status indicators and confirmation dialogs for all workflow actions
 
 ## User Preferences
 - None specified yet

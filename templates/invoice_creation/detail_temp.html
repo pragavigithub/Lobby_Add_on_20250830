@@ -1,0 +1,109 @@
+
+    function submitForQC(invoiceId) {
+        if (!confirm("Submit this invoice for QC approval? Once submitted, you cannot edit until approved or rejected.")) {
+            return;
+        }
+
+        fetch(`/invoice_creation/${invoiceId}/submit_for_qc`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Invoice submitted for QC approval successfully!");
+                location.reload();
+            } else {
+                alert("Error: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to submit for QC approval");
+        });
+    }
+
+    function qcApprove(invoiceId) {
+        if (!confirm("Approve this invoice and post to SAP? This action will finalize the document and make it read-only.")) {
+            return;
+        }
+
+        fetch(`/invoice_creation/${invoiceId}/qc_approve`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Invoice approved and posted to SAP successfully!");
+                location.reload();
+            } else {
+                alert("Error: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to approve invoice");
+        });
+    }
+
+    function qcReject(invoiceId) {
+        const reason = prompt("Enter rejection reason:");
+        if (!reason || reason.trim() === "") {
+            alert("Rejection reason is required");
+            return;
+        }
+
+        fetch(`/invoice_creation/${invoiceId}/qc_reject`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ rejection_reason: reason.trim() })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Invoice rejected and returned to draft mode for editing.");
+                location.reload();
+            } else {
+                alert("Error: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to reject invoice");
+        });
+    }
+
+    function deleteLineItem(lineId) {
+        if (!confirm("Delete this line item and all its serial numbers?")) {
+            return;
+        }
+
+        fetch(`/invoice_creation/lines/${lineId}/delete`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Line item deleted successfully!");
+                location.reload();
+            } else {
+                alert("Error: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to delete line item");
+        });
+    }

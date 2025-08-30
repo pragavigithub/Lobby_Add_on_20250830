@@ -12,10 +12,33 @@
                     <a href="{{ url_for('invoice_creation.index') }}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Invoices
                     </a>
-                    {% if invoice.status == 'created' and invoice.sap_doc_entry %}
-                    <a href="#" class="btn btn-primary ml-2" onclick="printInvoice()">
-                        <i class="fas fa-print"></i> Print
-                    </a>
+                    
+                    {% if invoice.status == 'draft' %}
+                        <!-- Draft Mode: Allow editing and submission for QC -->
+                        <button class="btn btn-success ml-2" onclick="submitForQC({{ invoice.id }})">
+                            <i class="fas fa-check-circle"></i> Submit for QC Approval
+                        </button>
+                        <a href="{{ url_for('invoice_creation.create') }}?edit={{ invoice.id }}" class="btn btn-primary ml-2">
+                            <i class="fas fa-edit"></i> Edit Invoice
+                        </a>
+                    {% elif invoice.status == 'pending_qc' %}
+                        <!-- Pending QC: Show QC actions if user has permission -->
+                        {% if current_user.has_permission('qc_approval') %}
+                            <button class="btn btn-success ml-2" onclick="qcApprove({{ invoice.id }})">
+                                <i class="fas fa-thumbs-up"></i> QC Approve
+                            </button>
+                            <button class="btn btn-warning ml-2" onclick="qcReject({{ invoice.id }})">
+                                <i class="fas fa-thumbs-down"></i> QC Reject
+                            </button>
+                        {% else %}
+                            <span class="badge badge-warning ml-2">Pending QC Approval</span>
+                        {% endif %}
+                    {% elif invoice.status == 'posted' and invoice.sap_doc_entry %}
+                        <!-- Final Mode: Read-only, show print option -->
+                        <a href="#" class="btn btn-primary ml-2" onclick="printInvoice()">
+                            <i class="fas fa-print"></i> Print Invoice
+                        </a>
+                        <span class="badge badge-success ml-2">Finalized & Posted</span>
                     {% endif %}
                 </div>
             </div>
@@ -54,15 +77,15 @@
                                             <td><strong>Status:</strong></td>
                                             <td>
                                                 {% if invoice.status == 'draft' %}
-                                                <span class="badge badge-secondary">{{ invoice.status.title() }}</span>
-                                                {% elif invoice.status == 'created' %}
-                                                <span class="badge badge-success">{{ invoice.status.title() }}</span>
-                                                {% elif invoice.status == 'failed' %}
-                                                <span class="badge badge-danger">{{ invoice.status.title() }}</span>
+                                                <span class="badge badge-secondary"><i class="fas fa-edit"></i> Draft (Edit Mode)</span>
+                                                {% elif invoice.status == 'pending_qc' %}
+                                                <span class="badge badge-warning"><i class="fas fa-clock"></i> Pending QC Approval</span>
                                                 {% elif invoice.status == 'posted' %}
-                                                <span class="badge bg-primary">{{ invoice.status.title() }}</span>
+                                                <span class="badge badge-success"><i class="fas fa-lock"></i> Final (Read-Only)</span>
+                                                {% elif invoice.status == 'failed' %}
+                                                <span class="badge badge-danger"><i class="fas fa-exclamation-triangle"></i> Failed</span>
                                                 {% elif invoice.status == 'rejected' %}
-                                                <span class="badge bg-danger">{{ invoice.status.title() }}</span>
+                                                <span class="badge badge-danger"><i class="fas fa-times"></i> Rejected</span>
                                                 {% else %}
                                                 <span class="badge badge-info">{{ invoice.status.title() }}</span>
                                                 {% endif %}
@@ -93,8 +116,15 @@
                     </div>
 
                     <div class="card mt-4">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Invoice Lines</h5>
+                            {% if invoice.status == 'draft' %}
+                                <small class="text-muted"><i class="fas fa-info-circle"></i> Editing allowed - Document in Draft Mode</small>
+                            {% elif invoice.status == 'pending_qc' %}
+                                <small class="text-warning"><i class="fas fa-clock"></i> Awaiting QC Approval - No editing allowed</small>
+                            {% elif invoice.status == 'posted' %}
+                                <small class="text-success"><i class="fas fa-lock"></i> Document Finalized - Read-only Mode</small>
+                            {% endif %}
                         </div>
                         <div class="card-body">
                             {% if invoice.lines %}
@@ -107,8 +137,10 @@
                                         <th>Description</th>
                                         <th>Quantity</th>
                                         <th>Warehouse</th>
-
                                         <th>Serial Numbers</th>
+                                        {% if invoice.status == 'draft' %}
+                                        <th>Actions</th>
+                                        {% endif %}
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -137,6 +169,13 @@
                                             -
                                             {% endif %}
                                         </td>
+                                        {% if invoice.status == 'draft' %}
+                                        <td>
+                                            <button class="btn btn-sm btn-danger" onclick="deleteLineItem({{ line.id }})">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </td>
+                                        {% endif %}
                                     </tr>
                                     {% endfor %}
                                     </tbody>
@@ -256,6 +295,115 @@
     }
 
     function printInvoice() {
+
+    function submitForQC(invoiceId) {
+        if (!confirm("Submit this invoice for QC approval? Once submitted, you cannot edit until approved or rejected.")) {
+            return;
+        }
+
+        fetch(`/invoice_creation/${invoiceId}/submit_for_qc`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Invoice submitted for QC approval successfully!");
+                location.reload();
+            } else {
+                alert("Error: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to submit for QC approval");
+        });
+    }
+
+    function qcApprove(invoiceId) {
+        if (!confirm("Approve this invoice and post to SAP? This action will finalize the document and make it read-only.")) {
+            return;
+        }
+
+        fetch(`/invoice_creation/${invoiceId}/qc_approve`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Invoice approved and posted to SAP successfully!");
+                location.reload();
+            } else {
+                alert("Error: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to approve invoice");
+        });
+    }
+
+    function qcReject(invoiceId) {
+        const reason = prompt("Enter rejection reason:");
+        if (!reason || reason.trim() === "") {
+            alert("Rejection reason is required");
+            return;
+        }
+
+        fetch(`/invoice_creation/${invoiceId}/qc_reject`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ rejection_reason: reason.trim() })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Invoice rejected and returned to draft mode for editing.");
+                location.reload();
+            } else {
+                alert("Error: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to reject invoice");
+        });
+    }
+
+    function deleteLineItem(lineId) {
+        if (!confirm("Delete this line item and all its serial numbers?")) {
+            return;
+        }
+
+        fetch(`/invoice_creation/lines/${lineId}/delete`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Line item deleted successfully!");
+                location.reload();
+            } else {
+                alert("Error: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to delete line item");
+        });
+    }
         // This would typically open a print-friendly version or PDF
         alert('Print functionality would be implemented here');
     }
