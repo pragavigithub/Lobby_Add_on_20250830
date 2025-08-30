@@ -3107,8 +3107,7 @@ def edit_user(user_id):
         
         # Update permissions
         permissions = {}
-        for screen in ['dashboard', 'grpo', 'inventory_transfer', 'pick_list', 'inventory_counting', 
-                       'bin_scanning', 'label_printing', 'user_management', 'qc_dashboard']:
+        for screen in ['dashboard', 'inventory_transfer', 'serial_transfer', 'user_management', 'qc_dashboard', 'invoice_creation']:
             permissions[screen] = screen in request.form
         
         user.set_permissions(permissions)

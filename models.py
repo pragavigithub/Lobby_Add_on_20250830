@@ -50,18 +50,11 @@ class User(UserMixin, db.Model):
         """Get default permissions based on role"""
         permissions = {
             'dashboard': True,
-            'grpo': False,
             'inventory_transfer': False,
             'serial_transfer': False,
-            'serial_item_transfer': False,  # New Serial Item Transfer module
-            'batch_transfer': False,
-            'pick_list': False,
-            'inventory_counting': False,
-            'bin_scanning': False,
-            'label_printing': False,
             'user_management': False,
             'qc_dashboard': False,
-            'invoice_creation': False  # New Invoice Creation module
+            'invoice_creation': False
         }
 
         if self.role == 'admin':
@@ -70,36 +63,21 @@ class User(UserMixin, db.Model):
                 permissions[key] = True
         elif self.role == 'manager':
             permissions.update({
-                'grpo': True,
                 'inventory_transfer': True,
                 'serial_transfer': True,
-                'serial_item_transfer': True,  # Allow managers access to Serial Item Transfer
-                'batch_transfer': True,
-                'pick_list': True,
-                'inventory_counting': True,
-                'bin_scanning': True,
-                'label_printing': True,
                 'user_management': True,
-                'invoice_creation': True  # Allow managers access to Invoice Creation
+                'qc_dashboard': True,
+                'invoice_creation': True
             })
         elif self.role == 'qc':
             permissions.update({
-                'grpo': True,
-                'qc_dashboard': True,
-                'bin_scanning': True
+                'qc_dashboard': True
             })
         elif self.role == 'user':
             permissions.update({
-                'grpo': True,
                 'inventory_transfer': True,
                 'serial_transfer': True,
-                'serial_item_transfer': True,  # Allow regular users access to Serial Item Transfer
-                'batch_transfer': True,
-                'pick_list': True,
-                'inventory_counting': True,
-                'bin_scanning': True,
-                'label_printing': True,
-                'invoice_creation': True  # Allow regular users access to Invoice Creation
+                'invoice_creation': True
             })
 
         return permissions

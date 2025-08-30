@@ -24,17 +24,6 @@
 <!--    </div>-->
 <!--    {% endif %}-->
 
-    {% if current_user.has_permission('serial_item_transfer')%}
-    <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card dashboard-card" data-url="{{ url_for('serial_item_transfer.index') }}">
-            <div class="card-body text-center">
-                <i data-feather="package" class="mb-3" style="width: 48px; height: 48px;"></i>
-<!--                <h3>{{ stats.grpo_count }}</h3>-->
-                <p>Serial Item Transfer</p>
-            </div>
-        </div>
-    </div>
-    {% endif %}
     
 <!--    {% if current_user.has_permission('inventory_transfer') %}-->
 <!--    <div class="col-md-3 col-sm-6 mb-3">-->
@@ -48,13 +37,45 @@
 <!--    </div>-->
 <!--    {% endif %}-->
 
-    {% if current_user.has_permission('serial_item_transfer')%}
+    {% if current_user.has_permission('inventory_transfer') %}
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card dashboard-card" data-url="{{ url_for('inventory_transfer') }}">
+            <div class="card-body text-center">
+                <i data-feather="move" class="mb-3" style="width: 48px; height: 48px;"></i>
+                <p>Inventory Transfer</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if current_user.has_permission('serial_transfer') %}
     <div class="col-md-3 col-sm-6 mb-3">
         <div class="card dashboard-card" data-url="{{ url_for('inventory_transfer.serial_index') }}">
             <div class="card-body text-center">
-                <i data-feather="move" class="mb-3" style="width: 48px; height: 48px;"></i>
-<!--                <h3>{{ stats.transfer_count }}</h3>-->
+                <i data-feather="arrow-right-circle" class="mb-3" style="width: 48px; height: 48px;"></i>
                 <p>Serial Transfer</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if current_user.has_permission('qc_dashboard') %}
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card dashboard-card" data-url="{{ url_for('qc_dashboard') }}">
+            <div class="card-body text-center">
+                <i data-feather="check-circle" class="mb-3" style="width: 48px; height: 48px;"></i>
+                <p>QC Dashboard</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if current_user.has_permission('user_management') %}
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card dashboard-card" data-url="{{ url_for('user_management') }}">
+            <div class="card-body text-center">
+                <i data-feather="users" class="mb-3" style="width: 48px; height: 48px;"></i>
+                <p>User Management</p>
             </div>
         </div>
     </div>

@@ -96,10 +96,6 @@
                                     <label class="form-check-label" for="dashboard">Dashboard</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="grpo" name="grpo" {{ 'checked' if user.has_permission('grpo') else '' }}>
-                                    <label class="form-check-label" for="grpo">Goods Receipt PO</label>
-                                </div>
-                                <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="inventory_transfer" name="inventory_transfer" {{ 'checked' if user.has_permission('inventory_transfer') else '' }}>
                                     <label class="form-check-label" for="inventory_transfer">Inventory Transfer</label>
                                 </div>
@@ -107,35 +103,19 @@
                                     <input class="form-check-input" type="checkbox" id="serial_transfer" name="serial_transfer" {{ 'checked' if user.has_permission('serial_transfer') else '' }}>
                                     <label class="form-check-label" for="serial_transfer">Serial Transfer</label>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="batch_transfer" name="batch_transfer" {{ 'checked' if user.has_permission('batch_transfer') else '' }}>
-                                    <label class="form-check-label" for="batch_transfer">Batch Transfer</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="pick_list" name="pick_list" {{ 'checked' if user.has_permission('pick_list') else '' }}>
-                                    <label class="form-check-label" for="pick_list">Pick List</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="inventory_counting" name="inventory_counting" {{ 'checked' if user.has_permission('inventory_counting') else '' }}>
-                                    <label class="form-check-label" for="inventory_counting">Inventory Counting</label>
-                                </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="bin_scanning" name="bin_scanning" {{ 'checked' if user.has_permission('bin_scanning') else '' }}>
-                                    <label class="form-check-label" for="bin_scanning">Bin Scanning</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="label_printing" name="label_printing" {{ 'checked' if user.has_permission('label_printing') else '' }}>
-                                    <label class="form-check-label" for="label_printing">Label Printing</label>
+                                    <input class="form-check-input" type="checkbox" id="qc_dashboard" name="qc_dashboard" {{ 'checked' if user.has_permission('qc_dashboard') else '' }}>
+                                    <label class="form-check-label" for="qc_dashboard">QC Dashboard</label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="user_management" name="user_management" {{ 'checked' if user.has_permission('user_management') else '' }}>
                                     <label class="form-check-label" for="user_management">User Management</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="qc_dashboard" name="qc_dashboard" {{ 'checked' if user.has_permission('qc_dashboard') else '' }}>
-                                    <label class="form-check-label" for="qc_dashboard">QC Dashboard</label>
+                                    <input class="form-check-input" type="checkbox" id="invoice_creation" name="invoice_creation" {{ 'checked' if user.has_permission('invoice_creation') else '' }}>
+                                    <label class="form-check-label" for="invoice_creation">Invoice Creation</label>
                                 </div>
                             </div>
                         </div>
