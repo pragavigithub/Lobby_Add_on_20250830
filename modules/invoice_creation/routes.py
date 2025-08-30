@@ -124,6 +124,19 @@ def create():
         flash('Access denied - Invoice Creation permissions required', 'error')
         return redirect(url_for('dashboard'))
     
+    # Check if this is an edit request
+    edit_invoice_id = request.args.get("edit", type=int)
+    edit_invoice = None
+    if edit_invoice_id:
+        edit_invoice = InvoiceDocument.query.get_or_404(edit_invoice_id)
+        # Check permissions and status
+        if edit_invoice.user_id != current_user.id and current_user.role not in ["admin", "manager"]:
+            flash("Access denied - You can only edit your own invoices", "error")
+            return redirect(url_for("invoice_creation.index"))
+        if edit_invoice.status != "draft":
+            flash("Cannot edit - Invoice must be in draft status", "error")
+            return redirect(url_for("invoice_creation.detail", invoice_id=edit_invoice_id))
+
     if request.method == 'POST':
         try:
             # Handle JSON data from the new interface
@@ -206,7 +219,7 @@ def create():
             else:
                 flash(f'Error creating invoice: {str(e)}', 'error')
     
-    return render_template('invoice_creation/create.html')
+    return render_template('invoice_creation/create.html', edit_invoice=edit_invoice)
 
 @invoice_bp.route('/detail/<int:invoice_id>')
 @login_required
@@ -563,6 +576,37 @@ def create_draft():
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
 
+
+@invoice_bp.route('/<int:invoice_id>/delete', methods=['POST'])
+@login_required
+def delete_invoice(invoice_id):
+    """Delete entire invoice document"""
+    try:
+        invoice = InvoiceDocument.query.get_or_404(invoice_id)
+        
+        # Check permissions
+        if invoice.user_id != current_user.id and current_user.role not in ['admin', 'manager']:
+            return jsonify({'success': False, 'error': 'Access denied'}), 403
+            
+        if invoice.status != 'draft':
+            return jsonify({'success': False, 'error': 'Cannot delete non-draft invoice'}), 400
+            
+        invoice_id_num = invoice.id
+        
+        # Delete the entire invoice (cascade will handle lines and serial numbers)
+        db.session.delete(invoice)
+        db.session.commit()
+        
+        logging.info(f"🗑️ Invoice {invoice_id_num} deleted successfully")
+        return jsonify({
+            'success': True, 
+            'message': 'Invoice deleted successfully'
+        })
+        
+    except Exception as e:
+        logging.error(f"Error deleting invoice: {str(e)}")
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @invoice_bp.route('/lines/<int:line_id>/delete', methods=['POST'])
 @login_required
