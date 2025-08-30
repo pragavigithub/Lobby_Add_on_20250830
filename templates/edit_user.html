@@ -96,8 +96,8 @@
                                     <label class="form-check-label" for="dashboard">Dashboard</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="inventory_transfer" name="inventory_transfer" {{ 'checked' if user.has_permission('inventory_transfer') else '' }}>
-                                    <label class="form-check-label" for="inventory_transfer">Inventory Transfer</label>
+                                    <input class="form-check-input" type="checkbox" id="inventory_transfer" name="inventory_transfer" {{ 'checked' if user.has_permission('serial_item_transfer') else '' }}>
+                                    <label class="form-check-label" for="inventory_transfer">Serial Item Transfer</label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="serial_transfer" name="serial_transfer" {{ 'checked' if user.has_permission('serial_transfer') else '' }}>
