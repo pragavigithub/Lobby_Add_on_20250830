@@ -1344,6 +1344,55 @@ def remove_line_item(invoice_id, item_id):
             'error': f'Internal error: {str(e)}'
         }), 500
 
+@invoice_bp.route('/<int:invoice_id>/clear_all_items', methods=['DELETE'])
+@login_required
+def clear_all_items(invoice_id):
+    """Clear all line items from an invoice"""
+    try:
+        invoice = InvoiceDocument.query.get_or_404(invoice_id)
+        
+        # Check permissions
+        if invoice.user_id != current_user.id and current_user.role not in ['admin', 'manager']:
+            return jsonify({'success': False, 'error': 'Access denied'}), 403
+        
+        if invoice.status not in ['draft', 'pending_qc']:
+            return jsonify({'success': False, 'error': 'Cannot clear items from this invoice status'}), 400
+        
+        # Count items before deletion
+        item_count = len(invoice.lines)
+        if item_count == 0:
+            return jsonify({'success': False, 'error': 'No items to clear'}), 400
+        
+        # Delete all invoice lines and their associated serial numbers
+        for line in invoice.lines:
+            # Delete all serial numbers for this line
+            for serial in line.serial_numbers:
+                db.session.delete(serial)
+            # Delete the line itself
+            db.session.delete(line)
+        
+        # Reset customer information when clearing all items
+        invoice.customer_code = None
+        invoice.customer_name = None
+        
+        db.session.commit()
+        
+        logging.info(f"✅ Cleared all {item_count} items from invoice {invoice.id} for user {current_user.username}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'All {item_count} items cleared successfully',
+            'items_cleared': item_count
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Error clearing all items: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'Internal error: {str(e)}'
+        }), 500
+
 @invoice_bp.route('/create_draft', methods=['POST'])
 @login_required
 def create_draft_invoice():

@@ -252,6 +252,17 @@ function initializeInvoiceCreation() {
         }
     });
 
+    // Customer selection change handler with freeze protection
+    $('#customerCode').on('change', function() {
+        const hasItems = $('#serialItemsBody tr').length > 0;
+        if (hasItems) {
+            console.log('🚫 Preventing customer change - line items already added');
+            showTemporaryMessage('Cannot change customer after adding line items', 'warning');
+            // Revert to previous value (this will be handled by the disabled property)
+            return false;
+        }
+    });
+
     $('#clearAllBtn').on('click', clearAllItems);
     $('#aboutAddingBtn').on('click', function() {
         $('#aboutModal').modal('show');
@@ -325,7 +336,7 @@ function createDraftInvoiceAndAddItem(serialNumber) {
                                 // Add row to table
                                 addRowToTable(response.item_data);
                                 
-                                // Update customer dropdown if auto-detected
+                                // Update customer dropdown if auto-detected AND FREEZE customer selection
                                 if (response.item_data.customer_code) {
                                     let customerSelect = $('#customerCode');
                                     let existingOption = customerSelect.find(`option[value="${response.item_data.customer_code}"]`);
@@ -337,6 +348,16 @@ function createDraftInvoiceAndAddItem(serialNumber) {
                                         let customerName = response.item_data.customer_name || 'Unknown Customer';
                                         customerSelect.append(`<option value="${response.item_data.customer_code}">${response.item_data.customer_code} - ${customerName}</option>`);
                                         customerSelect.val(response.item_data.customer_code);
+                                    }
+                                    
+                                    // FREEZE customer selection after first line item is added
+                                    customerSelect.prop('disabled', true);
+                                    customerSelect.css('background-color', '#f8f9fa');
+                                    
+                                    // Add visual indicator that customer is locked
+                                    if (!customerSelect.parent().find('.customer-locked-indicator').length) {
+                                        customerSelect.after('<small class="form-text text-muted customer-locked-indicator"><i data-feather="lock" style="width:12px;height:12px;"></i> Customer locked after adding line items</small>');
+                                        if (typeof feather !== 'undefined') feather.replace();
                                     }
                                 }
                                 
@@ -357,6 +378,9 @@ function createDraftInvoiceAndAddItem(serialNumber) {
                                 $('#serialNumberInput').focus();
 
                                 showTemporaryMessage(`✅ Invoice created and "${serialNumber}" added!`, 'success');
+                                
+                                // PREVENT PAGE REFRESH - Stay on current invoice after adding items
+                                console.log('🔒 Customer selection frozen, staying on current invoice');
                             } else {
                                 showTemporaryMessage('Failed to add first item: ' + (response.error || 'Unknown error'), 'danger');
                             }
@@ -623,7 +647,7 @@ function loadBusinessPartners() {
                     // Add row to table immediately
                     addRowToTable(response.item_data);
                     
-                    // Update customer dropdown if auto-detected
+                    // Update customer dropdown if auto-detected AND FREEZE customer selection
                     if (response.item_data.customer_code) {
                         let customerSelect = $('#customerCode');
                         let existingOption = customerSelect.find(`option[value="${response.item_data.customer_code}"]`);
@@ -635,6 +659,16 @@ function loadBusinessPartners() {
                             let customerName = response.item_data.customer_name || 'Unknown Customer';
                             customerSelect.append(`<option value="${response.item_data.customer_code}">${response.item_data.customer_code} - ${customerName}</option>`);
                             customerSelect.val(response.item_data.customer_code);
+                        }
+                        
+                        // FREEZE customer selection after ANY line item is added
+                        customerSelect.prop('disabled', true);
+                        customerSelect.css('background-color', '#f8f9fa');
+                        
+                        // Add visual indicator that customer is locked
+                        if (!customerSelect.parent().find('.customer-locked-indicator').length) {
+                            customerSelect.after('<small class="form-text text-muted customer-locked-indicator"><i data-feather="lock" style="width:12px;height:12px;"></i> Customer locked after adding line items</small>');
+                            if (typeof feather !== 'undefined') feather.replace();
                         }
                     }
                     
@@ -655,6 +689,9 @@ function loadBusinessPartners() {
                     $('#serialNumberInput').focus();
                     
                     showTemporaryMessage(`✅ Added "${serialNumber}" to invoice!`, 'success');
+                    
+                    // PREVENT PAGE REFRESH - Stay on current invoice after adding items
+                    console.log('🔒 Item added, staying on current invoice (no refresh)');
                 } else {
                     showTemporaryMessage('Failed to add item: ' + (response.error || 'Unknown error'), 'danger');
                 }
@@ -847,14 +884,110 @@ function removeLineItem(itemId) {
 }
 
 function clearAllItems() {
-        // For now, we'll disable this function since items are in database
-        // Could implement by deleting all items from current invoice
-        showTemporaryMessage('Clear all function not implemented yet', 'info');
+        const itemCount = $('#serialItemsBody tr').length;
+        if (itemCount === 0) {
+            showTemporaryMessage('No items to clear.', 'info');
+            return;
+        }
+        
+        if (confirm(`Are you sure you want to remove all ${itemCount} items from this invoice?`)) {
+            console.log('🗑️ Clearing all items from invoice:', currentInvoiceId);
+            
+            // Remove all items from database
+            $.ajax({
+                url: `/invoice_creation/${currentInvoiceId}/clear_all_items`,
+                method: 'DELETE',
+                success: function(response) {
+                    if (response.success) {
+                        // Clear the table
+                        $('#serialItemsBody').empty();
+                        $('#noItemsMessage').show();
+                        
+                        // Reset counters
+                        updateItemCount();
+                        currentLine = 1;
+                        $('#currentLineNumber').text(currentLine);
+                        $('#currentLineDisplay').text(currentLine);
+                        
+                        // Re-enable customer selection
+                        let customerSelect = $('#customerCode');
+                        customerSelect.prop('disabled', false);
+                        customerSelect.css('background-color', '');
+                        $('.customer-locked-indicator').remove();
+                        
+                        // Disable submit button
+                        $('#submitForQCBtn').prop('disabled', true);
+                        
+                        showTemporaryMessage('All items cleared. Customer selection unlocked.', 'success');
+                    } else {
+                        showTemporaryMessage('Failed to clear items: ' + (response.error || 'Unknown error'), 'danger');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('❌ Error clearing items:', error);
+                    showTemporaryMessage('Error clearing items', 'danger');
+                }
+            });
+        }
 }
 
 function submitInvoice() {
-        // Implementation for submitting invoice for QC
-        showTemporaryMessage('Submit function not implemented yet', 'info');
+        if (!currentInvoiceId) {
+            showTemporaryMessage('No invoice available to submit', 'warning');
+            return;
+        }
+        
+        const customerCode = $('#customerCode').val().trim();
+        const itemCount = $('#serialItemsBody tr').length;
+        
+        if (itemCount === 0) {
+            showTemporaryMessage('Please add at least one line item before submitting', 'warning');
+            return;
+        }
+        
+        if (!customerCode) {
+            showTemporaryMessage('Please select a customer before submitting', 'warning');
+            $('#customerCode').focus();
+            return;
+        }
+        
+        if (confirm(`Submit invoice with ${itemCount} items for QC approval?`)) {
+            console.log('🚀 Submitting invoice for QC approval:', currentInvoiceId);
+            showTemporaryMessage('Submitting invoice for QC approval...', 'info');
+            
+            $.ajax({
+                url: `/invoice_creation/${currentInvoiceId}/submit_for_qc`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    customer_code: customerCode,
+                    customer_name: $('#customerCode option:selected').text().split(' - ')[1] || ''
+                }),
+                xhrFields: {
+                    withCredentials: true
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showTemporaryMessage('✅ Invoice submitted for QC approval successfully!', 'success');
+                        
+                        // Redirect to invoice list after successful submission
+                        setTimeout(function() {
+                            window.location.href = '/invoice_creation/';
+                        }, 2000);
+                    } else {
+                        showTemporaryMessage('Failed to submit invoice: ' + (response.error || 'Unknown error'), 'danger');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('❌ Error submitting invoice:', error, xhr.responseJSON);
+                    let errorMsg = 'Error submitting invoice for QC approval';
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMsg = xhr.responseJSON.error;
+                    }
+                    showTemporaryMessage(errorMsg, 'danger');
+                }
+            });
+        }
 }
 
 // Updated summary calculation
