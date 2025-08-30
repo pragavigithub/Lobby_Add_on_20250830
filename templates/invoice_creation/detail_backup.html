@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice Creation - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Invoice Creation</h2>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <p class="text-muted">Create and manage invoices with serial number tracking</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('invoice_creation.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create New Invoice
+                    </a>
+                    <button onclick="cleanupEmptyDrafts()" class="btn btn-outline-warning ml-2">
+                        <i class="fas fa-broom"></i> Clean Empty Drafts
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('invoice_creation.index') }}">
+                        <div class="row">
+                            <!-- Search -->
+                            <div class="col-md-3 mb-3">
+                                <label for="search" class="form-label">Search</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       placeholder="Invoice number, customer..." value="{{ search }}">
+                            </div>
+                            
+                            <!-- Items per page -->
+                            <div class="col-md-2 mb-3">
+                                <label for="per_page" class="form-label">Items per page</label>
+                                <select class="form-control" id="per_page" name="per_page">
+                                    <option value="5" {% if per_page == 5 %}selected{% endif %}>5</option>
+                                    <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                                    <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+                                    <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                                    <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Status Filter -->
+                            <div class="col-md-2 mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-control" id="status" name="status">
+                                    <option value="">All Statuses</option>
+                                    {% for status in status_options %}
+                                    <option value="{{ status }}" {% if status_filter == status %}selected{% endif %}>
+                                        {{ status.title() }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <!-- Customer Filter -->
+                            <div class="col-md-2 mb-3">
+                                <label for="customer" class="form-label">Customer</label>
+                                <select class="form-control" id="customer" name="customer">
+                                    <option value="">All Customers</option>
+                                    {% for customer_code, customer_name in customer_options %}
+                                    <option value="{{ customer_code }}" {% if customer_filter == customer_code %}selected{% endif %}>
+                                        {{ customer_code }}{% if customer_name %} - {{ customer_name }}{% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="col-md-2 mb-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary mr-2">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <a href="{{ url_for('invoice_creation.index') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Clear
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Date Range Filter -->
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="date_from" class="form-label">Date From</label>
+                                <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="date_to" class="form-label">Date To</label>
+                                <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to }}">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if invoices %}
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Your Invoices</h5>
+                    <small class="text-muted">
+                        Showing {{ ((pagination.page - 1) * pagination.per_page) + 1 }} to {{ ((pagination.page - 1) * pagination.per_page) + invoices|length }} 
+                        of {{ pagination.total }} results
+                    </small>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Status</th>
+
+                                <th>SAP Doc #</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for invoice in invoices %}
+                            <tr>
+                                <td>{{ invoice.invoice_number or 'Draft' }}</td>
+                                <td>
+                                    <strong>{{ invoice.customer_code }}</strong><br>
+                                    <small class="text-muted">{{ invoice.customer_name or '' }}</small>
+                                </td>
+                                <td>{{ invoice.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% if invoice.status == 'draft' %}
+                                    <span class="badge badge-secondary">{{ invoice.status.title() }}</span>
+                                    {% elif invoice.status == 'created' %}
+                                    <span class="badge badge-success">{{ invoice.status.title() }}</span>
+                                    {% elif invoice.status == 'failed' %}
+                                    <span class="badge badge-danger">{{ invoice.status.title() }}</span>
+                                    {% elif invoice.status == 'posted' %}
+                                    <span class="badge bg-primary">{{ invoice.status.title() }}</span>
+                                    {% elif invoice.status == 'rejected' %}
+                                    <span class="badge bg-danger">{{ invoice.status.title() }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ invoice.sap_doc_num or '-' }}</td>
+                                <td>
+                                    <a href="{{ url_for('invoice_creation.detail', invoice_id=invoice.id) }}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if pagination.pages > 1 %}
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <small class="text-muted">
+                                Page {{ pagination.page }} of {{ pagination.pages }}
+                            </small>
+                        </div>
+                        <nav aria-label="Invoice pagination">
+                            <ul class="pagination pagination-sm mb-0">
+                                <!-- Previous Page -->
+                                {% if pagination.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('invoice_creation.index', 
+                                        page=pagination.prev_num, per_page=per_page, search=search, 
+                                        status=status_filter, customer=customer_filter, 
+                                        date_from=date_from, date_to=date_to) }}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                                </li>
+                                {% endif %}
+                                
+                                <!-- Page Numbers -->
+                                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                    {% if page_num %}
+                                        {% if page_num != pagination.page %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('invoice_creation.index', 
+                                                page=page_num, per_page=per_page, search=search, 
+                                                status=status_filter, customer=customer_filter, 
+                                                date_from=date_from, date_to=date_to) }}">
+                                                {{ page_num }}
+                                            </a>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                        {% endif %}
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">…</span>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                <!-- Next Page -->
+                                {% if pagination.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('invoice_creation.index', 
+                                        page=pagination.next_num, per_page=per_page, search=search, 
+                                        status=status_filter, customer=customer_filter, 
+                                        date_from=date_from, date_to=date_to) }}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+                    <h5>No Invoices Yet</h5>
+                    <p class="text-muted">Start creating your first invoice by clicking the button above.</p>
+                    <a href="{{ url_for('invoice_creation.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create First Invoice
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function cleanupEmptyDrafts() {
+        if (confirm('This will delete all draft invoices that have no line items. Are you sure?')) {
+            $.ajax({
+                url: '/invoice_creation/cleanup_empty_drafts',
+                method: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        alert(`✅ Cleaned up ${response.count} empty draft invoices`);
+                        location.reload(); // Refresh the page to show updated list
+                    } else {
+                        alert('❌ Error: ' + response.error);
+                    }
+                },
+                error: function() {
+                    alert('❌ Error cleaning up empty drafts');
+                }
+            });
+        }
+    }
+</script>
+{% endblock %}

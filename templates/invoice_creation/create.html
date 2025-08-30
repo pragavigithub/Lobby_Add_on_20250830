@@ -239,7 +239,7 @@ function initializeInvoiceCreation() {
     // Note: Draft invoice will be created only when first line item is added
 
     // Load business partners on page load
-    loadBusinessPartners();
+    loadBusinessPartners();\n    \n    // Check if this is an edit request\n    {% if edit_invoice %}\n        loadEditInvoiceData();\n    {% endif %}
 
     // Event handlers
     $('#serialNumberInput').on('keydown', function(e) {
@@ -1241,6 +1241,55 @@ function updateItemCountOld() {
         setTimeout(function() {
             $('.alert').alert('close');
         }, 3000);
+    }
+
+    // Load edit invoice data if editing
+    function loadEditInvoiceData() {
+        {% if edit_invoice %}
+        console.log('Loading edit data for invoice {{ edit_invoice.id }}');
+        
+        // Set the current invoice ID
+        currentInvoiceId = {{ edit_invoice.id }};
+        
+        // Pre-populate customer
+        setTimeout(function() {
+            $('#customerCode').val('{{ edit_invoice.customer_code or "" }}').trigger('change');
+            if ('{{ edit_invoice.customer_code }}') {
+                $('#customerCode').prop('disabled', true);
+                $('#customerCode').css('background-color', '#f8f9fa');
+            }
+        }, 1000);
+        
+        // Load existing invoice lines
+        {% for line in edit_invoice.lines %}
+        serialNumbers.push({
+            id: {{ line.id }},
+            serialNumber: '{{ line.serial_numbers[0].serial_number if line.serial_numbers else "" }}',
+            itemCode: '{{ line.item_code }}',
+            itemName: '{{ line.item_description }}',
+            warehouse: '{{ line.warehouse_code }}',
+            quantity: {{ line.quantity }},
+            status: 'validated'
+        });
+        {% endfor %}
+        
+        // Update line counter
+        currentLine = serialNumbers.length + 1;
+        $('#currentLineNumber').text(currentLine);
+        $('#currentLineDisplay').text(currentLine);
+        
+        // Update displays
+        updateSerialItemsTable();
+        updateSummaryCards();
+        updateItemCount();
+        
+        // Enable submit button if has items
+        if (serialNumbers.length > 0) {
+            $('#submitForQCBtn').prop('disabled', false);
+        }
+        
+        showTemporaryMessage('Invoice loaded for editing', 'info');
+        {% endif %}
     }
 
 </script>
