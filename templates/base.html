@@ -80,7 +80,8 @@
                 {% endif %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('inventory_transfer.serial_index') }}">
-                        <i data-feather="arrow-right-circle" class="mb-1" style="width: 22px; height: 22px;"></i> Bulk Transfer
+                        <i data-feather="arrow-right-circle" class="mb-1" style="width: 22px; height: 22px;"></i> Bulk
+                        Transfer
                     </a>
                 </li>
                 {% endif %}
@@ -133,6 +134,26 @@
             </ul>
 
             <ul class="navbar-nav">
+                <div id="notification-panel" class="alert alert-info" style="display: none;">
+                    <div class="d-flex align-items-center">
+                        <i data-feather="bell" class="me-1" style="width: 10px; height: 10px;"></i>
+                        <div>
+                            <strong>Pending Approvals</strong>
+                            <div id="notification-message" class="small"></div>
+                            <div class="small text-muted" id="notification-details"></div>
+                        </div>
+                        <button class="btn btn-sm btn-primary ms-auto" onclick="window.location.href='/qc_dashboard'">
+                            View QC Dashboard
+                        </button>
+                    </div>
+                </div>
+                <div id="notification-badge" class="position-relative d-inline-block" style="cursor: pointer;"
+                     onclick="toggleNotificationPanel()">
+                    <i data-feather="bell" style="width: 20px; height: 20px; color: #007bff;"></i>
+                    <span id="notification-count"
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                          style="display: none;">0</span>
+                </div>
                 {% if current_user.has_permission('user_management') or current_user.role == 'admin' %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('user_management') }}">
@@ -259,6 +280,81 @@
     window.addEventListener('appinstalled', () => {
         console.log('PWA was installed');
     });
+
+    function toggleNotificationPanel() {
+    const panel = document.getElementById('notification-panel');
+    const badge = document.getElementById('notification-badge');
+
+    if (notificationPanelVisible) {
+        panel.style.display = 'none';
+        badge.style.display = 'inline-block';
+        notificationPanelVisible = false;
+    } else {
+        panel.style.display = 'block';
+        badge.style.display = 'none';
+        notificationPanelVisible = true;
+    }
+}
+
+    function fetchPendingApprovals() {
+    fetch('/api/notifications/pending-approvals')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.has_pending) {
+                // Show notification badge
+                const badge = document.getElementById('notification-count');
+                const message = document.getElementById('notification-message');
+                const details = document.getElementById('notification-details');
+
+                badge.textContent = data.total_pending;
+                badge.style.display = 'inline';
+
+                message.textContent = data.message;
+
+                // Build details string
+                const detailsArray = [];
+                if (data.details.invoices > 0) {
+                    detailsArray.push(`${data.details.invoices} Invoice${data.details.invoices > 1 ? 's' : ''}`);
+                }
+                if (data.details.inventory_transfers > 0) {
+                    detailsArray.push(`${data.details.inventory_transfers} Transfer${data.details.inventory_transfers > 1 ? 's' : ''}`);
+                }
+                if (data.details.grpos > 0) {
+                    detailsArray.push(`${data.details.grpos} GRPO${data.details.grpos > 1 ? 's' : ''}`);
+                }
+                if (data.details.serial_transfers > 0) {
+                    detailsArray.push(`${data.details.serial_transfers} Serial Transfer${data.details.serial_transfers > 1 ? 's' : ''}`);
+                }
+                if (data.details.serial_item_transfers > 0) {
+                    detailsArray.push(`${data.details.serial_item_transfers} Serial Item${data.details.serial_item_transfers > 1 ? 's' : ''}`);
+                }
+
+                details.textContent = detailsArray.join(', ');
+
+                console.log('Pending approvals:', data.total_pending);
+            } else {
+                // Hide notification badge
+                const badge = document.getElementById('notification-count');
+                badge.style.display = 'none';
+                console.log('No pending approvals');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching notifications:', error);
+        });
+}
+
+// Load notifications on page load
+document.addEventListener('DOMContentLoaded', function() {
+    fetchPendingApprovals();
+});
+
+// Update notifications periodically
+setInterval(function() {
+    fetchPendingApprovals();
+    console.log('Checking for notification updates...');
+}, 30000); // Check every 30 seconds
+
 </script>
 
 {% block scripts %}{% endblock %}

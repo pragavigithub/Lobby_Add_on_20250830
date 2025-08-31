@@ -487,8 +487,29 @@ def dashboard():
         }
         recent_activities = []
         flash('Database needs to be updated. Please run: python migrate_database.py', 'warning')
-    
-    return render_template('dashboard.html', stats=stats, recent_activities=recent_activities)
+    from models import SerialNumberTransfer, SerialItemTransfer
+    pending_serial_transfers = SerialNumberTransfer.query.filter_by(status='submitted').order_by(
+        SerialNumberTransfer.created_at.desc()).all()
+
+    # Get pending Serial Item Transfers for QC approval
+    pending_serial_item_transfers = SerialItemTransfer.query.filter_by(status='submitted').order_by(
+        SerialItemTransfer.created_at.desc()).all()
+
+    # Get QC approved Serial Item Transfers ready for SAP posting
+    qc_approved_serial_item_transfers = SerialItemTransfer.query.filter_by(status='qc_approved').order_by(
+        SerialItemTransfer.qc_approved_at.desc()).all()
+
+    # Get pending Invoice Creation documents for QC approval
+    from modules.invoice_creation.models import InvoiceDocument
+    pending_invoices = InvoiceDocument.query.filter_by(status='pending_qc').order_by(
+        InvoiceDocument.created_at.desc()).all()
+
+    return render_template('dashboard.html',
+                           pending_serial_transfers=pending_serial_transfers,
+                           pending_serial_item_transfers=pending_serial_item_transfers,
+                           pending_invoices=pending_invoices,
+                           pending_count=len(pending_serial_transfers) + len(pending_serial_item_transfers) + len(pending_invoices),
+                           stats=stats, recent_activities=recent_activities)
 
 @app.route('/grpo')
 @login_required
@@ -1653,9 +1674,9 @@ def qc_dashboard():
                          pending_serial_transfers=pending_serial_transfers,
                          pending_serial_item_transfers=pending_serial_item_transfers,
                          pending_invoices=pending_invoices,
-                         qc_approved_serial_item_transfers=qc_approved_serial_item_transfers,
                          pending_count=len(pending_transfers) + len(pending_grpos) + len(pending_serial_transfers) + len(pending_serial_item_transfers) + len(pending_invoices),
                          approved_today=approved_today,
+                         qc_approved_serial_item_transfers=qc_approved_serial_item_transfers,
                          rejected_today=rejected_today,
                          avg_processing_time=avg_processing_time)
 
@@ -3700,11 +3721,7 @@ def get_bins_api():
         # If SAP is not available, return fallback bins
         if not bins:
             bins = [
-                {'BinCode': f'{warehouse_code}-A1-01', 'Description': 'Aisle A, Level 1, Position 1'},
-                {'BinCode': f'{warehouse_code}-A1-02', 'Description': 'Aisle A, Level 1, Position 2'},
-                {'BinCode': f'{warehouse_code}-A2-01', 'Description': 'Aisle A, Level 2, Position 1'},
-                {'BinCode': f'{warehouse_code}-B1-01', 'Description': 'Aisle B, Level 1, Position 1'},
-                {'BinCode': f'{warehouse_code}-B1-02', 'Description': 'Aisle B, Level 1, Position 2'},
+
             ]
         
         return jsonify({'bins': bins})
@@ -3713,11 +3730,7 @@ def get_bins_api():
         logging.error(f"Error fetching bins: {str(e)}")
         # Return fallback bins for error cases
         fallback_bins = [
-            {'BinCode': f'{warehouse_code}-A1-01', 'Description': 'Aisle A, Level 1, Position 1'},
-            {'BinCode': f'{warehouse_code}-A1-02', 'Description': 'Aisle A, Level 1, Position 2'},
-            {'BinCode': f'{warehouse_code}-A2-01', 'Description': 'Aisle A, Level 2, Position 1'},
-            {'BinCode': f'{warehouse_code}-B1-01', 'Description': 'Aisle B, Level 1, Position 1'},
-            {'BinCode': f'{warehouse_code}-B1-02', 'Description': 'Aisle B, Level 1, Position 2'},
+
         ]
         return jsonify({'bins': fallback_bins})
 

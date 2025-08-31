@@ -8,30 +8,30 @@
         <h1>Welcome, {{ current_user.first_name }}!</h1>
         <p class="text-muted">{{ current_user.role|title }} </p>
     </div>
-    <div class="col-4 text-right">
-        <!-- Notification Dashboard -->
-        <div id="notification-panel" class="alert alert-info" style="display: none;">
-            <div class="d-flex align-items-center">
-                <i data-feather="bell" class="me-2" style="width: 24px; height: 24px;"></i>
-                <div>
-                    <strong>Pending Approvals</strong>
-                    <div id="notification-message" class="small"></div>
-                    <div class="small text-muted" id="notification-details"></div>
-                </div>
-                <button class="btn btn-sm btn-primary ms-auto" onclick="window.location.href='/qc_dashboard'">
-                    View QC Dashboard
-                </button>
-            </div>
-        </div>
-        
-        <!-- Notification Badge (shown when collapsed) -->
-        <div id="notification-badge" class="position-relative d-inline-block" style="cursor: pointer;" onclick="toggleNotificationPanel()">
-            <i data-feather="bell" style="width: 32px; height: 32px; color: #007bff;"></i>
-            <span id="notification-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
-                0
-            </span>
-        </div>
-    </div>
+<!--    <div class="col-4 text-right">-->
+<!--        &lt;!&ndash; Notification Dashboard &ndash;&gt;-->
+<!--        <div id="notification-panel" class="alert alert-info" style="display: none;">-->
+<!--            <div class="d-flex align-items-center">-->
+<!--                <i data-feather="bell" class="me-2" style="width: 24px; height: 24px;"></i>-->
+<!--                <div>-->
+<!--                    <strong>Pending Approvals</strong>-->
+<!--                    <div id="notification-message" class="small"></div>-->
+<!--                    <div class="small text-muted" id="notification-details"></div>-->
+<!--                </div>-->
+<!--                <button class="btn btn-sm btn-primary ms-auto" onclick="window.location.href='/qc_dashboard'">-->
+<!--                    View QC Dashboard-->
+<!--                </button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        -->
+<!--        &lt;!&ndash; Notification Badge (shown when collapsed) &ndash;&gt;-->
+<!--        <div id="notification-badge" class="position-relative d-inline-block" style="cursor: pointer;" onclick="toggleNotificationPanel()">-->
+<!--            <i data-feather="bell" style="width: 32px; height: 32px; color: #007bff;"></i>-->
+<!--            <span id="notification-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">-->
+<!--                0-->
+<!--            </span>-->
+<!--        </div>-->
+<!--    </div>-->
 </div>
 
 <!-- Statistics Cards -->
