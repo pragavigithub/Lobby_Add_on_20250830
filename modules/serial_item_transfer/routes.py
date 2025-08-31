@@ -617,6 +617,7 @@ def add_multiple_serials(transfer_id):
 @login_required
 def post_to_sap(transfer_id):
     """Post approved Serial Item Transfer to SAP B1 as Stock Transfer"""
+    sap = SAPIntegration()
     try:
         transfer = SerialItemTransfer.query.get_or_404(transfer_id)
 
@@ -647,6 +648,35 @@ def post_to_sap(transfer_id):
         }
 
         # Group items by ItemCode for line consolidation
+        # item_groups = {}
+        # for item in transfer.items:
+        #
+        #     if item.qc_status == 'approved' and item.validation_status == 'validated':
+        #         if item.item_code not in item_groups:
+        #             item_groups[item.item_code] = {
+        #                 'item_code': item.item_code,
+        #                 'item_description': item.item_description,
+        #                 'serials': [],
+        #                 'quantity': 0
+        #             }
+        #             # 🔑 Get SystemNumber from SAP
+        #             system_number = get_system_number_from_sap(sap,item.serial_number)
+        #
+        #             print(f"sap_transfer_data (repr) --> {repr(system_number)}")
+        #         item_groups[item.item_code]['serials'].append({
+        #             "SystemSerialNumber": system_number,
+        #             "InternalSerialNumber": item.serial_number,
+        #             "ManufacturerSerialNumber": item.serial_number,
+        #             # "ExpiryDate": None,
+        #             # "ManufactureDate": None,
+        #             # "ReceptionDate": None,
+        #             # "WarrantyStart": None,
+        #             # "WarrantyEnd": None,
+        #             "Location": None,
+        #             "Notes": None
+        #         })
+        #         item_groups[item.item_code]['quantity'] += 1
+        # Group items by ItemCode for line consolidation
         item_groups = {}
         for item in transfer.items:
             if item.qc_status == 'approved' and item.validation_status == 'validated':
@@ -658,15 +688,14 @@ def post_to_sap(transfer_id):
                         'quantity': 0
                     }
 
+                # 🔑 Fetch SystemNumber for *each serial individually*
+                system_number = get_system_number_from_sap(sap, item.serial_number)
+                print(f"Serial: {item.serial_number} -> SystemNumber: {system_number}")
+
                 item_groups[item.item_code]['serials'].append({
-                    "SystemSerialNumber": 0,
+                    "SystemSerialNumber": system_number,
                     "InternalSerialNumber": item.serial_number,
                     "ManufacturerSerialNumber": item.serial_number,
-                    "ExpiryDate": None,
-                    "ManufactureDate": None,
-                    "ReceptionDate": None,
-                    "WarrantyStart": None,
-                    "WarrantyEnd": None,
                     "Location": None,
                     "Notes": None
                 })
@@ -687,10 +716,10 @@ def post_to_sap(transfer_id):
             line_num += 1
 
         # Post to SAP B1
-        sap = SAPIntegration()
+
         if not sap.ensure_logged_in():
             return jsonify({'success': False, 'error': 'SAP B1 connection failed'}), 500
-
+        print(f"sap_transfer_data (repr) --> {repr(sap_transfer_data)}")
         # Post directly to SAP B1 StockTransfers endpoint
         try:
             url = f"{sap.base_url}/b1s/v1/StockTransfers"
@@ -738,15 +767,16 @@ def post_to_sap(transfer_id):
             transfer.status = 'rejected'
             transfer.qc_notes = f"SAP B1 posting failed: {sap_result.get('error', 'Unknown error')}. Document rejected for editing."
             transfer.updated_at = datetime.utcnow()
-            
+
             # Reset QC approval to allow re-editing
             for item in transfer.items:
                 item.qc_status = 'pending'
                 item.updated_at = datetime.utcnow()
-            
+
             db.session.commit()
-            
-            logging.error(f"SAP B1 posting failed for transfer {transfer_id}: {sap_result.get('error')} - Document rejected for editing")
+
+            logging.error(
+                f"SAP B1 posting failed for transfer {transfer_id}: {sap_result.get('error')} - Document rejected for editing")
             return jsonify({
                 'success': False,
                 'error': f'SAP B1 posting failed: {sap_result.get("error", "Unknown error")}. Document has been rejected and sent back for editing.',
@@ -758,3 +788,29 @@ def post_to_sap(transfer_id):
         logging.error(f"Error posting serial item transfer to SAP: {str(e)}")
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# Helper: get SystemNumber from SAP for a serial
+def get_system_number_from_sap(sap,serial_number):
+    try:
+        if not sap.ensure_logged_in():
+            return jsonify({'success': False, 'error': 'SAP B1 connection failed'}), 500
+        url = f"{sap.base_url}/b1s/v1/SerialNumberDetails"
+        params = {
+            "$select": "SystemNumber",
+            "$filter": f"SerialNumber eq '{serial_number}'"
+        }
+        response = sap.session.get(url, params=params, timeout=15)
+        print(response)
+        if response.status_code == 200:
+            data = response.json()
+            print(data)
+            logging.info(f"SAP response for {serial_number}: {data}")  # 👈 log full JSON
+            if "value" in data and len(data["value"]) > 0:
+                return data["value"][0].get("SystemNumber", 0)   # 👈 safe get
+        else:
+            logging.error(f"SAP error {response.status_code}: {response.text}")
+        return 0
+    except Exception as e:
+        logging.error(f"Error fetching SystemNumber for {serial_number}: {str(e)}")
+        return 0

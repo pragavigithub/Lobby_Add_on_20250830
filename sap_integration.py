@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 import urllib.parse
 import urllib3
+from flask import jsonify
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -77,25 +78,25 @@ class SAPIntegration:
         """
         if not self.login():
             return None
-        
+
         try:
             headers = {
                 'Cookie': f'B1SESSION={self.session_id}',
                 'Content-Type': 'application/json',
                 'Prefer': 'odata.maxpagesize=0'
             }
-            
+
             url = f"{self.base_url}/b1s/v1/BusinessPartners?$select=CardCode,CardName"
-            
+
             response = requests.get(url, headers=headers, verify=False, timeout=30)
             response.raise_for_status()
-            
+
             data = response.json()
             business_partners = data.get('value', [])
-            
+
             logging.info(f"✅ Retrieved {len(business_partners)} business partners from SAP B1")
             return business_partners
-            
+
         except Exception as e:
             logging.error(f"❌ Failed to get business partners: {e}")
             return None
@@ -296,7 +297,7 @@ class SAPIntegration:
 
         try:
             logging.info(f"🔍 Enhanced bin scanning for: {bin_code}")
-            
+
             # Step 1: Get bin information using your exact API pattern
             bin_info_url = f"{self.base_url}/b1s/v1/BinLocations?$filter=BinCode eq '{bin_code}'"
             logging.debug(f"[DEBUG] Calling URL: {bin_info_url}")
@@ -325,7 +326,7 @@ class SAPIntegration:
             logging.debug(f"[DEBUG] Calling URL: {warehouse_info_url}")
             warehouse_response = self.session.get(warehouse_info_url)
             logging.debug(f"[DEBUG] Status code: {warehouse_response.status_code}")
-            
+
             business_place_id = 0
             if warehouse_response.status_code == 200:
                 warehouse_data = warehouse_response.json().get('value', [])
@@ -353,27 +354,27 @@ class SAPIntegration:
             # Step 4: Process crossjoin results and enhance with batch details
             formatted_items = []
             crossjoin_data = crossjoin_response.json().get('value', [])
-            
+
             logging.info(f"📦 Found {len(crossjoin_data)} items in warehouse {warehouse_code}")
 
             for item_data in crossjoin_data:
                 try:
                     item_info = item_data.get('Items', {})
                     warehouse_info = item_data.get('Items/ItemWarehouseInfoCollection', {})
-                    
+
                     item_code = item_info.get('ItemCode', '')
                     if not item_code:
                         continue
 
                     # Step 5: Get batch details for this item using your exact API pattern
                     batch_details = self._get_item_batch_details(item_code)
-                    
+
                     # Skip items with zero InStock quantity
                     in_stock_qty = float(warehouse_info.get('InStock', 0))
                     if in_stock_qty <= 0:
                         logging.debug(f"⏭️ Skipping item {item_code} - InStock quantity is {in_stock_qty}")
                         continue
-                    
+
                     # Create enhanced item record with all details
                     enhanced_item = {
                         'ItemCode': item_code,
@@ -425,7 +426,7 @@ class SAPIntegration:
                     enhanced_item['ItemDescription'] = enhanced_item['ItemName']
 
                     formatted_items.append(enhanced_item)
-                    
+
                     logging.debug(f"✅ Enhanced item: {item_code} - OnHand: {enhanced_item['OnHand']}, Batches: {enhanced_item['BatchCount']}")
 
                 except Exception as item_error:
@@ -444,7 +445,7 @@ class SAPIntegration:
         try:
             batch_url = f"{self.base_url}/b1s/v1/BatchNumberDetails?$filter=ItemCode eq '{item_code}'"
             logging.debug(f"[DEBUG] Getting batch details for {item_code}")
-            
+
             batch_response = self.session.get(batch_url)
             if batch_response.status_code == 200:
                 batch_data = batch_response.json().get('value', [])
@@ -453,7 +454,7 @@ class SAPIntegration:
             else:
                 logging.debug(f"⚠️ No batch details found for item {item_code}")
                 return []
-                
+
         except Exception as e:
             logging.error(f"❌ Error getting batch details for {item_code}: {str(e)}")
             return []
@@ -607,25 +608,25 @@ class SAPIntegration:
                 login_result = self.login()
                 if not login_result:
                     return {'success': False, 'error': 'SAP B1 login failed'}
-            
+
             # Use the exact API endpoint you provided
             url = f"{self.base_url}/BatchNumberDetails"
             params = {
                 '$filter': f"ItemCode eq '{item_code}'"
             }
-            
+
             headers = {
                 'Content-Type': 'application/json',
                 'Cookie': f'B1SESSION={self.session_id}'
             }
-            
+
             logging.info(f"🔍 Fetching batch details for item {item_code} from SAP B1")
             response = requests.get(url, headers=headers, params=params, verify=False, timeout=30)
-            
+
             if response.status_code == 200:
                 data = response.json()
                 batches = data.get('value', [])
-                
+
                 logging.info(f"✅ Found {len(batches)} batches for item {item_code}")
                 return {
                     'success': True,
@@ -634,7 +635,7 @@ class SAPIntegration:
             else:
                 logging.error(f"❌ Error fetching batch details: {response.status_code} - {response.text}")
                 return {'success': False, 'error': f'HTTP {response.status_code}'}
-                
+
         except Exception as e:
             logging.error(f"Error getting batch number details: {str(e)}")
             return {'success': False, 'error': str(e)}
@@ -778,7 +779,7 @@ class SAPIntegration:
             # Check cache first
             if bin_abs_entry in self._bin_location_cache:
                 return self._bin_location_cache[bin_abs_entry]
-            
+
             if not self.ensure_logged_in():
                 logging.warning("⚠️ SAP B1 not available, returning mock bin location")
                 mock_data = {
@@ -786,16 +787,16 @@ class SAPIntegration:
                 }
                 self._bin_location_cache[bin_abs_entry] = mock_data
                 return mock_data
-            
+
             # Use the exact API URL format from user's request
             url = f"{self.base_url}/b1s/v1/BinLocations?$select=BinCode,Warehouse&$filter=AbsEntry eq {bin_abs_entry}"
-            
+
             response = self.session.get(url, timeout=30)
-            
+
             if response.status_code == 200:
                 data = response.json()
                 bin_locations = data.get('value', [])
-                
+
                 if bin_locations:
                     bin_location = bin_locations[0]
                     result = {
@@ -803,7 +804,7 @@ class SAPIntegration:
                         'BinCode': bin_location.get('BinCode', ''),
                         'AbsEntry': bin_abs_entry
                     }
-                    
+
                     # Cache the result
                     self._bin_location_cache[bin_abs_entry] = result
                     logging.info(f"✅ Found bin location: {result['Warehouse']} - {result['BinCode']}")
@@ -822,7 +823,7 @@ class SAPIntegration:
                     'BinCode': f'Bin-{bin_abs_entry}',
                     'AbsEntry': bin_abs_entry
                 }
-                
+
         except Exception as e:
             logging.error(f"❌ Error getting bin location details: {str(e)}")
             return {
@@ -830,13 +831,13 @@ class SAPIntegration:
                 'BinCode': f'Bin-{bin_abs_entry}',
                 'AbsEntry': bin_abs_entry
             }
-    
+
     def enhance_pick_list_with_bin_details(self, pick_list_data):
         """Enhance pick list data with bin location details (Warehouse and BinCode)"""
         try:
             if not pick_list_data or 'PickListsLines' not in pick_list_data:
                 return pick_list_data
-            
+
             for line in pick_list_data['PickListsLines']:
                 if 'DocumentLinesBinAllocations' in line and line['DocumentLinesBinAllocations']:
                     for bin_allocation in line['DocumentLinesBinAllocations']:
@@ -846,9 +847,9 @@ class SAPIntegration:
                             # Add warehouse and bin code to the bin allocation
                             bin_allocation['Warehouse'] = bin_details.get('Warehouse', 'Unknown')
                             bin_allocation['BinCode'] = bin_details.get('BinCode', f'Bin-{bin_abs_entry}')
-            
+
             return pick_list_data
-            
+
         except Exception as e:
             logging.error(f"❌ Error enhancing pick list with bin details: {str(e)}")
             return pick_list_data
@@ -1164,7 +1165,7 @@ class SAPIntegration:
         try:
             # Build filter parameters - focus on ps_released, avoid ps_closed
             filters = []
-            
+
             # Default to filtering out ps_closed status unless specifically requested
             if status_filter:
                 if status_filter != 'ps_Closed':
@@ -1172,24 +1173,24 @@ class SAPIntegration:
             else:
                 # Default: avoid ps_closed items, prefer ps_released
                 filters.append(f"Status ne 'ps_Closed'")
-            
+
             if date_filter:
                 filters.append(f"PickDate ge '{date_filter}'")
-            
+
             filter_clause = " and ".join(filters) if filters else ""
-            
+
             # Construct URL with OData parameters
             url = f"{self.base_url}/b1s/v1/PickLists"
             if filter_clause:
                 url += f"?$filter={filter_clause}"
-            
+
             logging.info(f"🔍 Fetching pick lists from SAP B1 (avoiding ps_closed): {url}")
             response = self.session.get(url)
-            
+
             if response.status_code == 200:
                 data = response.json()
                 pick_lists = data.get('value', [])
-                
+
                 # Additional filtering for ps_released line items
                 filtered_pick_lists = []
                 for pick_list in pick_lists:
@@ -1200,11 +1201,11 @@ class SAPIntegration:
                         if line.get('PickStatus') == 'ps_Released':
                             has_released_items = True
                             break
-                    
+
                     # Only include pick lists that have ps_released items
                     if has_released_items or not pick_list_lines:  # Include empty pick lists too
                         filtered_pick_lists.append(pick_list)
-                
+
                 logging.info(f"✅ Found {len(filtered_pick_lists)} pick lists with ps_released items (filtered from {len(pick_lists)} total)")
                 return {
                     'success': True,
@@ -1214,7 +1215,7 @@ class SAPIntegration:
             else:
                 logging.error(f"❌ Error fetching pick lists: {response.status_code} - {response.text}")
                 return {'success': False, 'error': f'HTTP {response.status_code}'}
-                
+
         except Exception as e:
             logging.error(f"Error getting pick lists from SAP B1: {str(e)}")
             return {'success': False, 'error': str(e)}
@@ -1229,7 +1230,7 @@ class SAPIntegration:
                 mock_pick_list = {
 
                     }
-                
+
                 # Return enhanced mock data
                 return {
                     'success': True,
@@ -1240,9 +1241,9 @@ class SAPIntegration:
         try:
             url = f"{self.base_url}/b1s/v1/PickLists?$filter=Absoluteentry eq {absolute_entry}"
             logging.info(f"🔍 Fetching pick list {absolute_entry} from SAP B1: {url}")
-            
+
             response = self.session.get(url)
-            
+
             if response.status_code == 200:
                 data = response.json()
                 pick_lists = data.get('value', [])
@@ -1260,7 +1261,7 @@ class SAPIntegration:
             else:
                 logging.error(f"❌ Error fetching pick list: {response.status_code} - {response.text}")
                 return {'success': False, 'error': f'HTTP {response.status_code}'}
-                
+
         except Exception as e:
             logging.error(f"Error getting pick list {absolute_entry} from SAP B1: {str(e)}")
             return {'success': False, 'error': str(e)}
@@ -1276,14 +1277,14 @@ class SAPIntegration:
             pick_list_result = self.get_pick_list_by_id(absolute_entry)
             if not pick_list_result['success']:
                 return pick_list_result
-            
+
             pick_list = pick_list_result['pick_list']
-            
+
             # Build update payload
             update_data = {
                 'Status': new_status
             }
-            
+
             # Update line quantities if provided
             if picked_quantities:
                 lines = pick_list.get('PickListsLines', [])
@@ -1292,19 +1293,19 @@ class SAPIntegration:
                     if line_number in picked_quantities:
                         line['PickedQuantity'] = picked_quantities[line_number]
                         line['PickStatus'] = new_status
-                
+
                 update_data['PickListsLines'] = lines
-            
+
             url = f"{self.base_url}/b1s/v1/PickLists({absolute_entry})"
             response = self.session.patch(url, json=update_data)
-            
+
             if response.status_code == 204:
                 logging.info(f"✅ Pick list {absolute_entry} updated successfully")
                 return {'success': True}
             else:
                 logging.error(f"❌ Error updating pick list: {response.status_code} - {response.text}")
                 return {'success': False, 'error': f'HTTP {response.status_code}'}
-                
+
         except Exception as e:
             logging.error(f"Error updating pick list {absolute_entry}: {str(e)}")
             return {'success': False, 'error': str(e)}
@@ -1323,33 +1324,33 @@ class SAPIntegration:
         from app import db
         from models import PickListLine, PickListBinAllocation
         import json
-        
+
         try:
             # Clear existing lines and bin allocations - Fix for SQLAlchemy join delete issue
             # First get the IDs of bin allocations to delete
             pick_list_line_ids = [line.id for line in PickListLine.query.filter_by(pick_list_id=local_pick_list.id).all()]
-            
+
             if pick_list_line_ids:
                 # Delete bin allocations first (foreign key dependency)
                 PickListBinAllocation.query.filter(PickListBinAllocation.pick_list_line_id.in_(pick_list_line_ids)).delete(synchronize_session=False)
-                
+
                 # Then delete pick list lines
                 PickListLine.query.filter_by(pick_list_id=local_pick_list.id).delete(synchronize_session=False)
-            
+
             # Sync PickListsLines from SAP B1 - Focus on ps_released, avoid ps_closed
             sap_lines = sap_pick_list.get('PickListsLines', [])
             for sap_line in sap_lines:
                 pick_status = sap_line.get('PickStatus', 'ps_Open')
-                
+
                 # Skip ps_closed items - only sync ps_released and other active statuses
                 if pick_status == 'ps_Closed':
                     logging.info(f"⏭️ Skipping ps_Closed line item {sap_line.get('LineNumber', 0)}")
                     continue
-                
+
                 # Prefer ps_released items
                 if pick_status == 'ps_Released':
                     logging.info(f"✅ Syncing ps_Released line item {sap_line.get('LineNumber', 0)}")
-                
+
                 # Create PickListLine
                 pick_list_line = PickListLine()
                 pick_list_line.pick_list_id = local_pick_list.id
@@ -1366,7 +1367,7 @@ class SAPIntegration:
                 pick_list_line.batch_numbers = json.dumps(sap_line.get('BatchNumbers', []))
                 db.session.add(pick_list_line)
                 db.session.flush()  # Get the ID
-                
+
                 # Sync DocumentLinesBinAllocations
                 bin_allocations = sap_line.get('DocumentLinesBinAllocations', [])
                 for bin_allocation in bin_allocations:
@@ -1378,18 +1379,18 @@ class SAPIntegration:
                     pick_list_bin_allocation.serial_and_batch_numbers_base_line = bin_allocation.get('SerialAndBatchNumbersBaseLine', 0)
                     pick_list_bin_allocation.base_line_number = bin_allocation.get('BaseLineNumber')
                     db.session.add(pick_list_bin_allocation)
-            
+
             # Update pick list totals
             total_lines = len(sap_lines)
             picked_lines = len([line for line in sap_lines if line.get('PickStatus') == 'ps_Closed'])
-            
+
             local_pick_list.total_items = total_lines
             local_pick_list.picked_items = picked_lines
-            
+
             db.session.commit()
             logging.info(f"✅ Synced {total_lines} lines and bin allocations for pick list {local_pick_list.absolute_entry}")
             return {'success': True, 'synced_lines': total_lines}
-            
+
         except Exception as e:
             db.session.rollback()
             logging.error(f"❌ Error syncing pick list to local DB: {str(e)}")
@@ -1772,7 +1773,7 @@ class SAPIntegration:
         try:
             # Build the PATCH URL with the absolute entry
             url = f"{self.base_url}/b1s/v1/PickLists({absolute_entry})"
-            
+
             # Prepare the JSON payload with exact structure from user's example
             payload = {
                 "Absoluteentry": absolute_entry,
@@ -1786,7 +1787,7 @@ class SAPIntegration:
                 "UseBaseUnits": pick_list_data.get('use_base_units', 'tNO'),
                 "PickListsLines": []
             }
-            
+
             # Add pick list lines with picked status
             if pick_list_data.get('lines'):
                 for line in pick_list_data['lines']:
@@ -1805,13 +1806,13 @@ class SAPIntegration:
                         "DocumentLinesBinAllocations": []
                     }
                     payload["PickListsLines"].append(line_data)
-            
+
             # Execute PATCH request to SAP B1
             logging.info(f"Sending PATCH request to {url}")
             logging.info(f"Payload: {json.dumps(payload, indent=2)}")
-            
+
             response = self.session.patch(url, json=payload, timeout=30)
-            
+
             if response.status_code == 204:
                 # SAP B1 returns 204 No Content for successful PATCH
                 logging.info(f"Successfully marked pick list {absolute_entry} as picked in SAP B1")
@@ -1828,7 +1829,7 @@ class SAPIntegration:
                     'error': error_msg,
                     'sap_response': response.text
                 }
-                
+
         except Exception as e:
             error_msg = f"Error updating pick list status in SAP B1: {str(e)}"
             logging.error(error_msg)
@@ -1850,12 +1851,12 @@ class SAPIntegration:
         try:
             # Build the PATCH URL with the absolute entry
             url = f"{self.base_url}/b1s/v1/PickLists({absolute_entry})"
-            
+
             # Get original pick list data
             sap_pick_list = line_pick_data.get('sap_pick_list', {})
             target_line_number = line_pick_data.get('line_number')
             picked_quantity = line_pick_data.get('picked_quantity', 0)
-            
+
             # Prepare the JSON payload with exact structure, updating only the target line
             payload = {
                 "Absoluteentry": absolute_entry,
@@ -1868,11 +1869,11 @@ class SAPIntegration:
                 "UseBaseUnits": sap_pick_list.get('UseBaseUnits', 'tNO'),
                 "PickListsLines": []
             }
-            
+
             # Calculate overall pick list status
             all_lines_picked = True
             any_line_picked = False
-            
+
             # Add all pick list lines, updating the target line
             for line in sap_pick_list.get('PickListsLines', []):
                 line_data = {
@@ -1885,7 +1886,7 @@ class SAPIntegration:
                     "BatchNumbers": [],
                     "DocumentLinesBinAllocations": []
                 }
-                
+
                 # Update the target line
                 if line.get('LineNumber') == target_line_number:
                     line_data["PickedQuantity"] = float(picked_quantity)
@@ -1899,15 +1900,15 @@ class SAPIntegration:
                     line_data["PickStatus"] = line.get('PickStatus', 'ps_Released')
                     line_data["ReleasedQuantity"] = float(line.get('ReleasedQuantity', 0))
                     line_data["PreviouslyReleasedQuantity"] = float(line.get('PreviouslyReleasedQuantity', 0))
-                    
+
                     # Check if this line is picked
                     if line.get('PickStatus') == 'ps_Picked':
                         any_line_picked = True
                     elif line.get('PickStatus') != 'ps_Picked':
                         all_lines_picked = False
-                
+
                 payload["PickListsLines"].append(line_data)
-            
+
             # Determine overall pick list status
             if all_lines_picked and any_line_picked:
                 payload["Status"] = "ps_Picked"
@@ -1915,13 +1916,13 @@ class SAPIntegration:
                 payload["Status"] = "ps_PartiallyPicked"
             else:
                 payload["Status"] = sap_pick_list.get('Status', 'ps_Open')
-            
+
             # Execute PATCH request to SAP B1
             logging.info(f"Sending PATCH request to {url} for line {target_line_number}")
             logging.info(f"Payload: {json.dumps(payload, indent=2)}")
-            
+
             response = self.session.patch(url, json=payload, timeout=30)
-            
+
             if response.status_code == 204:
                 # SAP B1 returns 204 No Content for successful PATCH
                 logging.info(f"Successfully marked pick list line {target_line_number} as picked in SAP B1")
@@ -1939,7 +1940,7 @@ class SAPIntegration:
                     'error': error_msg,
                     'sap_response': response.text
                 }
-                
+
         except Exception as e:
             error_msg = f"Error updating pick list line status in SAP B1: {str(e)}"
             logging.error(error_msg)
@@ -2296,13 +2297,13 @@ class SAPIntegration:
         try:
             url = f"{self.base_url}/b1s/v1/Orders?$filter=DocEntry eq {doc_entry}"
             logging.info(f"🔍 Fetching Sales Order DocEntry={doc_entry}: {url}")
-            
+
             response = self.session.get(url)
-            
+
             if response.status_code == 200:
                 data = response.json()
                 orders = data.get('value', [])
-                
+
                 if orders:
                     order = orders[0]
                     logging.info(f"✅ Found Sales Order DocEntry={doc_entry}: {order.get('CardCode')} - {order.get('CardName')}")
@@ -2316,7 +2317,7 @@ class SAPIntegration:
             else:
                 logging.error(f"❌ Error fetching Sales Order: {response.status_code} - {response.text}")
                 return {'success': False, 'error': f'HTTP {response.status_code}'}
-                
+
         except Exception as e:
             logging.error(f"Error getting Sales Order {doc_entry} from SAP B1: {str(e)}")
             return {'success': False, 'error': str(e)}
@@ -2336,23 +2337,23 @@ class SAPIntegration:
             from app import db
             from models import SalesOrder, SalesOrderLine
             from datetime import datetime
-            
+
             doc_entry = order_data.get('DocEntry')
             if not doc_entry:
                 return {'success': False, 'error': 'Missing DocEntry'}
-            
+
             # Check if Sales Order already exists
             sales_order = SalesOrder.query.filter_by(doc_entry=doc_entry).first()
-            
+
             if not sales_order:
                 sales_order = SalesOrder()
                 db.session.add(sales_order)
-            
+
             # Update Sales Order fields
             sales_order.doc_entry = doc_entry
             sales_order.doc_num = order_data.get('DocNum')
             sales_order.doc_type = order_data.get('DocType')
-            
+
             # Parse dates
             doc_date = order_data.get('DocDate')
             if doc_date:
@@ -2360,14 +2361,14 @@ class SAPIntegration:
                     sales_order.doc_date = datetime.fromisoformat(doc_date.replace('Z', '+00:00'))
                 else:
                     sales_order.doc_date = doc_date
-            
+
             doc_due_date = order_data.get('DocDueDate')
             if doc_due_date:
                 if isinstance(doc_due_date, str):
                     sales_order.doc_due_date = datetime.fromisoformat(doc_due_date.replace('Z', '+00:00'))
                 else:
                     sales_order.doc_due_date = doc_due_date
-            
+
             sales_order.card_code = order_data.get('CardCode')
             sales_order.card_name = order_data.get('CardName')
             sales_order.address = order_data.get('Address')
@@ -2376,29 +2377,29 @@ class SAPIntegration:
             sales_order.comments = order_data.get('Comments')
             sales_order.document_status = order_data.get('DocumentStatus')
             sales_order.last_sap_sync = datetime.utcnow()
-            
+
             db.session.flush()  # Get the ID
-            
+
             # Sync Sales Order Lines
             lines_synced = 0
             document_lines = order_data.get('DocumentLines', [])
-            
+
             for line_data in document_lines:
                 line_num = line_data.get('LineNum')
                 if line_num is None:
                     continue
-                    
+
                 # Check if line already exists
                 order_line = SalesOrderLine.query.filter_by(
                     sales_order_id=sales_order.id,
                     line_num=line_num
                 ).first()
-                
+
                 if not order_line:
                     order_line = SalesOrderLine()
                     order_line.sales_order_id = sales_order.id
                     db.session.add(order_line)
-                
+
                 # Update line fields
                 order_line.line_num = line_num
                 order_line.item_code = line_data.get('ItemCode')
@@ -2411,18 +2412,18 @@ class SAPIntegration:
                 order_line.warehouse_code = line_data.get('WarehouseCode')
                 order_line.unit_of_measure = line_data.get('UoMCode')
                 order_line.line_status = line_data.get('LineStatus')
-                
+
                 lines_synced += 1
-            
+
             db.session.commit()
-            
+
             logging.info(f"✅ Synced Sales Order {doc_entry} with {lines_synced} lines")
             return {
                 'success': True,
                 'sales_order_id': sales_order.id,
                 'lines_synced': lines_synced
             }
-            
+
         except Exception as e:
             db.session.rollback()
             logging.error(f"Error syncing Sales Order to local DB: {str(e)}")
@@ -2431,21 +2432,21 @@ class SAPIntegration:
     def enhance_picklist_with_sales_order_data(self, picklist_lines):
         """Enhance picklist lines with Sales Order item details"""
         enhanced_lines = []
-        
+
         try:
             from app import db
             from models import SalesOrder, SalesOrderLine
-            
+
             for line in picklist_lines:
                 enhanced_line = line.copy()
-                
+
                 order_entry = line.get('OrderEntry')
                 order_row_id = line.get('OrderRowID')
-                
+
                 if order_entry and order_row_id is not None:
                     # First try to get from local database
                     sales_order = SalesOrder.query.filter_by(doc_entry=order_entry).first()
-                    
+
                     if not sales_order:
                         # Fetch from SAP B1 and sync to local
                         sap_result = self.get_sales_order_by_doc_entry(order_entry)
@@ -2453,14 +2454,14 @@ class SAPIntegration:
                             sync_result = self.sync_sales_order_to_local_db(sap_result['sales_order'])
                             if sync_result.get('success'):
                                 sales_order = SalesOrder.query.filter_by(doc_entry=order_entry).first()
-                    
+
                     if sales_order:
                         # Get the specific line based on OrderRowID (which corresponds to LineNum)
                         order_line = SalesOrderLine.query.filter_by(
                             sales_order_id=sales_order.id,
                             line_num=order_row_id
                         ).first()
-                        
+
                         if order_line:
                             # Enhance the picklist line with Sales Order data directly on the line object
                             enhanced_line.update({
@@ -2476,7 +2477,7 @@ class SAPIntegration:
                                 'UnitPrice': order_line.unit_price,
                                 'LineTotal': order_line.line_total
                             })
-                            
+
                             logging.info(f"✅ Enhanced picklist line {line.get('LineNumber')} with Sales Order data: {order_line.item_code}")
                         else:
                             logging.warning(f"⚠️ Sales Order line not found: OrderEntry={order_entry}, OrderRowID={order_row_id}")
@@ -2484,13 +2485,13 @@ class SAPIntegration:
                         logging.warning(f"⚠️ Could not sync Sales Order: OrderEntry={order_entry}")
                 else:
                     logging.debug(f"No OrderEntry or OrderRowID for picklist line {line.get('LineNumber')}")
-                
+
                 enhanced_lines.append(enhanced_line)
-                
+
         except Exception as e:
             logging.error(f"Error enhancing picklist with Sales Order data: {str(e)}")
             return picklist_lines  # Return original lines if enhancement fails
-        
+
         return enhanced_lines
 
     def validate_series_with_warehouse(self, serial_number, item_code, warehouse_code=None):
@@ -2507,11 +2508,11 @@ class SAPIntegration:
                 'valid': False,
                 'error': 'SAP B1 not available'
             }
-        
+
         try:
             # SAP B1 API endpoint for SQL Queries
             api_url = f"{self.base_url}/b1s/v1/SQLQueries('Series_Validation')/List"
-            
+
             # Request body with ParamList - include warehouse code if provided
             if warehouse_code:
                 payload = {
@@ -2521,13 +2522,13 @@ class SAPIntegration:
                 payload = {
                     "ParamList": f"series='{serial_number}'&itemCode='{item_code}'"
                 }
-            
+
             # Make API call with existing session
             response = self.session.post(api_url, json=payload, timeout=30)
-            
+
             if response.status_code == 200:
                 data = response.json()
-                
+
                 if data.get('value') and len(data['value']) > 0:
                     # Series found in the specified warehouse
                     series_data = data['value'][0]
@@ -2559,7 +2560,7 @@ class SAPIntegration:
                     'valid': False,
                     'error': f'SAP API error: {response.status_code} - {response.text}'
                 }
-                
+
         except Exception as e:
             logging.error(f"Error validating series with SAP: {str(e)}")
             return {
@@ -2582,33 +2583,33 @@ class SAPIntegration:
         if not self.ensure_logged_in():
             logging.warning("SAP B1 not available, cannot validate batch series")
             return {serial: {'valid': False, 'error': 'SAP B1 not available'} for serial in serial_numbers}
-        
+
         if not serial_numbers:
             return {}
-            
+
         results = {}
         total_serials = len(serial_numbers)
-        
+
         try:
             # Process serials in batches to avoid API limits and improve performance
             for i in range(0, total_serials, batch_size):
                 batch = serial_numbers[i:i+batch_size]
                 batch_results = self._validate_batch_chunk(batch, item_code, warehouse_code)
                 results.update(batch_results)
-                
+
                 # Log progress for large batches
                 if total_serials > 100:
                     processed = min(i + batch_size, total_serials)
                     logging.info(f"📊 Batch validation progress: {processed}/{total_serials} serial numbers processed")
-            
+
             logging.info(f"✅ Completed batch validation for {total_serials} serial numbers")
             return results
-            
+
         except Exception as e:
             logging.error(f"❌ Error in batch series validation: {str(e)}")
             # Return error for all serials if batch fails
             return {serial: {'valid': False, 'error': f'Batch validation error: {str(e)}'} for serial in serial_numbers}
-    
+
     def _validate_batch_chunk(self, serial_batch, item_code, warehouse_code):
         """Validate a chunk of serial numbers using SAP B1 bulk query
         
@@ -2621,7 +2622,7 @@ class SAPIntegration:
             Dict with validation results for each serial in the batch
         """
         results = {}
-        
+
         try:
             # Create SQL query for batch validation
             serial_list = "','".join(serial_batch)
@@ -2635,26 +2636,26 @@ class SAPIntegration:
             WHERE SN.DistNumber IN ('{serial_list}')
             AND SN.ItemCode = '{item_code}'
             """
-            
+
             # Use custom SQL query endpoint
             api_url = f"{self.base_url}/b1s/v1/SQLQueries('Batch_Series_Validation')/List"
-            
+
             payload = {
                 "ParamList": f"sqlQuery={sql_query}"
             }
-            
+
             response = self.session.post(api_url, json=payload, timeout=60)
-            
+
             if response.status_code == 200:
                 data = response.json()
                 found_serials = {item.get('SerialNumber'): item for item in data.get('value', [])}
-                
+
                 # Process each serial in the batch
                 for serial in serial_batch:
                     if serial in found_serials:
                         series_data = found_serials[serial]
                         available_in_warehouse = bool(series_data.get('AvailableInWarehouse', 0))
-                        
+
                         results[serial] = {
                             'valid': True,
                             'DistNumber': series_data.get('SerialNumber'),
@@ -2664,7 +2665,7 @@ class SAPIntegration:
                             'validation_type': 'batch_warehouse_specific' if available_in_warehouse else 'batch_warehouse_unavailable',
                             'message': f'Series {serial} validated in batch'
                         }
-                        
+
                         if not available_in_warehouse:
                             results[serial]['warning'] = f'Series {serial} is not available in warehouse {warehouse_code}'
                     else:
@@ -2684,7 +2685,7 @@ class SAPIntegration:
                         'error': error_msg,
                         'validation_type': 'batch_api_error'
                     }
-                
+
         except Exception as e:
             logging.error(f"❌ Error in batch chunk validation: {str(e)}")
             # Mark all serials in chunk as failed
@@ -2695,7 +2696,7 @@ class SAPIntegration:
                     'error': error_msg,
                     'validation_type': 'batch_exception'
                 }
-        
+
         return results
 
 
@@ -2712,10 +2713,10 @@ class SAPIntegration:
 
         try:
             url = f"{self.base_url}/b1s/v1/StockTransfers"
-            
+
             # Build stock transfer document for serial numbers
             stock_transfer_lines = []
-            
+
             for index, item in enumerate(serial_transfer_document.items):
                 # Create transfer line with serial numbers
                 line = {
@@ -2726,13 +2727,15 @@ class SAPIntegration:
                     "FromWarehouseCode": item.from_warehouse_code,
                     "UoMCode": item.unit_of_measure or ""
                 }
-                
+
                 # Add serial numbers to the line
                 serial_numbers = []
+
                 for serial in item.serial_numbers:
                     if serial.is_validated:  # Only include validated serials
+                        system_number = self.get_system_number_from_sap_get(serial.serial_number)
                         serial_info = {
-                            "SystemSerialNumber": serial.system_serial_number or 0,
+                            "SystemSerialNumber": system_number,
                             "InternalSerialNumber": serial.serial_number,
                             "ManufacturerSerialNumber": serial.serial_number,
                             "ExpiryDate": serial.expiry_date.isoformat() + "Z" if serial.expiry_date else None,
@@ -2744,12 +2747,12 @@ class SAPIntegration:
                             "Notes": None
                         }
                         serial_numbers.append(serial_info)
-                
+
                 if serial_numbers:
                     line["SerialNumbers"] = serial_numbers
-                
+
                 stock_transfer_lines.append(line)
-            
+
             # Build the stock transfer document
             transfer_data = {
                 "DocDate": serial_transfer_document.created_at.strftime('%Y-%m-%d'),
@@ -2768,7 +2771,7 @@ class SAPIntegration:
                 "AuthorizationStatus": "sasWithout",
                 "StockTransferLines": stock_transfer_lines
             }
-            
+
             # Log the payload for debugging
             logging.info("=" * 80)
             logging.info("SERIAL NUMBER STOCK TRANSFER - JSON PAYLOAD")
@@ -2776,15 +2779,15 @@ class SAPIntegration:
             import json
             logging.info(json.dumps(transfer_data, indent=2, default=str))
             logging.info("=" * 80)
-            print(f"transfer_item (repr) --> {repr(transfer_data)}")
+            print(f"transfer_itemTSTAT (repr) --> {repr(transfer_data)}")
             # Submit to SAP B1
             response = self.session.post(url, json=transfer_data)
-            
+
             if response.status_code == 201:
                 result = response.json()
                 doc_num = result.get('DocNum')
                 logging.info(f"✅ Successfully created Serial Number Stock Transfer {doc_num}")
-                
+
                 return {
                     'success': True,
                     'document_number': doc_num,
@@ -2795,27 +2798,51 @@ class SAPIntegration:
                 error_msg = f"SAP B1 error creating Serial Number Stock Transfer: {response.text}"
                 logging.error(error_msg)
                 return {'success': False, 'error': error_msg}
-                
+
         except Exception as e:
             error_msg = f"Error creating Serial Number Stock Transfer in SAP B1: {str(e)}"
             logging.error(error_msg)
             return {'success': False, 'error': error_msg}
 
+    def get_system_number_from_sap_get(self, serial_number):
+        try:
+            if not self.ensure_logged_in():
+                return jsonify({'success': False, 'error': 'SAP B1 connection failed'}), 500
+            url = f"{self.base_url}/b1s/v1/SerialNumberDetails"
+            params = {
+                "$select": "SystemNumber",
+                "$filter": f"SerialNumber eq '{serial_number}'"
+            }
+            response = self.session.get(url, params=params, timeout=15)
+            print(response)
+            if response.status_code == 200:
+                data = response.json()
+                print(data)
+                logging.info(f"SAP response for {serial_number}: {data}")  # 👈 log full JSON
+                if "value" in data and len(data["value"]) > 0:
+                    return data["value"][0].get("SystemNumber", 0)  # 👈 safe get
+            else:
+                logging.error(f"SAP error {response.status_code}: {response.text}")
+            return 0
+        except Exception as e:
+            logging.error(f"Error fetching SystemNumber for {serial_number}: {str(e)}")
+            return 0
+
     def post_inventory_transfer_to_sap(self, transfer_document):
         """Post inventory transfer to SAP B1 as Stock Transfer"""
         try:
             logging.info(f"🚀 Posting Inventory Transfer {transfer_document.id} to SAP B1...")
-            
+
             # Use the existing create_inventory_transfer function
             result = self.create_inventory_transfer(transfer_document)
-            
+
             if result.get('success'):
                 logging.info(f"✅ Inventory Transfer {transfer_document.id} posted successfully to SAP B1")
                 return result
             else:
                 logging.error(f"❌ Failed to post Inventory Transfer {transfer_document.id}: {result.get('error')}")
                 return result
-                
+
         except Exception as e:
             error_msg = f"Error posting inventory transfer to SAP B1: {str(e)}"
             logging.error(error_msg)
@@ -2835,23 +2862,23 @@ class SAPIntegration:
 
             # SAP B1 SQL Query API endpoint as specified
             url = f"{self.base_url}/b1s/v1/SQLQueries('Item_Validation')/List"
-            
+
             # Request body with parameters as specified
             request_body = {
                 "ParamList": f"seriel_number='{serial_number}'&whcode='{warehouse_code}'"
             }
-            
+
             logging.info(f"🔍 Validating serial {serial_number} in warehouse {warehouse_code} via SAP B1 SQL Query")
             logging.info(f"📡 Request URL: {url}")
             logging.info(f"📦 Request Body: {request_body}")
-            
+
             response = self.session.post(url, json=request_body, timeout=30)
             logging.info(f"📡 Response Status: {response.status_code}")
-            
+
             if response.status_code == 200:
                 data = response.json()
                 logging.info(f"📦 SAP B1 Response: {data}")
-                
+
                 # Check if we have results
                 values = data.get('value', [])
                 if values and len(values) > 0:
@@ -2860,13 +2887,13 @@ class SAPIntegration:
                     item_code = result.get('ItemCode', '')
                     dist_number = result.get('DistNumber', '')
                     whs_code = result.get('WhsCode', '')
-                    
+
                     # For item description, we'll need to make another call to get item details
                     item_description = self._get_item_description(item_code)
-                    
+
                     logging.info(f"✅ Serial number {serial_number} validated successfully")
                     logging.info(f"📋 Item Code: {item_code}, Warehouse: {whs_code}")
-                    
+
                     return {
                         'valid': True,
                         'item_code': item_code,
@@ -2892,7 +2919,7 @@ class SAPIntegration:
                     'error': f'SAP B1 API call failed: {response.status_code} - {response.text}',
                     'source': 'sap_b1_error'
                 }
-                
+
         except Exception as e:
             logging.error(f"❌ Error validating serial item: {str(e)}")
             return {
@@ -2908,20 +2935,20 @@ class SAPIntegration:
         try:
             if not item_code:
                 return "Unknown Item"
-                
+
             # Try to get item description from Items master data
             url = f"{self.base_url}/b1s/v1/Items?$filter=ItemCode eq '{item_code}'&$select=ItemCode,ItemName"
             response = self.session.get(url, timeout=10)
-            
+
             if response.status_code == 200:
                 data = response.json()
                 items = data.get('value', [])
                 if items and len(items) > 0:
                     return items[0].get('ItemName', f'Item {item_code}')
-                    
+
         except Exception as e:
             logging.warning(f"⚠️ Could not fetch item description for {item_code}: {str(e)}")
-            
+
         # Fallback to item code if description not found
         return f'Item {item_code}'
 
