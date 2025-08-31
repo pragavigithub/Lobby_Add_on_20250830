@@ -8,7 +8,9 @@ from barcode_generator import BarcodeGenerator
 
 from app import app, db, login_manager
 from models import User, GRPODocument, GRPOItem, InventoryTransfer, InventoryTransferItem, PickList, PickListItem, \
-    InventoryCount, InventoryCountItem, BarcodeLabel, BinScanningLog, DocumentNumberSeries, QRCodeLabel, PickListLine
+    InventoryCount, InventoryCountItem,BarcodeLabel, BinScanningLog, DocumentNumberSeries, QRCodeLabel, PickListLine
+from modules.invoice_creation.models import InvoiceDocument
+
 from sap_integration import SAPIntegration
 from sqlalchemy import or_
 
