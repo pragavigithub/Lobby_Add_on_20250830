@@ -4,9 +4,33 @@
 
 {% block content %}
 <div class="row mb-4">
-    <div class="col-12">
+    <div class="col-8">
         <h1>Welcome, {{ current_user.first_name }}!</h1>
         <p class="text-muted">{{ current_user.role|title }} </p>
+    </div>
+    <div class="col-4 text-right">
+        <!-- Notification Dashboard -->
+        <div id="notification-panel" class="alert alert-info" style="display: none;">
+            <div class="d-flex align-items-center">
+                <i data-feather="bell" class="me-2" style="width: 24px; height: 24px;"></i>
+                <div>
+                    <strong>Pending Approvals</strong>
+                    <div id="notification-message" class="small"></div>
+                    <div class="small text-muted" id="notification-details"></div>
+                </div>
+                <button class="btn btn-sm btn-primary ms-auto" onclick="window.location.href='/qc_dashboard'">
+                    View QC Dashboard
+                </button>
+            </div>
+        </div>
+        
+        <!-- Notification Badge (shown when collapsed) -->
+        <div id="notification-badge" class="position-relative d-inline-block" style="cursor: pointer;" onclick="toggleNotificationPanel()">
+            <i data-feather="bell" style="width: 32px; height: 32px; color: #007bff;"></i>
+            <span id="notification-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+                0
+            </span>
+        </div>
     </div>
 </div>
 
@@ -298,10 +322,81 @@ document.getElementById('quickScanInput').addEventListener('keypress', function(
     }
 });
 
-// Update activity periodically
+// Notification System
+let notificationPanelVisible = false;
+
+function toggleNotificationPanel() {
+    const panel = document.getElementById('notification-panel');
+    const badge = document.getElementById('notification-badge');
+    
+    if (notificationPanelVisible) {
+        panel.style.display = 'none';
+        badge.style.display = 'inline-block';
+        notificationPanelVisible = false;
+    } else {
+        panel.style.display = 'block';
+        badge.style.display = 'none';
+        notificationPanelVisible = true;
+    }
+}
+
+function fetchPendingApprovals() {
+    fetch('/api/notifications/pending-approvals')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.has_pending) {
+                // Show notification badge
+                const badge = document.getElementById('notification-count');
+                const message = document.getElementById('notification-message');
+                const details = document.getElementById('notification-details');
+                
+                badge.textContent = data.total_pending;
+                badge.style.display = 'inline';
+                
+                message.textContent = data.message;
+                
+                // Build details string
+                const detailsArray = [];
+                if (data.details.invoices > 0) {
+                    detailsArray.push(`${data.details.invoices} Invoice${data.details.invoices > 1 ? 's' : ''}`);
+                }
+                if (data.details.inventory_transfers > 0) {
+                    detailsArray.push(`${data.details.inventory_transfers} Transfer${data.details.inventory_transfers > 1 ? 's' : ''}`);
+                }
+                if (data.details.grpos > 0) {
+                    detailsArray.push(`${data.details.grpos} GRPO${data.details.grpos > 1 ? 's' : ''}`);
+                }
+                if (data.details.serial_transfers > 0) {
+                    detailsArray.push(`${data.details.serial_transfers} Serial Transfer${data.details.serial_transfers > 1 ? 's' : ''}`);
+                }
+                if (data.details.serial_item_transfers > 0) {
+                    detailsArray.push(`${data.details.serial_item_transfers} Serial Item${data.details.serial_item_transfers > 1 ? 's' : ''}`);
+                }
+                
+                details.textContent = detailsArray.join(', ');
+                
+                console.log('Pending approvals:', data.total_pending);
+            } else {
+                // Hide notification badge
+                const badge = document.getElementById('notification-count');
+                badge.style.display = 'none';
+                console.log('No pending approvals');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching notifications:', error);
+        });
+}
+
+// Load notifications on page load
+document.addEventListener('DOMContentLoaded', function() {
+    fetchPendingApprovals();
+});
+
+// Update notifications periodically
 setInterval(function() {
-    // This could fetch real-time updates from the server
-    console.log('Checking for updates...');
+    fetchPendingApprovals();
+    console.log('Checking for notification updates...');
 }, 30000); // Check every 30 seconds
 </script>
 {% endblock %}

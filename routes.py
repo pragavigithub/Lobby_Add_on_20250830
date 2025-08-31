@@ -364,6 +364,53 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
+@app.route('/api/notifications/pending-approvals')
+@login_required
+def get_pending_approvals():
+    """API endpoint to get pending approval counts for notifications"""
+    try:
+        from models import SerialNumberTransfer, SerialItemTransfer
+        
+        # Count pending approvals across all modules
+        pending_counts = {}
+        
+        # Inventory Transfers
+        pending_counts['inventory_transfers'] = InventoryTransfer.query.filter_by(status='submitted').count()
+        
+        # GRPOs
+        pending_counts['grpos'] = GRPODocument.query.filter_by(status='submitted').count()
+        
+        # Serial Number Transfers
+        pending_counts['serial_transfers'] = SerialNumberTransfer.query.filter_by(status='submitted').count()
+        
+        # Serial Item Transfers
+        pending_counts['serial_item_transfers'] = SerialItemTransfer.query.filter_by(status='submitted').count()
+        
+        # Invoices
+        pending_counts['invoices'] = InvoiceDocument.query.filter_by(status='pending_qc').count()
+        
+        # Calculate total pending
+        total_pending = sum(pending_counts.values())
+        
+        return jsonify({
+            'success': True,
+            'total_pending': total_pending,
+            'details': pending_counts,
+            'has_pending': total_pending > 0,
+            'message': f'{total_pending} transaction{"s" if total_pending != 1 else ""} pending approval'
+        })
+        
+    except Exception as e:
+        logging.error(f"Error fetching pending approvals: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to fetch pending approvals',
+            'total_pending': 0,
+            'details': {},
+            'has_pending': False,
+            'message': 'Unable to fetch notifications'
+        }), 500
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -2647,9 +2694,9 @@ def complete_count_task(count_id):
     flash('Count task completed successfully', 'success')
     return redirect(url_for('inventory_counting'))
 
-@app.route('/api/pending_approvals')
+@app.route('/api/pending-pick-lists')
 @login_required
-def get_pending_approvals():
+def get_pending_pick_lists():
     if current_user.role not in ['admin', 'manager']:
         return jsonify({'error': 'Unauthorized'}), 403
     
