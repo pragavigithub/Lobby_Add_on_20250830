@@ -273,7 +273,7 @@
                                             <a href="{{ url_for('inventory_transfer.serial_detail', transfer_id=transfer.id) }}" class="btn btn-sm btn-outline-primary">
                                                 <i data-feather="eye"></i> Review
                                             </a>
-                                            <button class="btn btn-sm btn-success" onclick="showSerialTransferApprovalModal({{ transfer.id }}, '{{ transfer.transfer_number }}')">
+                                            <button class="btn btn-sm btn-success" id="approve-serial-{{ transfer.id }}" onclick="showSerialTransferApprovalModal({{ transfer.id }}, '{{ transfer.transfer_number }}')">
                                                 <i data-feather="check"></i> Approve
                                             </button>
                                             <button class="btn btn-sm btn-danger" onclick="showSerialTransferRejectionModal({{ transfer.id }}, '{{ transfer.transfer_number }}')">
@@ -370,7 +370,7 @@
                                             <a href="{{ url_for('serial_item_transfer.detail', transfer_id=transfer.id) }}" class="btn btn-sm btn-outline-primary">
                                                 <i data-feather="eye"></i> Review
                                             </a>
-                                            <button class="btn btn-sm btn-success" onclick="showSerialItemTransferApprovalModal({{ transfer.id }}, '{{ transfer.transfer_number }}')">
+                                            <button class="btn btn-sm btn-success" id="approve-item-{{ transfer.id }}" onclick="showSerialItemTransferApprovalModal({{ transfer.id }}, '{{ transfer.transfer_number }}')">
                                                 <i data-feather="check"></i> Approve
                                             </button>
                                             <button class="btn btn-sm btn-danger" onclick="showSerialItemTransferRejectionModal({{ transfer.id }}, '{{ transfer.transfer_number }}')">
@@ -461,7 +461,7 @@
                                         <a href="{{ url_for('invoice_creation.detail', invoice_id=invoice.id) }}" class="btn btn-sm btn-outline-primary">
                                             <i data-feather="eye"></i> Review
                                         </a>
-                                        <button class="btn btn-sm btn-success" onclick="showInvoiceApprovalModal({{ invoice.id }}, '{{ invoice.invoice_number or ('Invoice-' + invoice.id|string) }}')">
+                                        <button class="btn btn-sm btn-success" id="approve-invoice-{{ invoice.id }}" onclick="showInvoiceApprovalModal({{ invoice.id }}, '{{ invoice.invoice_number or ('Invoice-' + invoice.id|string) }}')">
                                             <i data-feather="check"></i> Approve
                                         </button>
                                         <button class="btn btn-sm btn-danger" onclick="showInvoiceRejectionModal({{ invoice.id }}, '{{ invoice.invoice_number or ('Invoice-' + invoice.id|string) }}')">
@@ -853,7 +853,15 @@ function showTransferRejectionModal(transferId, transferNumber) {
 
 // Serial Number Transfer approval functions
 function showSerialTransferApprovalModal(transferId, transferNumber) {
+    const approveButton = document.getElementById(`approve-serial-${transferId}`);
+    const originalHTML = approveButton.innerHTML;
+    
     if (confirm(`Are you sure you want to approve serial number transfer ${transferNumber}? This will post the transfer to SAP B1.`)) {
+        // Set processing state
+        approveButton.disabled = true;
+        approveButton.innerHTML = '<i data-feather="loader" class="spin"></i> Processing...';
+        feather.replace();
+        
         // Make AJAX call to approve serial transfer
         fetch(`/inventory_transfer/serial/${transferId}/qc_approve`, {
             method: 'POST',
@@ -872,12 +880,21 @@ function showSerialTransferApprovalModal(transferId, transferNumber) {
                 // If there's a redirect, go to it
                 if (data.redirect) {
                     window.location.href = data.redirect;
+                } else {
+                    // Restore button state on error
+                    approveButton.disabled = false;
+                    approveButton.innerHTML = originalHTML;
+                    feather.replace();
                 }
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Error approving serial transfer');
+            // Restore button state on error
+            approveButton.disabled = false;
+            approveButton.innerHTML = originalHTML;
+            feather.replace();
         });
     }
 }
@@ -915,9 +932,17 @@ function showSerialTransferRejectionModal(transferId, transferNumber) {
 
 // Serial Item Transfer approval functions
 function showSerialItemTransferApprovalModal(transferId, transferNumber) {
+    const approveButton = document.getElementById(`approve-item-${transferId}`);
+    const originalHTML = approveButton.innerHTML;
+    
     const shouldPostToSap = confirm(`Serial Item Transfer ${transferNumber}\n\nPost to SAP B1 after approval?\n\nOK = Approve & Post to SAP immediately\nCancel = Approve only (manual SAP posting later)`);
     
     if (confirm(`Are you sure you want to approve serial item transfer ${transferNumber}?`)) {
+        // Set processing state
+        approveButton.disabled = true;
+        approveButton.innerHTML = '<i data-feather="loader" class="spin"></i> Processing...';
+        feather.replace();
+        
         // Make AJAX call to approve serial item transfer
         fetch(`/serial-item-transfer/${transferId}/approve`, {
             method: 'POST',
@@ -961,7 +986,16 @@ function showSerialItemTransferApprovalModal(transferId, transferNumber) {
         .catch(error => {
             console.error('Error:', error);
             alert('Error approving serial item transfer');
+            // Restore button state on error
+            approveButton.disabled = false;
+            approveButton.innerHTML = originalHTML;
+            feather.replace();
         });
+    } else {
+        // User cancelled, restore button state
+        approveButton.disabled = false;
+        approveButton.innerHTML = originalHTML;
+        feather.replace();
     }
 }
 
@@ -1002,7 +1036,15 @@ setInterval(function() {
 
 // Invoice Approval/Rejection Functions
 function showInvoiceApprovalModal(invoiceId, invoiceNumber) {
+    const approveButton = document.getElementById(`approve-invoice-${invoiceId}`);
+    const originalHTML = approveButton.innerHTML;
+    
     const shouldPostToSap = confirm(`Approve Invoice ${invoiceNumber} and post to SAP B1?\n\nClick OK to approve and post to SAP B1, or Cancel to just approve.`);
+    
+    // Set processing state
+    approveButton.disabled = true;
+    approveButton.innerHTML = '<i data-feather="loader" class="spin"></i> Processing...';
+    feather.replace();
     
     // Make AJAX call to approve invoice
     fetch(`/invoice_creation/${invoiceId}/qc_approve`, {
@@ -1019,11 +1061,19 @@ function showInvoiceApprovalModal(invoiceId, invoiceNumber) {
             location.reload();
         } else {
             alert(`❌ Error: ${data.error}`);
+            // Restore button state on error
+            approveButton.disabled = false;
+            approveButton.innerHTML = originalHTML;
+            feather.replace();
         }
     })
     .catch(error => {
         console.error('Error:', error);
         alert('Error approving invoice');
+        // Restore button state on error
+        approveButton.disabled = false;
+        approveButton.innerHTML = originalHTML;
+        feather.replace();
     });
 }
 

@@ -538,12 +538,137 @@ def dashboard():
     pending_invoices = InvoiceDocument.query.filter_by(status='pending_qc').order_by(
         InvoiceDocument.created_at.desc()).all()
 
+    # Calculate Process Analytics Data
+    analytics = {}
+    
+    try:
+        # Serial Number Transfer Analytics
+        serial_transfer_total = SerialNumberTransfer.query.count()
+        serial_transfer_completed = SerialNumberTransfer.query.filter_by(status='qc_approved').count()
+        serial_transfer_pending = SerialNumberTransfer.query.filter_by(status='submitted').count()
+        serial_transfer_success_rate = (serial_transfer_completed * 100 // serial_transfer_total) if serial_transfer_total > 0 else 0
+        
+        # Calculate average processing time for Serial Number Transfers
+        from sqlalchemy import text
+        try:
+            if 'postgresql' in str(db.engine.url).lower():
+                serial_transfer_avg = db.session.execute(text("""
+                    SELECT AVG(
+                        EXTRACT(EPOCH FROM (qc_approved_at - created_at)) / 3600
+                    ) as avg_hours
+                    FROM serial_number_transfers 
+                    WHERE qc_approved_at IS NOT NULL 
+                    AND created_at >= CURRENT_DATE - INTERVAL '30 days'
+                """)).scalar()
+            else:
+                serial_transfer_avg = db.session.execute(text("""
+                    SELECT AVG(
+                        (julianday(qc_approved_at) - julianday(created_at)) * 24
+                    ) as avg_hours
+                    FROM serial_number_transfers 
+                    WHERE qc_approved_at IS NOT NULL 
+                    AND created_at >= date('now', '-30 days')
+                """)).scalar()
+        except:
+            serial_transfer_avg = 0
+        
+        analytics['serial_transfer'] = {
+            'total': serial_transfer_total,
+            'completed': serial_transfer_completed,
+            'pending': serial_transfer_pending,
+            'success_rate': serial_transfer_success_rate,
+            'avg_processing_time': f"{serial_transfer_avg:.1f}h" if serial_transfer_avg else 'N/A'
+        }
+        
+        # Serial Item Transfer Analytics
+        serial_item_total = SerialItemTransfer.query.count()
+        serial_item_completed = SerialItemTransfer.query.filter_by(status='qc_approved').count()
+        serial_item_pending = SerialItemTransfer.query.filter_by(status='submitted').count()
+        serial_item_success_rate = (serial_item_completed * 100 // serial_item_total) if serial_item_total > 0 else 0
+        
+        # Calculate average processing time for Serial Item Transfers
+        try:
+            if 'postgresql' in str(db.engine.url).lower():
+                serial_item_avg = db.session.execute(text("""
+                    SELECT AVG(
+                        EXTRACT(EPOCH FROM (qc_approved_at - created_at)) / 3600
+                    ) as avg_hours
+                    FROM serial_item_transfers 
+                    WHERE qc_approved_at IS NOT NULL 
+                    AND created_at >= CURRENT_DATE - INTERVAL '30 days'
+                """)).scalar()
+            else:
+                serial_item_avg = db.session.execute(text("""
+                    SELECT AVG(
+                        (julianday(qc_approved_at) - julianday(created_at)) * 24
+                    ) as avg_hours
+                    FROM serial_item_transfers 
+                    WHERE qc_approved_at IS NOT NULL 
+                    AND created_at >= date('now', '-30 days')
+                """)).scalar()
+        except:
+            serial_item_avg = 0
+        
+        analytics['serial_item_transfer'] = {
+            'total': serial_item_total,
+            'completed': serial_item_completed,
+            'pending': serial_item_pending,
+            'success_rate': serial_item_success_rate,
+            'avg_processing_time': f"{serial_item_avg:.1f}h" if serial_item_avg else 'N/A'
+        }
+        
+        # Invoice Creation Analytics
+        invoice_total = InvoiceDocument.query.count()
+        invoice_posted = InvoiceDocument.query.filter_by(status='posted').count()
+        invoice_draft = InvoiceDocument.query.filter_by(status='draft').count()
+        invoice_completion_rate = (invoice_posted * 100 // invoice_total) if invoice_total > 0 else 0
+        
+        # Calculate average processing time for Invoice Creation
+        try:
+            if 'postgresql' in str(db.engine.url).lower():
+                invoice_avg = db.session.execute(text("""
+                    SELECT AVG(
+                        EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600
+                    ) as avg_hours
+                    FROM invoice_documents 
+                    WHERE status = 'posted' 
+                    AND created_at >= CURRENT_DATE - INTERVAL '30 days'
+                """)).scalar()
+            else:
+                invoice_avg = db.session.execute(text("""
+                    SELECT AVG(
+                        (julianday(updated_at) - julianday(created_at)) * 24
+                    ) as avg_hours
+                    FROM invoice_documents 
+                    WHERE status = 'posted' 
+                    AND created_at >= date('now', '-30 days')
+                """)).scalar()
+        except:
+            invoice_avg = 0
+        
+        analytics['invoice_creation'] = {
+            'total': invoice_total,
+            'posted': invoice_posted,
+            'draft': invoice_draft,
+            'completion_rate': invoice_completion_rate,
+            'avg_processing_time': f"{invoice_avg:.1f}h" if invoice_avg else 'N/A'
+        }
+        
+    except Exception as e:
+        logging.warning(f"Error calculating analytics: {e}")
+        # Provide default analytics if calculation fails
+        analytics = {
+            'serial_transfer': {'total': 0, 'completed': 0, 'pending': 0, 'success_rate': 0, 'avg_processing_time': 'N/A'},
+            'serial_item_transfer': {'total': 0, 'completed': 0, 'pending': 0, 'success_rate': 0, 'avg_processing_time': 'N/A'},
+            'invoice_creation': {'total': 0, 'posted': 0, 'draft': 0, 'completion_rate': 0, 'avg_processing_time': 'N/A'}
+        }
+
     return render_template('dashboard.html',
                            pending_serial_transfers=pending_serial_transfers,
                            pending_serial_item_transfers=pending_serial_item_transfers,
                            pending_invoices=pending_invoices,
                            pending_count=len(pending_serial_transfers) + len(pending_serial_item_transfers) + len(pending_invoices),
-                           stats=stats, recent_activities=recent_activities)
+                           stats=stats, recent_activities=recent_activities, analytics=analytics)
 
 @app.route('/grpo')
 @login_required
