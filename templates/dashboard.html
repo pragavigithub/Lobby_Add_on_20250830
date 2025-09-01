@@ -199,54 +199,6 @@
 <!--        </div>-->
 <!--    </div>-->
 <!--</div>-->
-
-<!-- Recent Activity -->
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Recent Activity</h5>
-            </div>
-            <div class="card-body">
-                <div class="list-group list-group-flush">
-                    {% if recent_activities %}
-                        {% for activity in recent_activities %}
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>{{ activity.type }}</strong>
-                                <small class="text-muted d-block">{{ activity.description }}</small>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                {% if activity.status == 'draft' %}
-                                    <span class="badge bg-secondary">Draft</span>
-                                {% elif activity.status == 'submitted' %}
-                                    <span class="badge bg-warning text-dark">Submitted</span>
-                                {% elif activity.status == 'qc_approved' or activity.status == 'posted' %}
-                                    <span class="badge bg-success">Completed</span>
-                                {% elif activity.status == 'rejected' %}
-                                    <span class="badge bg-danger">Rejected</span>
-                                {% else %}
-                                    <span class="badge bg-info">{{ activity.status|title }}</span>
-                                {% endif %}
-                                <small class="text-muted">{{ activity.created_at.strftime('%m/%d %H:%M') }}</small>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="list-group-item">
-                            <div class="text-center text-muted py-3">
-                                <i data-feather="activity" class="mb-2"></i>
-                                <p class="mb-0">No recent activity found</p>
-                                <small>Start creating GRPO, transfers, or pick lists to see activity here</small>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Process Analytics Section -->
 <div class="row mt-4">
     <div class="col-12">
@@ -270,7 +222,7 @@
                     <div class="col-lg-4 mb-4">
                         <div class="border rounded p-3">
                             <h6 class="mb-3">
-                                <i data-feather="arrow-right-circle"></i> Serial Number Transfer
+                                <i data-feather="arrow-right-circle"></i> Bulk Transfer
                             </h6>
                             <div class="row text-center mb-3">
                                 <div class="col-4">
@@ -435,6 +387,54 @@
         </div>
     </div>
 </div>
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% if recent_activities %}
+                        {% for activity in recent_activities %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ activity.type }}</strong>
+                                <small class="text-muted d-block">{{ activity.description }}</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                {% if activity.status == 'draft' %}
+                                    <span class="badge bg-secondary">Draft</span>
+                                {% elif activity.status == 'submitted' %}
+                                    <span class="badge bg-warning text-dark">Submitted</span>
+                                {% elif activity.status == 'qc_approved' or activity.status == 'posted' %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% elif activity.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% else %}
+                                    <span class="badge bg-info">{{ activity.status|title }}</span>
+                                {% endif %}
+                                <small class="text-muted">{{ activity.created_at.strftime('%m/%d %H:%M') }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="list-group-item">
+                            <div class="text-center text-muted py-3">
+                                <i data-feather="activity" class="mb-2"></i>
+                                <p class="mb-0">No recent activity found</p>
+                                <small>Start creating GRPO, transfers, or pick lists to see activity here</small>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <!-- Quick Scan Modal -->
 <div class="modal fade" id="quickScanModal" tabindex="-1" aria-labelledby="quickScanModalLabel" aria-hidden="true">
