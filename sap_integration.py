@@ -199,13 +199,13 @@ class SAPIntegration:
                 for bin_data in bins:
                     formatted_bins.append({
                         'BinCode':
-                        bin_data.get('BinCode'),
+                            bin_data.get('BinCode'),
                         'Description':
-                        bin_data.get('Description', ''),
+                            bin_data.get('Description', ''),
                         'Warehouse':
-                        bin_data.get('Warehouse'),
+                            bin_data.get('Warehouse'),
                         'Active':
-                        bin_data.get('Active', 'Y')
+                            bin_data.get('Active', 'Y')
                     })
 
                 return formatted_bins
@@ -321,8 +321,8 @@ class SAPIntegration:
 
             # Step 2: Get warehouse business place info using your exact API pattern
             warehouse_info_url = (f"{self.base_url}/b1s/v1/Warehouses?"
-                                f"$select=BusinessPlaceID,WarehouseCode,DefaultBin&"
-                                f"$filter=WarehouseCode eq '{warehouse_code}'")
+                                  f"$select=BusinessPlaceID,WarehouseCode,DefaultBin&"
+                                  f"$filter=WarehouseCode eq '{warehouse_code}'")
             logging.debug(f"[DEBUG] Calling URL: {warehouse_info_url}")
             warehouse_response = self.session.get(warehouse_info_url)
             logging.debug(f"[DEBUG] Status code: {warehouse_response.status_code}")
@@ -336,14 +336,14 @@ class SAPIntegration:
 
             # Step 3: Get warehouse items using your exact crossjoin API pattern
             crossjoin_url = (f"{self.base_url}/b1s/v1/$crossjoin(Items,Items/ItemWarehouseInfoCollection)?"
-                           f"$expand=Items($select=ItemCode,ItemName,QuantityOnStock),"
-                           f"Items/ItemWarehouseInfoCollection($select=InStock,Ordered,StandardAveragePrice)&"
-                           f"$filter=Items/ItemCode eq Items/ItemWarehouseInfoCollection/ItemCode and "
-                           f"Items/ItemWarehouseInfoCollection/WarehouseCode eq '{warehouse_code}'")
+                             f"$expand=Items($select=ItemCode,ItemName,QuantityOnStock),"
+                             f"Items/ItemWarehouseInfoCollection($select=InStock,Ordered,StandardAveragePrice)&"
+                             f"$filter=Items/ItemCode eq Items/ItemWarehouseInfoCollection/ItemCode and "
+                             f"Items/ItemWarehouseInfoCollection/WarehouseCode eq '{warehouse_code}'")
 
             logging.debug(f"[DEBUG] Calling URL: {crossjoin_url}")
             headers = {"Prefer": "odata.maxpagesize=300"}
-            crossjoin_response = self.session.get(crossjoin_url,headers=headers)
+            crossjoin_response = self.session.get(crossjoin_url, headers=headers)
             logging.debug(f"[DEBUG] Status code: {crossjoin_response.status_code}")
             logging.debug(f"[DEBUG] Response text: {crossjoin_response.text[:300]}")
 
@@ -398,8 +398,10 @@ class SAPIntegration:
                     if batch_details:
                         enhanced_item['BatchCount'] = len(batch_details)
                         enhanced_item['BatchNumbers'] = [b.get('Batch', '') for b in batch_details]
-                        enhanced_item['ExpiryDates'] = [b.get('ExpirationDate') for b in batch_details if b.get('ExpirationDate')]
-                        enhanced_item['AdmissionDates'] = [b.get('AdmissionDate') for b in batch_details if b.get('AdmissionDate')]
+                        enhanced_item['ExpiryDates'] = [b.get('ExpirationDate') for b in batch_details if
+                                                        b.get('ExpirationDate')]
+                        enhanced_item['AdmissionDates'] = [b.get('AdmissionDate') for b in batch_details if
+                                                           b.get('AdmissionDate')]
                         # Use first batch info for main display
                         if batch_details:
                             first_batch = batch_details[0]
@@ -427,7 +429,8 @@ class SAPIntegration:
 
                     formatted_items.append(enhanced_item)
 
-                    logging.debug(f"✅ Enhanced item: {item_code} - OnHand: {enhanced_item['OnHand']}, Batches: {enhanced_item['BatchCount']}")
+                    logging.debug(
+                        f"✅ Enhanced item: {item_code} - OnHand: {enhanced_item['OnHand']}, Batches: {enhanced_item['BatchCount']}")
 
                 except Exception as item_error:
                     logging.error(f"❌ Error processing item: {str(item_error)}")
@@ -538,12 +541,12 @@ class SAPIntegration:
             if item.batch_number:
                 line["BatchNumbers"] = [{
                     "BatchNumber":
-                    item.batch_number,
+                        item.batch_number,
                     "Quantity":
-                    item.received_quantity,
+                        item.received_quantity,
                     "ExpiryDate":
-                    item.expiration_date.strftime('%Y-%m-%d')
-                    if item.expiration_date else None
+                        item.expiration_date.strftime('%Y-%m-%d')
+                        if item.expiration_date else None
                 }]
 
             # Add serial numbers if needed
@@ -560,9 +563,9 @@ class SAPIntegration:
             "DocDate": grpo_document.created_at.strftime('%Y-%m-%d'),
             "DocumentLines": document_lines,
             "Comments":
-            f"Created from WMS GRPO {grpo_document.id} by {grpo_document.user.username}",
+                f"Created from WMS GRPO {grpo_document.id} by {grpo_document.user.username}",
             "U_WMS_GRPO_ID":
-            str(grpo_document.id)  # Custom field to track WMS document
+                str(grpo_document.id)  # Custom field to track WMS document
         }
 
         try:
@@ -958,7 +961,7 @@ class SAPIntegration:
         transfer_data = {
             "DocDate": datetime.now().strftime('%Y-%m-%d'),
             "Comments":
-            f"QC Approved WMS Transfer {transfer_document.id} by {transfer_document.qc_approver.username if transfer_document.qc_approver else 'System'}",
+                f"QC Approved WMS Transfer {transfer_document.id} by {transfer_document.qc_approver.username if transfer_document.qc_approver else 'System'}",
             "FromWarehouse": transfer_document.from_warehouse,
             "ToWarehouse": transfer_document.to_warehouse,
             "StockTransferLines": stock_transfer_lines
@@ -1099,7 +1102,7 @@ class SAPIntegration:
                     'DefaultWarehouse': item_data.get('DefaultWarehouse'),
                     'ItemType': item_data.get('ItemType'),
                     'ManageSerialNumbers':
-                    item_data.get('ManageSerialNumbers'),
+                        item_data.get('ManageSerialNumbers'),
                     'ManageBatchNumbers': item_data.get('ManageBatchNumbers')
                 }
             else:
@@ -1206,7 +1209,8 @@ class SAPIntegration:
                     if has_released_items or not pick_list_lines:  # Include empty pick lists too
                         filtered_pick_lists.append(pick_list)
 
-                logging.info(f"✅ Found {len(filtered_pick_lists)} pick lists with ps_released items (filtered from {len(pick_lists)} total)")
+                logging.info(
+                    f"✅ Found {len(filtered_pick_lists)} pick lists with ps_released items (filtered from {len(pick_lists)} total)")
                 return {
                     'success': True,
                     'pick_lists': filtered_pick_lists,
@@ -1229,7 +1233,7 @@ class SAPIntegration:
                 # Enhanced mock data with warehouse and bin code details
                 mock_pick_list = {
 
-                    }
+                }
 
                 # Return enhanced mock data
                 return {
@@ -1251,7 +1255,8 @@ class SAPIntegration:
                     pick_list = pick_lists[0]
                     # Enhance pick list with bin location details (Warehouse and BinCode)
                     enhanced_pick_list = self.enhance_pick_list_with_bin_details(pick_list)
-                    logging.info(f"✅ Found pick list {absolute_entry} with {len(enhanced_pick_list.get('PickListsLines', []))} line items (enhanced with bin details)")
+                    logging.info(
+                        f"✅ Found pick list {absolute_entry} with {len(enhanced_pick_list.get('PickListsLines', []))} line items (enhanced with bin details)")
                     return {
                         'success': True,
                         'pick_list': enhanced_pick_list
@@ -1328,11 +1333,13 @@ class SAPIntegration:
         try:
             # Clear existing lines and bin allocations - Fix for SQLAlchemy join delete issue
             # First get the IDs of bin allocations to delete
-            pick_list_line_ids = [line.id for line in PickListLine.query.filter_by(pick_list_id=local_pick_list.id).all()]
+            pick_list_line_ids = [line.id for line in
+                                  PickListLine.query.filter_by(pick_list_id=local_pick_list.id).all()]
 
             if pick_list_line_ids:
                 # Delete bin allocations first (foreign key dependency)
-                PickListBinAllocation.query.filter(PickListBinAllocation.pick_list_line_id.in_(pick_list_line_ids)).delete(synchronize_session=False)
+                PickListBinAllocation.query.filter(
+                    PickListBinAllocation.pick_list_line_id.in_(pick_list_line_ids)).delete(synchronize_session=False)
 
                 # Then delete pick list lines
                 PickListLine.query.filter_by(pick_list_id=local_pick_list.id).delete(synchronize_session=False)
@@ -1375,8 +1382,10 @@ class SAPIntegration:
                     pick_list_bin_allocation.pick_list_line_id = pick_list_line.id
                     pick_list_bin_allocation.bin_abs_entry = bin_allocation.get('BinAbsEntry')
                     pick_list_bin_allocation.quantity = float(bin_allocation.get('Quantity', 0))
-                    pick_list_bin_allocation.allow_negative_quantity = bin_allocation.get('AllowNegativeQuantity', 'tNO')
-                    pick_list_bin_allocation.serial_and_batch_numbers_base_line = bin_allocation.get('SerialAndBatchNumbersBaseLine', 0)
+                    pick_list_bin_allocation.allow_negative_quantity = bin_allocation.get('AllowNegativeQuantity',
+                                                                                          'tNO')
+                    pick_list_bin_allocation.serial_and_batch_numbers_base_line = bin_allocation.get(
+                        'SerialAndBatchNumbersBaseLine', 0)
                     pick_list_bin_allocation.base_line_number = bin_allocation.get('BaseLineNumber')
                     db.session.add(pick_list_bin_allocation)
 
@@ -1388,7 +1397,8 @@ class SAPIntegration:
             local_pick_list.picked_items = picked_lines
 
             db.session.commit()
-            logging.info(f"✅ Synced {total_lines} lines and bin allocations for pick list {local_pick_list.absolute_entry}")
+            logging.info(
+                f"✅ Synced {total_lines} lines and bin allocations for pick list {local_pick_list.absolute_entry}")
             return {'success': True, 'synced_lines': total_lines}
 
         except Exception as e:
@@ -2049,9 +2059,9 @@ class SAPIntegration:
         if not po_data:
             return {
                 'success':
-                False,
+                    False,
                 'error':
-                f'Purchase Order {grpo_document.po_number} not found in SAP B1'
+                    f'Purchase Order {grpo_document.po_number} not found in SAP B1'
             }
 
         # Extract required fields from PO with correct date formatting
@@ -2156,17 +2166,17 @@ class SAPIntegration:
 
                 batch_info = {
                     "BatchNumber":
-                    item.batch_number,
+                        item.batch_number,
                     "Quantity":
-                    item.received_quantity,
+                        item.received_quantity,
                     "BaseLineNumber":
-                    line_number,
+                        line_number,
                     "ManufacturerSerialNumber":
-                    getattr(item, 'manufacturer_serial', None) or "MFG-SN-001",
+                        getattr(item, 'manufacturer_serial', None) or "MFG-SN-001",
                     "InternalSerialNumber":
-                    getattr(item, 'internal_serial', None) or "INT-SN-001",
+                        getattr(item, 'internal_serial', None) or "INT-SN-001",
                     "ExpiryDate":
-                    expiry_date
+                        expiry_date
                 }
 
                 line["BatchNumbers"] = [batch_info]
@@ -2177,9 +2187,9 @@ class SAPIntegration:
         if not document_lines:
             return {
                 'success':
-                False,
+                    False,
                 'error':
-                'No approved items found for Purchase Delivery Note creation'
+                    'No approved items found for Purchase Delivery Note creation'
             }
 
         # Build Purchase Delivery Note with EXACT user-specified structure
@@ -2213,15 +2223,15 @@ class SAPIntegration:
                 )
                 return {
                     'success':
-                    True,
+                        True,
                     'document_number':
-                    result.get('DocNum'),
+                        result.get('DocNum'),
                     'doc_entry':
-                    result.get('DocEntry'),
+                        result.get('DocEntry'),
                     'external_reference':
-                    external_ref,
+                        external_ref,
                     'message':
-                    f'Purchase Delivery Note {result.get("DocNum")} created successfully with reference {external_ref}'
+                        f'Purchase Delivery Note {result.get("DocNum")} created successfully with reference {external_ref}'
                 }
             else:
                 error_msg = f"SAP B1 error creating Purchase Delivery Note: {response.text}"
@@ -2256,11 +2266,11 @@ class SAPIntegration:
                 )
                 return {
                     'success':
-                    True,
+                        True,
                     'sap_document_number':
-                    result.get('document_number'),
+                        result.get('document_number'),
                     'message':
-                    f'GRPO posted to SAP B1 as Purchase Delivery Note {result.get("document_number")}'
+                        f'GRPO posted to SAP B1 as Purchase Delivery Note {result.get("document_number")}'
                 }
             else:
                 return {
@@ -2306,7 +2316,8 @@ class SAPIntegration:
 
                 if orders:
                     order = orders[0]
-                    logging.info(f"✅ Found Sales Order DocEntry={doc_entry}: {order.get('CardCode')} - {order.get('CardName')}")
+                    logging.info(
+                        f"✅ Found Sales Order DocEntry={doc_entry}: {order.get('CardCode')} - {order.get('CardName')}")
                     return {
                         'success': True,
                         'sales_order': order
@@ -2478,9 +2489,11 @@ class SAPIntegration:
                                 'LineTotal': order_line.line_total
                             })
 
-                            logging.info(f"✅ Enhanced picklist line {line.get('LineNumber')} with Sales Order data: {order_line.item_code}")
+                            logging.info(
+                                f"✅ Enhanced picklist line {line.get('LineNumber')} with Sales Order data: {order_line.item_code}")
                         else:
-                            logging.warning(f"⚠️ Sales Order line not found: OrderEntry={order_entry}, OrderRowID={order_row_id}")
+                            logging.warning(
+                                f"⚠️ Sales Order line not found: OrderEntry={order_entry}, OrderRowID={order_row_id}")
                     else:
                         logging.warning(f"⚠️ Could not sync Sales Order: OrderEntry={order_entry}")
                 else:
@@ -2496,12 +2509,17 @@ class SAPIntegration:
 
     def validate_series_with_warehouse(self, serial_number, item_code, warehouse_code=None):
         """Validate series against SAP B1 API using SQL Queries for warehouse validation
-        
+
         Args:
             serial_number: The series/serial number to validate
             item_code: The item code to check against
             warehouse_code: Optional warehouse code to check series availability in specific warehouse
         """
+        # results = []
+        # result = self.validate_series_with_warehouse(serial_number, item_code, warehouse_code)
+        # results.append(result)
+
+        print(serial_number + " / " + item_code + " / " + warehouse_code)
         if not self.ensure_logged_in():
             logging.warning("SAP B1 not available, cannot validate series")
             return {
@@ -2568,6 +2586,28 @@ class SAPIntegration:
                 'error': f'Validation error: {str(e)}'
             }
 
+    def validate_series_with_warehouse_bulk(self, series_list):
+        """
+        Validate multiple serial numbers in a loop.
+        series_list = [
+            {"serial_number": "RDM789", "item_code": "RedmiNote4", "warehouse_code": "7000-FG"},
+            {"serial_number": "RDM790", "item_code": "RedmiNote4", "warehouse_code": "7000-FG"},
+            {"serial_number": "RLM791", "item_code": "Realme"}  # no warehouse code
+        ]
+        """
+        results = []
+        for entry in series_list:
+            serial_number = entry.get("serial_number")
+            item_code = entry.get("item_code")
+            warehouse_code = entry.get("warehouse_code")
+
+            result = self.validate_series_with_warehouse(serial_number, item_code, warehouse_code)
+            results.append(result)
+
+            print(f"{serial_number} / {item_code} / {warehouse_code}")
+            print(f"transfer_itemTSTAT (repr) --> {repr(results)}")
+        return results
+
     def validate_batch_series_with_warehouse(self, serial_numbers, item_code, warehouse_code, batch_size=100):
         """Batch validate multiple series against SAP B1 API for improved performance
         
@@ -2593,7 +2633,7 @@ class SAPIntegration:
         try:
             # Process serials in batches to avoid API limits and improve performance
             for i in range(0, total_serials, batch_size):
-                batch = serial_numbers[i:i+batch_size]
+                batch = serial_numbers[i:i + batch_size]
                 batch_results = self._validate_batch_chunk(batch, item_code, warehouse_code)
                 results.update(batch_results)
 
@@ -2667,7 +2707,8 @@ class SAPIntegration:
                         }
 
                         if not available_in_warehouse:
-                            results[serial]['warning'] = f'Series {serial} is not available in warehouse {warehouse_code}'
+                            results[serial][
+                                'warning'] = f'Series {serial} is not available in warehouse {warehouse_code}'
                     else:
                         # Serial not found in SAP
                         results[serial] = {
@@ -2698,7 +2739,6 @@ class SAPIntegration:
                 }
 
         return results
-
 
     def create_serial_number_stock_transfer(self, serial_transfer_document):
         """Create Stock Transfer in SAP B1 for Serial Number Transfer"""

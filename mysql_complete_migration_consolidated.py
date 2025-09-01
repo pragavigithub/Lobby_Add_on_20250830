@@ -95,46 +95,46 @@ class ConsolidatedMySQLMigration:
         """Create all WMS tables in correct order (dependencies first)"""
         
         tables = {
-            # 1. Document Number Series for auto-numbering
-            'document_number_series': '''
-                CREATE TABLE IF NOT EXISTS document_number_series (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    document_type VARCHAR(20) NOT NULL UNIQUE,
-                    prefix VARCHAR(10) NOT NULL,
-                    current_number INT DEFAULT 1,
-                    year_suffix BOOLEAN DEFAULT TRUE,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    INDEX idx_document_type (document_type)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-            ''',
-            
-            # 2. Branches/Locations
-            'branches': '''
-                CREATE TABLE IF NOT EXISTS branches (
-                    id VARCHAR(10) PRIMARY KEY,
-                    name VARCHAR(100),
-                    description VARCHAR(255),
-                    branch_code VARCHAR(10) UNIQUE NOT NULL,
-                    branch_name VARCHAR(100) NOT NULL,
-                    address VARCHAR(255),
-                    city VARCHAR(50),
-                    state VARCHAR(50),
-                    postal_code VARCHAR(20),
-                    country VARCHAR(50),
-                    phone VARCHAR(20),
-                    email VARCHAR(120),
-                    manager_name VARCHAR(100),
-                    warehouse_codes TEXT,
-                    active BOOLEAN DEFAULT TRUE,
-                    is_default BOOLEAN DEFAULT FALSE,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    INDEX idx_branch_code (branch_code),
-                    INDEX idx_active (active)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-            ''',
-            
+            # # 1. Document Number Series for auto-numbering
+            # 'document_number_series': '''
+            #     CREATE TABLE IF NOT EXISTS document_number_series (
+            #         id INT AUTO_INCREMENT PRIMARY KEY,
+            #         document_type VARCHAR(20) NOT NULL UNIQUE,
+            #         prefix VARCHAR(10) NOT NULL,
+            #         current_number INT DEFAULT 1,
+            #         year_suffix BOOLEAN DEFAULT TRUE,
+            #         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            #         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            #         INDEX idx_document_type (document_type)
+            #     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            # ''',
+            #
+            # # 2. Branches/Locations
+            # 'branches': '''
+            #     CREATE TABLE IF NOT EXISTS branches (
+            #         id VARCHAR(10) PRIMARY KEY,
+            #         name VARCHAR(100),
+            #         description VARCHAR(255),
+            #         branch_code VARCHAR(10) UNIQUE NOT NULL,
+            #         branch_name VARCHAR(100) NOT NULL,
+            #         address VARCHAR(255),
+            #         city VARCHAR(50),
+            #         state VARCHAR(50),
+            #         postal_code VARCHAR(20),
+            #         country VARCHAR(50),
+            #         phone VARCHAR(20),
+            #         email VARCHAR(120),
+            #         manager_name VARCHAR(100),
+            #         warehouse_codes TEXT,
+            #         active BOOLEAN DEFAULT TRUE,
+            #         is_default BOOLEAN DEFAULT FALSE,
+            #         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            #         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            #         INDEX idx_branch_code (branch_code),
+            #         INDEX idx_active (active)
+            #     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            # ''',
+            #
             # 3. Users with comprehensive role management
             'users': '''
                 CREATE TABLE IF NOT EXISTS users (
@@ -329,33 +329,33 @@ class ConsolidatedMySQLMigration:
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ''',
             
-            # 10. Additional WMS tables (GRPO, Inventory Transfers, Pick Lists, etc.)
-            'grpo_documents': '''
-                CREATE TABLE IF NOT EXISTS grpo_documents (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    po_number VARCHAR(20) NOT NULL,
-                    sap_document_number VARCHAR(20),
-                    supplier_code VARCHAR(50),
-                    supplier_name VARCHAR(200),
-                    po_date TIMESTAMP NULL,
-                    po_total DECIMAL(15,4),
-                    status VARCHAR(20) DEFAULT 'draft',
-                    user_id INT NOT NULL,
-                    qc_user_id INT,
-                    qc_approved_at TIMESTAMP NULL,
-                    qc_notes TEXT,
-                    notes TEXT,
-                    draft_or_post VARCHAR(10) DEFAULT 'draft',
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(id),
-                    FOREIGN KEY (qc_user_id) REFERENCES users(id),
-                    INDEX idx_po_number (po_number),
-                    INDEX idx_status (status),
-                    INDEX idx_user_id (user_id),
-                    INDEX idx_created_at (created_at)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-            '''
+            # # 10. Additional WMS tables (GRPO, Inventory Transfers, Pick Lists, etc.)
+            # 'grpo_documents': '''
+            #     CREATE TABLE IF NOT EXISTS grpo_documents (
+            #         id INT AUTO_INCREMENT PRIMARY KEY,
+            #         po_number VARCHAR(20) NOT NULL,
+            #         sap_document_number VARCHAR(20),
+            #         supplier_code VARCHAR(50),
+            #         supplier_name VARCHAR(200),
+            #         po_date TIMESTAMP NULL,
+            #         po_total DECIMAL(15,4),
+            #         status VARCHAR(20) DEFAULT 'draft',
+            #         user_id INT NOT NULL,
+            #         qc_user_id INT,
+            #         qc_approved_at TIMESTAMP NULL,
+            #         qc_notes TEXT,
+            #         notes TEXT,
+            #         draft_or_post VARCHAR(10) DEFAULT 'draft',
+            #         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            #         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            #         FOREIGN KEY (user_id) REFERENCES users(id),
+            #         FOREIGN KEY (qc_user_id) REFERENCES users(id),
+            #         INDEX idx_po_number (po_number),
+            #         INDEX idx_status (status),
+            #         INDEX idx_user_id (user_id),
+            #         INDEX idx_created_at (created_at)
+            #     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            # '''
         }
         
         logger.info("Creating database tables...")
