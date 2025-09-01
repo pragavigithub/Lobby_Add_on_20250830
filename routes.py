@@ -372,6 +372,7 @@ def get_pending_approvals():
     """API endpoint to get pending approval counts for notifications"""
     try:
         from models import SerialNumberTransfer, SerialItemTransfer
+        from modules.invoice_creation.models import InvoiceDocument
         
         # Count pending approvals across all modules
         pending_counts = {}
@@ -471,6 +472,39 @@ def dashboard():
                 'description': f"Count: {count.count_name}",
                 'created_at': count.created_at,
                 'status': getattr(count, 'status', 'active')
+            })
+        
+        # Get recent Serial Number Transfers
+        from models import SerialNumberTransfer
+        recent_serial_transfers = SerialNumberTransfer.query.filter_by(user_id=current_user.id).order_by(SerialNumberTransfer.created_at.desc()).limit(5).all()
+        for serial_transfer in recent_serial_transfers:
+            recent_activities.append({
+                'type': 'Serial Number Transfer',
+                'description': f"Transfer: {serial_transfer.transfer_number}",
+                'created_at': serial_transfer.created_at,
+                'status': serial_transfer.status
+            })
+        
+        # Get recent Serial Item Transfers
+        from models import SerialItemTransfer
+        recent_serial_item_transfers = SerialItemTransfer.query.filter_by(user_id=current_user.id).order_by(SerialItemTransfer.created_at.desc()).limit(5).all()
+        for serial_item_transfer in recent_serial_item_transfers:
+            recent_activities.append({
+                'type': 'Serial Item Transfer',
+                'description': f"Transfer: {serial_item_transfer.transfer_number}",
+                'created_at': serial_item_transfer.created_at,
+                'status': serial_item_transfer.status
+            })
+        
+        # Get recent Invoice Creation documents
+        from modules.invoice_creation.models import InvoiceDocument
+        recent_invoices = InvoiceDocument.query.filter_by(user_id=current_user.id).order_by(InvoiceDocument.created_at.desc()).limit(5).all()
+        for invoice in recent_invoices:
+            recent_activities.append({
+                'type': 'Invoice Creation',
+                'description': f"Invoice: {invoice.invoice_number}",
+                'created_at': invoice.created_at,
+                'status': invoice.status
             })
         
         # Sort all activities by creation date and get top 10
@@ -1570,7 +1604,13 @@ def qc_dashboard():
         db.func.date(SerialItemTransfer.qc_approved_at) == today
     ).count()
     
-    rejected_today = rejected_grpos_today + rejected_transfers_today + rejected_serial_transfers_today
+    # Count rejected invoices today
+    rejected_invoices_today = InvoiceDocument.query.filter(
+        InvoiceDocument.status == 'rejected',
+        db.func.date(InvoiceDocument.updated_at) == today
+    ).count()
+    
+    rejected_today = rejected_grpos_today + rejected_transfers_today + rejected_serial_transfers_today + rejected_serial_item_transfers_today + rejected_invoices_today
     
     # Calculate average processing time
     from sqlalchemy import text
@@ -1648,14 +1688,131 @@ def qc_dashboard():
         logging.warning(f"Error calculating transfer average processing time: {e}")
         transfer_avg = 0
     
-    # Calculate overall average
+    # Get average processing time for Serial Number Transfers
+    try:
+        if 'postgresql' in str(db.engine.url).lower():
+            # PostgreSQL syntax
+            serial_transfer_avg = db.session.execute(text("""
+                SELECT AVG(
+                    EXTRACT(EPOCH FROM (qc_approved_at - created_at)) / 3600
+                ) as avg_hours
+                FROM serial_number_transfers 
+                WHERE qc_approved_at IS NOT NULL 
+                AND created_at >= CURRENT_DATE - INTERVAL '7 days'
+            """)).scalar()
+        elif 'mysql' in str(db.engine.url).lower():
+            # MySQL syntax
+            serial_transfer_avg = db.session.execute(text("""
+                SELECT AVG(
+                    TIMESTAMPDIFF(HOUR, created_at, qc_approved_at)
+                ) as avg_hours
+                FROM serial_number_transfers 
+                WHERE qc_approved_at IS NOT NULL 
+                AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+            """)).scalar()
+        else:
+            # SQLite syntax (fallback)
+            serial_transfer_avg = db.session.execute(text("""
+                SELECT AVG(
+                    (julianday(qc_approved_at) - julianday(created_at)) * 24
+                ) as avg_hours
+                FROM serial_number_transfers 
+                WHERE qc_approved_at IS NOT NULL 
+                AND created_at >= date('now', '-7 days')
+            """)).scalar()
+    except Exception as e:
+        logging.warning(f"Error calculating serial transfer average processing time: {e}")
+        serial_transfer_avg = 0
+    
+    # Get average processing time for Serial Item Transfers
+    try:
+        if 'postgresql' in str(db.engine.url).lower():
+            # PostgreSQL syntax
+            serial_item_transfer_avg = db.session.execute(text("""
+                SELECT AVG(
+                    EXTRACT(EPOCH FROM (qc_approved_at - created_at)) / 3600
+                ) as avg_hours
+                FROM serial_item_transfers 
+                WHERE qc_approved_at IS NOT NULL 
+                AND created_at >= CURRENT_DATE - INTERVAL '7 days'
+            """)).scalar()
+        elif 'mysql' in str(db.engine.url).lower():
+            # MySQL syntax
+            serial_item_transfer_avg = db.session.execute(text("""
+                SELECT AVG(
+                    TIMESTAMPDIFF(HOUR, created_at, qc_approved_at)
+                ) as avg_hours
+                FROM serial_item_transfers 
+                WHERE qc_approved_at IS NOT NULL 
+                AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+            """)).scalar()
+        else:
+            # SQLite syntax (fallback)
+            serial_item_transfer_avg = db.session.execute(text("""
+                SELECT AVG(
+                    (julianday(qc_approved_at) - julianday(created_at)) * 24
+                ) as avg_hours
+                FROM serial_item_transfers 
+                WHERE qc_approved_at IS NOT NULL 
+                AND created_at >= date('now', '-7 days')
+            """)).scalar()
+    except Exception as e:
+        logging.warning(f"Error calculating serial item transfer average processing time: {e}")
+        serial_item_transfer_avg = 0
+    
+    # Get average processing time for Invoice Creation
+    try:
+        if 'postgresql' in str(db.engine.url).lower():
+            # PostgreSQL syntax
+            invoice_avg = db.session.execute(text("""
+                SELECT AVG(
+                    EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600
+                ) as avg_hours
+                FROM invoice_documents 
+                WHERE status IN ('posted') 
+                AND created_at >= CURRENT_DATE - INTERVAL '7 days'
+            """)).scalar()
+        elif 'mysql' in str(db.engine.url).lower():
+            # MySQL syntax
+            invoice_avg = db.session.execute(text("""
+                SELECT AVG(
+                    TIMESTAMPDIFF(HOUR, created_at, updated_at)
+                ) as avg_hours
+                FROM invoice_documents 
+                WHERE status IN ('posted') 
+                AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+            """)).scalar()
+        else:
+            # SQLite syntax (fallback)
+            invoice_avg = db.session.execute(text("""
+                SELECT AVG(
+                    (julianday(updated_at) - julianday(created_at)) * 24
+                ) as avg_hours
+                FROM invoice_documents 
+                WHERE status IN ('posted') 
+                AND created_at >= date('now', '-7 days')
+            """)).scalar()
+    except Exception as e:
+        logging.warning(f"Error calculating invoice average processing time: {e}")
+        invoice_avg = 0
+    
+    # Calculate overall average including all modules
     avg_processing_hours = 0
-    if grpo_avg and transfer_avg:
-        avg_processing_hours = (grpo_avg + transfer_avg) / 2
-    elif grpo_avg:
-        avg_processing_hours = grpo_avg
-    elif transfer_avg:
-        avg_processing_hours = transfer_avg
+    valid_averages = []
+    
+    if grpo_avg:
+        valid_averages.append(grpo_avg)
+    if transfer_avg:
+        valid_averages.append(transfer_avg)
+    if serial_transfer_avg:
+        valid_averages.append(serial_transfer_avg)
+    if serial_item_transfer_avg:
+        valid_averages.append(serial_item_transfer_avg)
+    if invoice_avg:
+        valid_averages.append(invoice_avg)
+    
+    if valid_averages:
+        avg_processing_hours = sum(valid_averages) / len(valid_averages)
     
     # Format processing time
     if avg_processing_hours:
@@ -1666,7 +1823,7 @@ def qc_dashboard():
     else:
         avg_processing_time = "N/A"
     
-    rejected_today = rejected_grpos_today + rejected_transfers_today + rejected_serial_transfers_today + rejected_serial_item_transfers_today
+    rejected_today = rejected_grpos_today + rejected_transfers_today + rejected_serial_transfers_today + rejected_serial_item_transfers_today + rejected_invoices_today
     
     return render_template('qc_dashboard.html', 
                          pending_transfers=pending_transfers,

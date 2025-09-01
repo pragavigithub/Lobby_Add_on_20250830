@@ -282,6 +282,9 @@
         console.log('PWA was installed');
     });
 
+    // Initialize notification panel state
+    let notificationPanelVisible = false;
+
     function toggleNotificationPanel() {
     const panel = document.getElementById('notification-panel');
     const badge = document.getElementById('notification-badge');
