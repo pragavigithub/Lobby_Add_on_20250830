@@ -250,191 +250,206 @@
 <!-- Process Analytics Section -->
 <div class="row mt-4">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header">
+        <div class="card border-0 shadow-sm">
+            <!-- Purple Gradient Header -->
+            <div class="card-header border-0 text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px 12px 0 0;">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i data-feather="bar-chart-2"></i> Process Analytics
+                    <h5 class="mb-0 fw-bold">
+                        <i data-feather="bar-chart-2" class="me-2"></i> Process Analytics
                     </h5>
-                    <div class="btn-group btn-group-sm" role="group">
-                        <button type="button" class="btn btn-outline-primary active" data-period="7">7 Days</button>
-                        <button type="button" class="btn btn-outline-primary" data-period="30">30 Days</button>
-                        <button type="button" class="btn btn-outline-primary" data-period="90">90 Days</button>
-                    </div>
+                    <button type="button" class="btn btn-light btn-sm rounded-pill px-3">
+                        7 Days
+                    </button>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <!-- Serial Number Transfer Analytics -->
+            
+            <!-- Analytics Content -->
+            <div class="card-body p-4" style="background-color: #f8f9fb;">
+                <div class="row g-4">
+                    <!-- Serial Number Transfer -->
                     {% if current_user.has_permission('serial_transfer') %}
-                    <div class="col-lg-4 mb-4">
-                        <div class="border rounded p-3">
-                            <h6 class="mb-3">
-                                <i data-feather="arrow-right-circle"></i> Bulk Transfer
-                            </h6>
-                            <div class="row text-center mb-3">
+                    <div class="col-lg-4">
+                        <div class="bg-white rounded-3 p-4 h-100" style="border: 1px solid #e9ecef;">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                    <i data-feather="refresh-cw" class="text-primary" style="width: 24px; height: 24px;"></i>
+                                </div>
+                                <h6 class="mb-0 fw-semibold text-dark">Serial Number Transfer</h6>
+                            </div>
+                            
+                            <div class="row text-center mb-4">
                                 <div class="col-4">
                                     <div class="text-primary">
-                                        <strong id="serial-transfer-total">{{ analytics.serial_transfer.total or 0
-                                            }}</strong>
-                                        <small class="d-block text-muted">Total</small>
+                                        <h4 class="mb-1 fw-bold">{{ analytics.serial_transfer.total or 0 }}</h4>
+                                        <small class="text-muted">Total</small>
                                     </div>
                                 </div>
                                 <div class="col-4">
                                     <div class="text-success">
-                                        <strong id="serial-transfer-completed">{{ analytics.serial_transfer.completed or
-                                            0 }}</strong>
-                                        <small class="d-block text-muted">Completed</small>
+                                        <h4 class="mb-1 fw-bold">{{ analytics.serial_transfer.completed or 0 }}</h4>
+                                        <small class="text-muted">Completed</small>
                                     </div>
                                 </div>
                                 <div class="col-4">
                                     <div class="text-warning">
-                                        <strong id="serial-transfer-pending">{{ analytics.serial_transfer.pending or 0
-                                            }}</strong>
-                                        <small class="d-block text-muted">Pending</small>
+                                        <h4 class="mb-1 fw-bold">{{ analytics.serial_transfer.pending or 0 }}</h4>
+                                        <small class="text-muted">Pending</small>
                                     </div>
                                 </div>
                             </div>
-                            <div class="progress mb-2" style="height: 8px;">
+                            
+                            <!-- Progress Bar -->
+                            <div class="progress mb-3" style="height: 8px; border-radius: 10px;">
                                 {% set total = analytics.serial_transfer.total or 1 %}
                                 {% set completed_pct = (analytics.serial_transfer.completed or 0) * 100 // total %}
-                                {% set pending_pct = (analytics.serial_transfer.pending or 0) * 100 // total %}
-                                <div class="progress-bar bg-success" style="width: {{ completed_pct }}%"></div>
-                                <div class="progress-bar bg-warning" style="width: {{ pending_pct }}%"></div>
+                                <div class="progress-bar bg-success" style="width: {{ completed_pct }}%; border-radius: 10px;"></div>
                             </div>
-                            <small class="text-muted">
-                                Success Rate: <span id="serial-transfer-rate">{{ analytics.serial_transfer.success_rate or '0' }}%</span>
-                            </small>
+                            
+                            <div class="text-center">
+                                <small class="text-muted">Success Rate: <span class="fw-semibold">{{ analytics.serial_transfer.success_rate or '0' }}%</span></small>
+                            </div>
                         </div>
                     </div>
                     {% endif %}
 
-                    <!-- Serial Item Transfer Analytics -->
+                    <!-- Serial Item Transfer -->
                     {% if current_user.has_permission('serial_item_transfer') %}
-                    <div class="col-lg-4 mb-4">
-                        <div class="border rounded p-3">
-                            <h6 class="mb-3">
-                                <i data-feather="move"></i> Serial Transfer
-                            </h6>
-                            <div class="row text-center mb-3">
+                    <div class="col-lg-4">
+                        <div class="bg-white rounded-3 p-4 h-100" style="border: 1px solid #e9ecef;">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                                    <i data-feather="plus" class="text-info" style="width: 24px; height: 24px;"></i>
+                                </div>
+                                <h6 class="mb-0 fw-semibold text-dark">Serial Item Transfer</h6>
+                            </div>
+                            
+                            <div class="row text-center mb-4">
                                 <div class="col-4">
                                     <div class="text-primary">
-                                        <strong id="serial-item-total">{{ analytics.serial_item_transfer.total or 0
-                                            }}</strong>
-                                        <small class="d-block text-muted">Total</small>
+                                        <h4 class="mb-1 fw-bold">{{ analytics.serial_item_transfer.total or 0 }}</h4>
+                                        <small class="text-muted">Total</small>
                                     </div>
                                 </div>
                                 <div class="col-4">
                                     <div class="text-success">
-                                        <strong id="serial-item-completed">{{ analytics.serial_item_transfer.completed
-                                            or 0 }}</strong>
-                                        <small class="d-block text-muted">Completed</small>
+                                        <h4 class="mb-1 fw-bold">{{ analytics.serial_item_transfer.completed or 0 }}</h4>
+                                        <small class="text-muted">Completed</small>
                                     </div>
                                 </div>
                                 <div class="col-4">
                                     <div class="text-warning">
-                                        <strong id="serial-item-pending">{{ analytics.serial_item_transfer.pending or 0
-                                            }}</strong>
-                                        <small class="d-block text-muted">Pending</small>
+                                        <h4 class="mb-1 fw-bold">{{ analytics.serial_item_transfer.pending or 0 }}</h4>
+                                        <small class="text-muted">Pending</small>
                                     </div>
                                 </div>
                             </div>
-                            <div class="progress mb-2" style="height: 8px;">
+                            
+                            <!-- Progress Bar -->
+                            <div class="progress mb-3" style="height: 8px; border-radius: 10px;">
                                 {% set total = analytics.serial_item_transfer.total or 1 %}
                                 {% set completed_pct = (analytics.serial_item_transfer.completed or 0) * 100 // total %}
-                                {% set pending_pct = (analytics.serial_item_transfer.pending or 0) * 100 // total %}
-                                <div class="progress-bar bg-success" style="width: {{ completed_pct }}%"></div>
-                                <div class="progress-bar bg-warning" style="width: {{ pending_pct }}%"></div>
+                                <div class="progress-bar bg-success" style="width: {{ completed_pct }}%; border-radius: 10px;"></div>
                             </div>
-                            <small class="text-muted">
-                                Success Rate: <span id="serial-item-rate">{{ analytics.serial_item_transfer.success_rate or '0' }}%</span>
-                            </small>
+                            
+                            <div class="text-center">
+                                <small class="text-muted">Success Rate: <span class="fw-semibold">{{ analytics.serial_item_transfer.success_rate or '0' }}%</span></small>
+                            </div>
                         </div>
                     </div>
                     {% endif %}
 
-                    <!-- Invoice Creation Analytics -->
+                    <!-- Invoice Creation -->
                     {% if current_user.has_permission('invoice_creation') %}
-                    <div class="col-lg-4 mb-4">
-                        <div class="border rounded p-3">
-                            <h6 class="mb-3">
-                                <i data-feather="file-text"></i> Invoice Creation
-                            </h6>
-                            <div class="row text-center mb-3">
+                    <div class="col-lg-4">
+                        <div class="bg-white rounded-3 p-4 h-100" style="border: 1px solid #e9ecef;">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                    <i data-feather="file-text" class="text-success" style="width: 24px; height: 24px;"></i>
+                                </div>
+                                <h6 class="mb-0 fw-semibold text-dark">Invoice Creation</h6>
+                            </div>
+                            
+                            <div class="row text-center mb-4">
                                 <div class="col-4">
                                     <div class="text-primary">
-                                        <strong id="invoice-total">{{ analytics.invoice_creation.total or 0 }}</strong>
-                                        <small class="d-block text-muted">Total</small>
+                                        <h4 class="mb-1 fw-bold">{{ analytics.invoice_creation.total or 0 }}</h4>
+                                        <small class="text-muted">Total</small>
                                     </div>
                                 </div>
                                 <div class="col-4">
                                     <div class="text-success">
-                                        <strong id="invoice-posted">{{ analytics.invoice_creation.posted or 0
-                                            }}</strong>
-                                        <small class="d-block text-muted">Posted</small>
+                                        <h4 class="mb-1 fw-bold">{{ analytics.invoice_creation.posted or 0 }}</h4>
+                                        <small class="text-muted">Posted</small>
                                     </div>
                                 </div>
                                 <div class="col-4">
                                     <div class="text-warning">
-                                        <strong id="invoice-draft">{{ analytics.invoice_creation.draft or 0 }}</strong>
-                                        <small class="d-block text-muted">Draft</small>
+                                        <h4 class="mb-1 fw-bold">{{ analytics.invoice_creation.draft or 0 }}</h4>
+                                        <small class="text-muted">Draft</small>
                                     </div>
                                 </div>
                             </div>
-                            <div class="progress mb-2" style="height: 8px;">
+                            
+                            <!-- Progress Bar -->
+                            <div class="progress mb-3" style="height: 8px; border-radius: 10px;">
                                 {% set total = analytics.invoice_creation.total or 1 %}
                                 {% set posted_pct = (analytics.invoice_creation.posted or 0) * 100 // total %}
-                                {% set draft_pct = (analytics.invoice_creation.draft or 0) * 100 // total %}
-                                <div class="progress-bar bg-success" style="width: {{ posted_pct }}%"></div>
-                                <div class="progress-bar bg-warning" style="width: {{ draft_pct }}%"></div>
+                                <div class="progress-bar bg-success" style="width: {{ posted_pct }}%; border-radius: 10px;"></div>
                             </div>
-                            <small class="text-muted">
-                                Completion Rate: <span id="invoice-rate">{{ analytics.invoice_creation.completion_rate or '0' }}%</span>
-                            </small>
+                            
+                            <div class="text-center">
+                                <small class="text-muted">Completion Rate: <span class="fw-semibold">{{ analytics.invoice_creation.completion_rate or '0' }}%</span></small>
+                            </div>
                         </div>
                     </div>
                     {% endif %}
                 </div>
-
-                <!-- Average Processing Time -->
-                <div class="row mt-3">
+                
+                <!-- Average Processing Time Section -->
+                <div class="row mt-4">
                     <div class="col-12">
-                        <div class="alert alert-light">
-                            <div class="row text-center">
-                                {% if current_user.has_permission('serial_transfer') %}
-                                <div class="col-md-4">
-                                    <div>
-                                        <i data-feather="clock" class="text-primary"></i>
-                                        <strong class="ms-2">Serial Number Transfer</strong>
-                                        <div class="text-muted mt-1">
-                                            Avg Time: <span id="serial-transfer-avg-time">{{ analytics.serial_transfer.avg_processing_time or 'N/A' }}</span>
-                                        </div>
+                        <div class="row text-center">
+                            {% if current_user.has_permission('serial_transfer') %}
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i data-feather="clock" class="text-primary" style="width: 20px; height: 20px;"></i>
+                                    </div>
+                                    <div class="text-start">
+                                        <div class="fw-semibold text-dark">Serial Number Transfer</div>
+                                        <small class="text-muted">Avg Time: {{ analytics.serial_transfer.avg_processing_time or 'N/A' }}</small>
                                     </div>
                                 </div>
-                                {% endif %}
-                                {% if current_user.has_permission('serial_item_transfer') %}
-                                <div class="col-md-4">
-                                    <div>
-                                        <i data-feather="clock" class="text-primary"></i>
-                                        <strong class="ms-2">Serial Item Transfer</strong>
-                                        <div class="text-muted mt-1">
-                                            Avg Time: <span id="serial-item-avg-time">{{ analytics.serial_item_transfer.avg_processing_time or 'N/A' }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                                {% if current_user.has_permission('invoice_creation') %}
-                                <div class="col-md-4">
-                                    <div>
-                                        <i data-feather="clock" class="text-primary"></i>
-                                        <strong class="ms-2">Invoice Creation</strong>
-                                        <div class="text-muted mt-1">
-                                            Avg Time: <span id="invoice-avg-time">{{ analytics.invoice_creation.avg_processing_time or 'N/A' }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
                             </div>
+                            {% endif %}
+                            
+                            {% if current_user.has_permission('serial_item_transfer') %}
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i data-feather="clock" class="text-primary" style="width: 20px; height: 20px;"></i>
+                                    </div>
+                                    <div class="text-start">
+                                        <div class="fw-semibold text-dark">Serial Item Transfer</div>
+                                        <small class="text-muted">Avg Time: {{ analytics.serial_item_transfer.avg_processing_time or 'N/A' }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if current_user.has_permission('invoice_creation') %}
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i data-feather="clock" class="text-primary" style="width: 20px; height: 20px;"></i>
+                                    </div>
+                                    <div class="text-start">
+                                        <div class="fw-semibold text-dark">Invoice Creation</div>
+                                        <small class="text-muted">Avg Time: {{ analytics.invoice_creation.avg_processing_time or 'N/A' }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
