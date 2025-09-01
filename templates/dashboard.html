@@ -8,58 +8,58 @@
         <h1>Welcome, {{ current_user.first_name }}!</h1>
         <p class="text-muted">{{ current_user.role|title }} </p>
     </div>
-<!--    <div class="col-4 text-right">-->
-<!--        &lt;!&ndash; Notification Dashboard &ndash;&gt;-->
-<!--        <div id="notification-panel" class="alert alert-info" style="display: none;">-->
-<!--            <div class="d-flex align-items-center">-->
-<!--                <i data-feather="bell" class="me-2" style="width: 24px; height: 24px;"></i>-->
-<!--                <div>-->
-<!--                    <strong>Pending Approvals</strong>-->
-<!--                    <div id="notification-message" class="small"></div>-->
-<!--                    <div class="small text-muted" id="notification-details"></div>-->
-<!--                </div>-->
-<!--                <button class="btn btn-sm btn-primary ms-auto" onclick="window.location.href='/qc_dashboard'">-->
-<!--                    View QC Dashboard-->
-<!--                </button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        -->
-<!--        &lt;!&ndash; Notification Badge (shown when collapsed) &ndash;&gt;-->
-<!--        <div id="notification-badge" class="position-relative d-inline-block" style="cursor: pointer;" onclick="toggleNotificationPanel()">-->
-<!--            <i data-feather="bell" style="width: 32px; height: 32px; color: #007bff;"></i>-->
-<!--            <span id="notification-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">-->
-<!--                0-->
-<!--            </span>-->
-<!--        </div>-->
-<!--    </div>-->
+    <!--    <div class="col-4 text-right">-->
+    <!--        &lt;!&ndash; Notification Dashboard &ndash;&gt;-->
+    <!--        <div id="notification-panel" class="alert alert-info" style="display: none;">-->
+    <!--            <div class="d-flex align-items-center">-->
+    <!--                <i data-feather="bell" class="me-2" style="width: 24px; height: 24px;"></i>-->
+    <!--                <div>-->
+    <!--                    <strong>Pending Approvals</strong>-->
+    <!--                    <div id="notification-message" class="small"></div>-->
+    <!--                    <div class="small text-muted" id="notification-details"></div>-->
+    <!--                </div>-->
+    <!--                <button class="btn btn-sm btn-primary ms-auto" onclick="window.location.href='/qc_dashboard'">-->
+    <!--                    View QC Dashboard-->
+    <!--                </button>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--        -->
+    <!--        &lt;!&ndash; Notification Badge (shown when collapsed) &ndash;&gt;-->
+    <!--        <div id="notification-badge" class="position-relative d-inline-block" style="cursor: pointer;" onclick="toggleNotificationPanel()">-->
+    <!--            <i data-feather="bell" style="width: 32px; height: 32px; color: #007bff;"></i>-->
+    <!--            <span id="notification-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">-->
+    <!--                0-->
+    <!--            </span>-->
+    <!--        </div>-->
+    <!--    </div>-->
 </div>
 
 <!-- Statistics Cards -->
 <div class="row mb-4">
-<!--    {% if current_user.has_permission('grpo') %}-->
-<!--    <div class="col-md-3 col-sm-6 mb-3">-->
-<!--        <div class="card dashboard-card" data-url="{{ url_for('grpo') }}">-->
-<!--            <div class="card-body text-center">-->
-<!--                <i data-feather="package" class="mb-3" style="width: 48px; height: 48px;"></i>-->
-<!--                <h3>{{ stats.grpo_count }}</h3>-->
-<!--                <p>GRN Documents</p>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    {% endif %}-->
+    <!--    {% if current_user.has_permission('grpo') %}-->
+    <!--    <div class="col-md-3 col-sm-6 mb-3">-->
+    <!--        <div class="card dashboard-card" data-url="{{ url_for('grpo') }}">-->
+    <!--            <div class="card-body text-center">-->
+    <!--                <i data-feather="package" class="mb-3" style="width: 48px; height: 48px;"></i>-->
+    <!--                <h3>{{ stats.grpo_count }}</h3>-->
+    <!--                <p>GRN Documents</p>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--    {% endif %}-->
 
-    
-<!--    {% if current_user.has_permission('inventory_transfer') %}-->
-<!--    <div class="col-md-3 col-sm-6 mb-3">-->
-<!--        <div class="card dashboard-card" data-url="{{ url_for('inventory_transfer') }}">-->
-<!--            <div class="card-body text-center">-->
-<!--                <i data-feather="move" class="mb-3" style="width: 48px; height: 48px;"></i>-->
-<!--                <h3>{{ stats.transfer_count }}</h3>-->
-<!--                <p>Inventory Transfers</p>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    {% endif %}-->
+
+    <!--    {% if current_user.has_permission('inventory_transfer') %}-->
+    <!--    <div class="col-md-3 col-sm-6 mb-3">-->
+    <!--        <div class="card dashboard-card" data-url="{{ url_for('inventory_transfer') }}">-->
+    <!--            <div class="card-body text-center">-->
+    <!--                <i data-feather="move" class="mb-3" style="width: 48px; height: 48px;"></i>-->
+    <!--                <h3>{{ stats.transfer_count }}</h3>-->
+    <!--                <p>Inventory Transfers</p>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--    {% endif %}-->
 
     {% if current_user.has_permission('serial_item_transfer') %}
     <div class="col-md-2 col-sm-6 mb-3">
@@ -71,7 +71,7 @@
         </div>
     </div>
     {% endif %}
-    
+
     {% if current_user.has_permission('serial_transfer') %}
     <div class="col-md-2 col-sm-6 mb-3">
         <div class="card dashboard-card" data-url="{{ url_for('inventory_transfer.serial_index') }}">
@@ -103,7 +103,7 @@
         </div>
     </div>
     {% endif %}
-    
+
     {% if current_user.has_permission('user_management') %}
     <div class="col-md-2 col-sm-6 mb-3">
         <div class="card dashboard-card" data-url="{{ url_for('user_management') }}">
@@ -115,30 +115,30 @@
     </div>
     {% endif %}
 
-    
-<!--    {% if current_user.has_permission('pick_list') %}-->
-<!--    <div class="col-md-3 col-sm-6 mb-3">-->
-<!--        <div class="card dashboard-card" data-url="{{ url_for('pick_list') }}">-->
-<!--            <div class="card-body text-center">-->
-<!--                <i data-feather="list" class="mb-3" style="width: 48px; height: 48px;"></i>-->
-<!--                <h3>{{ stats.pick_list_count }}</h3>-->
-<!--                <p>Pick Lists</p>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    {% endif %}-->
-<!--    -->
-<!--    {% if current_user.has_permission('inventory_counting') %}-->
-<!--    <div class="col-md-3 col-sm-6 mb-3">-->
-<!--        <div class="card dashboard-card" data-url="{{ url_for('inventory_counting') }}">-->
-<!--            <div class="card-body text-center">-->
-<!--                <i data-feather="check-square" class="mb-3" style="width: 48px; height: 48px;"></i>-->
-<!--                <h3>{{ stats.count_tasks }}</h3>-->
-<!--                <p>Count Tasks</p>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    {% endif %}-->
+
+    <!--    {% if current_user.has_permission('pick_list') %}-->
+    <!--    <div class="col-md-3 col-sm-6 mb-3">-->
+    <!--        <div class="card dashboard-card" data-url="{{ url_for('pick_list') }}">-->
+    <!--            <div class="card-body text-center">-->
+    <!--                <i data-feather="list" class="mb-3" style="width: 48px; height: 48px;"></i>-->
+    <!--                <h3>{{ stats.pick_list_count }}</h3>-->
+    <!--                <p>Pick Lists</p>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--    {% endif %}-->
+    <!--    -->
+    <!--    {% if current_user.has_permission('inventory_counting') %}-->
+    <!--    <div class="col-md-3 col-sm-6 mb-3">-->
+    <!--        <div class="card dashboard-card" data-url="{{ url_for('inventory_counting') }}">-->
+    <!--            <div class="card-body text-center">-->
+    <!--                <i data-feather="check-square" class="mb-3" style="width: 48px; height: 48px;"></i>-->
+    <!--                <h3>{{ stats.count_tasks }}</h3>-->
+    <!--                <p>Count Tasks</p>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--    {% endif %}-->
 </div>
 
 <!-- Quick Actions -->
@@ -199,6 +199,54 @@
 <!--        </div>-->
 <!--    </div>-->
 <!--</div>-->
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% if recent_activities %}
+                    {% for activity in recent_activities %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ activity.type }}</strong>
+                            <small class="text-muted d-block">{{ activity.description }}</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            {% if activity.status == 'draft' %}
+                            <span class="badge bg-secondary">Draft</span>
+                            {% elif activity.status == 'submitted' %}
+                            <span class="badge bg-warning text-dark">Submitted</span>
+                            {% elif activity.status == 'qc_approved' or activity.status == 'posted' %}
+                            <span class="badge bg-success">Completed</span>
+                            {% elif activity.status == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                            {% else %}
+                            <span class="badge bg-info">{{ activity.status|title }}</span>
+                            {% endif %}
+                            <small class="text-muted">{{ activity.created_at.strftime('%m/%d %H:%M') }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="list-group-item">
+                        <div class="text-center text-muted py-3">
+                            <i data-feather="activity" class="mb-2"></i>
+                            <p class="mb-0">No recent activity found</p>
+                            <small>Start creating GRPO, transfers, or pick lists to see activity here</small>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Process Analytics Section -->
 <div class="row mt-4">
     <div class="col-12">
@@ -227,19 +275,22 @@
                             <div class="row text-center mb-3">
                                 <div class="col-4">
                                     <div class="text-primary">
-                                        <strong id="serial-transfer-total">{{ analytics.serial_transfer.total or 0 }}</strong>
+                                        <strong id="serial-transfer-total">{{ analytics.serial_transfer.total or 0
+                                            }}</strong>
                                         <small class="d-block text-muted">Total</small>
                                     </div>
                                 </div>
                                 <div class="col-4">
                                     <div class="text-success">
-                                        <strong id="serial-transfer-completed">{{ analytics.serial_transfer.completed or 0 }}</strong>
+                                        <strong id="serial-transfer-completed">{{ analytics.serial_transfer.completed or
+                                            0 }}</strong>
                                         <small class="d-block text-muted">Completed</small>
                                     </div>
                                 </div>
                                 <div class="col-4">
                                     <div class="text-warning">
-                                        <strong id="serial-transfer-pending">{{ analytics.serial_transfer.pending or 0 }}</strong>
+                                        <strong id="serial-transfer-pending">{{ analytics.serial_transfer.pending or 0
+                                            }}</strong>
                                         <small class="d-block text-muted">Pending</small>
                                     </div>
                                 </div>
@@ -263,24 +314,27 @@
                     <div class="col-lg-4 mb-4">
                         <div class="border rounded p-3">
                             <h6 class="mb-3">
-                                <i data-feather="move"></i> Serial Item Transfer
+                                <i data-feather="move"></i> Serial Transfer
                             </h6>
                             <div class="row text-center mb-3">
                                 <div class="col-4">
                                     <div class="text-primary">
-                                        <strong id="serial-item-total">{{ analytics.serial_item_transfer.total or 0 }}</strong>
+                                        <strong id="serial-item-total">{{ analytics.serial_item_transfer.total or 0
+                                            }}</strong>
                                         <small class="d-block text-muted">Total</small>
                                     </div>
                                 </div>
                                 <div class="col-4">
                                     <div class="text-success">
-                                        <strong id="serial-item-completed">{{ analytics.serial_item_transfer.completed or 0 }}</strong>
+                                        <strong id="serial-item-completed">{{ analytics.serial_item_transfer.completed
+                                            or 0 }}</strong>
                                         <small class="d-block text-muted">Completed</small>
                                     </div>
                                 </div>
                                 <div class="col-4">
                                     <div class="text-warning">
-                                        <strong id="serial-item-pending">{{ analytics.serial_item_transfer.pending or 0 }}</strong>
+                                        <strong id="serial-item-pending">{{ analytics.serial_item_transfer.pending or 0
+                                            }}</strong>
                                         <small class="d-block text-muted">Pending</small>
                                     </div>
                                 </div>
@@ -315,7 +369,8 @@
                                 </div>
                                 <div class="col-4">
                                     <div class="text-success">
-                                        <strong id="invoice-posted">{{ analytics.invoice_creation.posted or 0 }}</strong>
+                                        <strong id="invoice-posted">{{ analytics.invoice_creation.posted or 0
+                                            }}</strong>
                                         <small class="d-block text-muted">Posted</small>
                                     </div>
                                 </div>
@@ -387,54 +442,6 @@
         </div>
     </div>
 </div>
-<!-- Recent Activity -->
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Recent Activity</h5>
-            </div>
-            <div class="card-body">
-                <div class="list-group list-group-flush">
-                    {% if recent_activities %}
-                        {% for activity in recent_activities %}
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>{{ activity.type }}</strong>
-                                <small class="text-muted d-block">{{ activity.description }}</small>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                {% if activity.status == 'draft' %}
-                                    <span class="badge bg-secondary">Draft</span>
-                                {% elif activity.status == 'submitted' %}
-                                    <span class="badge bg-warning text-dark">Submitted</span>
-                                {% elif activity.status == 'qc_approved' or activity.status == 'posted' %}
-                                    <span class="badge bg-success">Completed</span>
-                                {% elif activity.status == 'rejected' %}
-                                    <span class="badge bg-danger">Rejected</span>
-                                {% else %}
-                                    <span class="badge bg-info">{{ activity.status|title }}</span>
-                                {% endif %}
-                                <small class="text-muted">{{ activity.created_at.strftime('%m/%d %H:%M') }}</small>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="list-group-item">
-                            <div class="text-center text-muted py-3">
-                                <i data-feather="activity" class="mb-2"></i>
-                                <p class="mb-0">No recent activity found</p>
-                                <small>Start creating GRPO, transfers, or pick lists to see activity here</small>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 
 <!-- Quick Scan Modal -->
 <div class="modal fade" id="quickScanModal" tabindex="-1" aria-labelledby="quickScanModalLabel" aria-hidden="true">
@@ -469,123 +476,123 @@
 
 {% block scripts %}
 <script>
-function startQuickScan() {
-    const modal = new bootstrap.Modal(document.getElementById('quickScanModal'));
-    modal.show();
-    
-    modal._element.addEventListener('shown.bs.modal', function () {
-        const video = document.getElementById('quickScanVideo');
-        startBarcodeScanner('quickScanVideo', function(code) {
-            document.getElementById('scannedCode').textContent = code;
-            document.getElementById('quickScanResult').style.display = 'block';
-            document.getElementById('quickScanInput').value = code;
-        });
-    });
-    
-    modal._element.addEventListener('hidden.bs.modal', function () {
-        stopBarcodeScanner();
-    });
-}
+    function startQuickScan() {
+        const modal = new bootstrap.Modal(document.getElementById('quickScanModal'));
+        modal.show();
 
-function processQuickScan() {
-    const code = document.getElementById('quickScanInput').value;
-    if (code) {
-        // Determine what to do with the scanned code
-        if (code.startsWith('PO-')) {
-            window.location.href = '/grpo';
-        } else if (code.startsWith('IT-')) {
-            window.location.href = '/inventory_transfer';
-        } else if (code.startsWith('PL-')) {
-            window.location.href = '/pick_list';
-        } else {
-            // Generic item scan
-            window.location.href = '/bin_scanning';
+        modal._element.addEventListener('shown.bs.modal', function () {
+            const video = document.getElementById('quickScanVideo');
+            startBarcodeScanner('quickScanVideo', function(code) {
+                document.getElementById('scannedCode').textContent = code;
+                document.getElementById('quickScanResult').style.display = 'block';
+                document.getElementById('quickScanInput').value = code;
+            });
+        });
+
+        modal._element.addEventListener('hidden.bs.modal', function () {
+            stopBarcodeScanner();
+        });
+    }
+
+    function processQuickScan() {
+        const code = document.getElementById('quickScanInput').value;
+        if (code) {
+            // Determine what to do with the scanned code
+            if (code.startsWith('PO-')) {
+                window.location.href = '/grpo';
+            } else if (code.startsWith('IT-')) {
+                window.location.href = '/inventory_transfer';
+            } else if (code.startsWith('PL-')) {
+                window.location.href = '/pick_list';
+            } else {
+                // Generic item scan
+                window.location.href = '/bin_scanning';
+            }
         }
     }
-}
 
-// Handle manual input
-document.getElementById('quickScanInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        processQuickScan();
+    // Handle manual input
+    document.getElementById('quickScanInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            processQuickScan();
+        }
+    });
+
+    // Notification System
+    let notificationPanelVisible = false;
+
+    function toggleNotificationPanel() {
+        const panel = document.getElementById('notification-panel');
+        const badge = document.getElementById('notification-badge');
+
+        if (notificationPanelVisible) {
+            panel.style.display = 'none';
+            badge.style.display = 'inline-block';
+            notificationPanelVisible = false;
+        } else {
+            panel.style.display = 'block';
+            badge.style.display = 'none';
+            notificationPanelVisible = true;
+        }
     }
-});
 
-// Notification System
-let notificationPanelVisible = false;
+    function fetchPendingApprovals() {
+        fetch('/api/notifications/pending-approvals')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.has_pending) {
+                    // Show notification badge
+                    const badge = document.getElementById('notification-count');
+                    const message = document.getElementById('notification-message');
+                    const details = document.getElementById('notification-details');
 
-function toggleNotificationPanel() {
-    const panel = document.getElementById('notification-panel');
-    const badge = document.getElementById('notification-badge');
-    
-    if (notificationPanelVisible) {
-        panel.style.display = 'none';
-        badge.style.display = 'inline-block';
-        notificationPanelVisible = false;
-    } else {
-        panel.style.display = 'block';
-        badge.style.display = 'none';
-        notificationPanelVisible = true;
+                    badge.textContent = data.total_pending;
+                    badge.style.display = 'inline';
+
+                    message.textContent = data.message;
+
+                    // Build details string
+                    const detailsArray = [];
+                    if (data.details.invoices > 0) {
+                        detailsArray.push(`${data.details.invoices} Invoice${data.details.invoices > 1 ? 's' : ''}`);
+                    }
+                    if (data.details.inventory_transfers > 0) {
+                        detailsArray.push(`${data.details.inventory_transfers} Transfer${data.details.inventory_transfers > 1 ? 's' : ''}`);
+                    }
+                    if (data.details.grpos > 0) {
+                        detailsArray.push(`${data.details.grpos} GRPO${data.details.grpos > 1 ? 's' : ''}`);
+                    }
+                    if (data.details.serial_transfers > 0) {
+                        detailsArray.push(`${data.details.serial_transfers} Serial Transfer${data.details.serial_transfers > 1 ? 's' : ''}`);
+                    }
+                    if (data.details.serial_item_transfers > 0) {
+                        detailsArray.push(`${data.details.serial_item_transfers} Serial Item${data.details.serial_item_transfers > 1 ? 's' : ''}`);
+                    }
+
+                    details.textContent = detailsArray.join(', ');
+
+                    console.log('Pending approvals:', data.total_pending);
+                } else {
+                    // Hide notification badge
+                    const badge = document.getElementById('notification-count');
+                    badge.style.display = 'none';
+                    console.log('No pending approvals');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching notifications:', error);
+            });
     }
-}
 
-function fetchPendingApprovals() {
-    fetch('/api/notifications/pending-approvals')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success && data.has_pending) {
-                // Show notification badge
-                const badge = document.getElementById('notification-count');
-                const message = document.getElementById('notification-message');
-                const details = document.getElementById('notification-details');
-                
-                badge.textContent = data.total_pending;
-                badge.style.display = 'inline';
-                
-                message.textContent = data.message;
-                
-                // Build details string
-                const detailsArray = [];
-                if (data.details.invoices > 0) {
-                    detailsArray.push(`${data.details.invoices} Invoice${data.details.invoices > 1 ? 's' : ''}`);
-                }
-                if (data.details.inventory_transfers > 0) {
-                    detailsArray.push(`${data.details.inventory_transfers} Transfer${data.details.inventory_transfers > 1 ? 's' : ''}`);
-                }
-                if (data.details.grpos > 0) {
-                    detailsArray.push(`${data.details.grpos} GRPO${data.details.grpos > 1 ? 's' : ''}`);
-                }
-                if (data.details.serial_transfers > 0) {
-                    detailsArray.push(`${data.details.serial_transfers} Serial Transfer${data.details.serial_transfers > 1 ? 's' : ''}`);
-                }
-                if (data.details.serial_item_transfers > 0) {
-                    detailsArray.push(`${data.details.serial_item_transfers} Serial Item${data.details.serial_item_transfers > 1 ? 's' : ''}`);
-                }
-                
-                details.textContent = detailsArray.join(', ');
-                
-                console.log('Pending approvals:', data.total_pending);
-            } else {
-                // Hide notification badge
-                const badge = document.getElementById('notification-count');
-                badge.style.display = 'none';
-                console.log('No pending approvals');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching notifications:', error);
-        });
-}
+    // Load notifications on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchPendingApprovals();
+    });
 
-// Load notifications on page load
-document.addEventListener('DOMContentLoaded', function() {
-    fetchPendingApprovals();
-});
-
-// Update notifications periodically
-setInterval(function() {
-    fetchPendingApprovals();
-    console.log('Checking for notification updates...');
-}, 30000); // Check every 30 seconds
+    // Update notifications periodically
+    setInterval(function() {
+        fetchPendingApprovals();
+        console.log('Checking for notification updates...');
+    }, 30000); // Check every 30 seconds
 </script>
 {% endblock %}
